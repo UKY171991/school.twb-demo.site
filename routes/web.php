@@ -18,11 +18,25 @@ Route::get('/dashboard', function () {
 // Super Admin Routes
 Route::middleware(['auth', 'role:super-admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('schools', \App\Http\Controllers\SuperAdmin\SchoolController::class);
+    Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
 });
 
 // School Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
+    Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class);
+    Route::resource('classes', \App\Http\Controllers\Admin\ClassController::class);
+    Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class);
+    Route::resource('fees', \App\Http\Controllers\Admin\FeeController::class);
+    Route::resource('exams', \App\Http\Controllers\Admin\ExamController::class);
+    Route::resource('library', \App\Http\Controllers\Admin\LibraryController::class);
+    
+    // Attendance Routes
+    Route::get('/attendance', [\App\Http\Controllers\Admin\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/create', [\App\Http\Controllers\Admin\AttendanceController::class, 'create'])->name('attendance.create');
+    Route::post('/attendance', [\App\Http\Controllers\Admin\AttendanceController::class, 'store'])->name('attendance.store');
 });
 
 // Teacher Routes
