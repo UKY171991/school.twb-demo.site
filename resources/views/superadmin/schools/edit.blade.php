@@ -1,86 +1,137 @@
-@extends('layouts.admin')
+@extends('layouts.adminlte')
 
 @section('title', 'Edit School')
 @section('page-title', 'Edit School')
 
+@section('breadcrumb')
+<li class="breadcrumb-item"><a href="{{ route('superadmin.dashboard') }}">Home</a></li>
+<li class="breadcrumb-item"><a href="{{ route('superadmin.schools.index') }}">Schools</a></li>
+<li class="breadcrumb-item active">Edit</li>
+@endsection
+
 @section('sidebar')
-<x-superadmin-sidebar />
+<x-adminlte-superadmin-sidebar />
 @endsection
 
 @section('content')
-<div class="max-w-4xl">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-6">Edit School Information</h3>
-        
-        <form action="{{ route('superadmin.schools.update', $school) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="col-span-2">
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">School Name *</label>
-                    <input type="text" name="name" id="name" value="{{ old('name', $school->name) }}" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('name') border-red-500 @enderror">
-                    @error('name')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <label for="code" class="block text-sm font-medium text-gray-700 mb-2">School Code *</label>
-                    <input type="text" name="code" id="code" value="{{ old('code', $school->code) }}" required
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('code') border-red-500 @enderror">
-                    @error('code')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input type="email" name="email" id="email" value="{{ old('email', $school->email) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('email') border-red-500 @enderror">
-                    @error('email')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                    <input type="text" name="phone" id="phone" value="{{ old('phone', $school->phone) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('phone') border-red-500 @enderror">
-                    @error('phone')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div>
-                    <label for="website" class="block text-sm font-medium text-gray-700 mb-2">Website</label>
-                    <input type="url" name="website" id="website" value="{{ old('website', $school->website) }}"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('website') border-red-500 @enderror">
-                    @error('website')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="col-span-2">
-                    <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                    <textarea name="address" id="address" rows="3"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('address') border-red-500 @enderror">{{ old('address', $school->address) }}</textarea>
-                    @error('address')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="col-span-2">
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                    <textarea name="description" id="description" rows="3"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 @error('description') border-red-500 @enderror">{{ old('description', $school->description) }}</textarea>
-                    @error('description')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror
-                </div>
-
-                <div class="col-span-2">
-                    <label class="flex items-center">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', $school->is_active) ? 'checked' : '' }}
-                               class="rounded border-gray-300 text-purple-600 shadow-sm focus:ring-purple-500">
-                        <span class="ml-2 text-sm text-gray-700">School is Active</span>
-                    </label>
-                </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Edit School Information</h3>
             </div>
+            <form action="{{ route('superadmin.schools.update', $school) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="card-body">
+                    <div class="row">
+                        <!-- School Name -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="name">School Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" id="name" value="{{ old('name', $school->name) }}" required
+                                       class="form-control @error('name') is-invalid @enderror" placeholder="Enter school name">
+                                @error('name')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
 
-            <div class="flex justify-end space-x-3 mt-6">
-                <a href="{{ route('superadmin.schools.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">Cancel</a>
-                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">Update School</button>
-            </div>
-        </form>
+                        <!-- School Code -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="code">School Code <span class="text-danger">*</span></label>
+                                <input type="text" name="code" id="code" value="{{ old('code', $school->code) }}" required
+                                       class="form-control @error('code') is-invalid @enderror" placeholder="Enter school code">
+                                @error('code')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" id="email" value="{{ old('email', $school->email) }}"
+                                       class="form-control @error('email') is-invalid @enderror" placeholder="Enter email">
+                                @error('email')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" name="phone" id="phone" value="{{ old('phone', $school->phone) }}"
+                                       class="form-control @error('phone') is-invalid @enderror" placeholder="Enter phone number">
+                                @error('phone')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Website -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="website">Website</label>
+                                <input type="url" name="website" id="website" value="{{ old('website', $school->website) }}"
+                                       class="form-control @error('website') is-invalid @enderror" placeholder="Enter website URL">
+                                @error('website')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <textarea name="address" id="address" rows="3"
+                                          class="form-control @error('address') is-invalid @enderror" placeholder="Enter address">{{ old('address', $school->address) }}</textarea>
+                                @error('address')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea name="description" id="description" rows="3"
+                                          class="form-control @error('description') is-invalid @enderror" placeholder="Enter description">{{ old('description', $school->description) }}</textarea>
+                                @error('description')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Is Active -->
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $school->is_active) ? 'checked' : '' }}
+                                           class="custom-control-input">
+                                    <label class="custom-control-label" for="is_active">School is Active</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save mr-1"></i> Update School
+                    </button>
+                    <a href="{{ route('superadmin.schools.index') }}" class="btn btn-default">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
-
