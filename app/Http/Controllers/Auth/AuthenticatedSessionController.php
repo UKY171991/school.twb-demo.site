@@ -28,7 +28,30 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Role-based redirection
+        $user = Auth::user();
+        
+        if (!$user->is_active) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Your account has been deactivated.',
+            ]);
+        }
+
+        $redirectRoute = match ($user->role?->slug) {
+            'super-admin' => 'superadmin.dashboard',
+            'admin' => 'admin.dashboard',
+            'teacher' => 'teacher.dashboard',
+            'student' => 'student.dashboard',
+            'guardian' => 'guardian.dashboard',
+            'accountant' => 'accountant.dashboard',
+            'librarian' => 'librarian.dashboard',
+            'receptionist' => 'receptionist.dashboard',
+            'staff' => 'staff.dashboard',
+            default => 'dashboard',
+        };
+
+        return redirect()->intended(route($redirectRoute, absolute: false));
     }
 
     /**
