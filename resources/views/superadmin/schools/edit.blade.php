@@ -4,10 +4,7 @@
 @section('page-title', 'Edit School')
 
 @section('sidebar')
-<ul class="space-y-2">
-    <li><a href="{{ route('superadmin.dashboard') }}" class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg">Dashboard</a></li>
-    <li><a href="{{ route('superadmin.schools.index') }}" class="flex items-center px-4 py-3 text-white bg-purple-600 rounded-lg">Schools</a></li>
-</ul>
+<x-superadmin-sidebar />
 @endsection
 
 @section('content')
