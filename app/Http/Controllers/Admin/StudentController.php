@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
+use App\Models\School;
 use App\Models\ClassModel;
-use App\Models\Section;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,154 +14,150 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $schoolId = auth()->user()->school_id;
-        $students = Student::with(['user', 'class', 'section'])
-            ->where('school_id', $schoolId)
-            ->latest()
-            ->paginate(20);
-        
+        $students = Student::with(['user', 'school', 'classModel'])->paginate(10);
         return view('admin.students.index', compact('students'));
     }
 
     public function create()
     {
-        $schoolId = auth()->user()->school_id;
-        $classes = ClassModel::where('school_id', $schoolId)->where('is_active', true)->get();
-        $sections = Section::whereHas('class', function($q) use ($schoolId) {
-            $q->where('school_id', $schoolId);
-        })->get();
-        $guardians = User::where('school_id', $schoolId)
-            ->where('role_id', 5) // Guardian role
-            ->get();
-        
-        return view('admin.students.create', compact('classes', 'sections', 'guardians'));
+        $schools = School::where('is_active', true)->get();
+        $classes = ClassModel::where('is_active', true)->get();
+        return view('admin.students.create', compact('schools', 'classes'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'admission_number' => 'required|string|unique:students,admission_number',
-            'admission_date' => 'required|date',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female,other',
-            'blood_group' => 'nullable|in:A+,A-,B+,B-,O+,O-,AB+,AB-',
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8',
+            'school_id' => 'required|exists:schools,id',
             'class_id' => 'required|exists:classes,id',
-            'section_id' => 'nullable|exists:sections,id',
-            'parent_id' => 'nullable|exists:users,id',
-            'religion' => 'nullable|string|max:50',
-            'nationality' => 'nullable|string|max:50',
-            'address' => 'required|string',
-            'phone' => 'nullable|string|max:20',
+            'student_id' => 'required|string|max:50|unique:students',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:male,female',
+            'admission_date' => 'required|date',
+            'guardian_name' => 'required|string|max:255',
+            'guardian_phone' => 'required|string|max:20',
+            'is_active' => 'boolean'
         ]);
 
-        // Create user account for student
         $user = User::create([
-            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-            'email' => $validated['email'],
-            'password' => Hash::make('password'), // Default password
-            'role_id' => 4, // Student role
-            'school_id' => auth()->user()->school_id,
-            'phone' => $request->phone,
-            'address' => $validated['address'],
-            'is_active' => true,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'user_type' => 'student',
+            'school_id' => $request->school_id,
+            'is_active' => $request->is_active ?? true
         ]);
 
-        // Create student record
-        Student::create([
+        $student = Student::create([
             'user_id' => $user->id,
-            'school_id' => auth()->user()->school_id,
-            'class_id' => $validated['class_id'],
-            'section_id' => $validated['section_id'],
-            'parent_id' => $validated['parent_id'],
-            'admission_number' => $validated['admission_number'],
-            'admission_date' => $validated['admission_date'],
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'date_of_birth' => $validated['date_of_birth'],
-            'gender' => $validated['gender'],
-            'blood_group' => $validated['blood_group'],
-            'religion' => $validated['religion'],
-            'nationality' => $validated['nationality'],
-            'address' => $validated['address'],
-            'is_active' => true,
+            'school_id' => $request->school_id,
+            'class_id' => $request->class_id,
+            'student_id' => $request->student_id,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'date_of_birth' => $request->date_of_birth,
+            'gender' => $request->gender,
+            'admission_date' => $request->admission_date,
+            'guardian_name' => $request->guardian_name,
+            'guardian_phone' => $request->guardian_phone,
+            'is_active' => $request->is_active ?? true
         ]);
 
-        return redirect()->route('admin.students.index')->with('success', 'Student added successfully!');
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Student created successfully',
+                'data' => $student->load('user')
+            ]);
+        }
+
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student created successfully.');
     }
 
     public function show(Student $student)
     {
-        $student->load(['user', 'class', 'section', 'parent']);
+        $student->load(['user', 'school', 'classModel', 'attendance', 'grades']);
         return view('admin.students.show', compact('student'));
     }
 
     public function edit(Student $student)
     {
-        $schoolId = auth()->user()->school_id;
-        $classes = ClassModel::where('school_id', $schoolId)->where('is_active', true)->get();
-        $sections = Section::whereHas('class', function($q) use ($schoolId) {
-            $q->where('school_id', $schoolId);
-        })->get();
-        $guardians = User::where('school_id', $schoolId)->where('role_id', 5)->get();
-        
-        return view('admin.students.edit', compact('student', 'classes', 'sections', 'guardians'));
+        $schools = School::where('is_active', true)->get();
+        $classes = ClassModel::where('is_active', true)->get();
+        $student->load('user');
+        return view('admin.students.edit', compact('student', 'schools', 'classes'));
     }
 
     public function update(Request $request, Student $student)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+        $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $student->user_id,
-            'admission_number' => 'required|string|unique:students,admission_number,' . $student->id,
-            'admission_date' => 'required|date',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|in:male,female,other',
-            'blood_group' => 'nullable|in:A+,A-,B+,B-,O+,O-,AB+,AB-',
+            'school_id' => 'required|exists:schools,id',
             'class_id' => 'required|exists:classes,id',
-            'section_id' => 'nullable|exists:sections,id',
-            'parent_id' => 'nullable|exists:users,id',
-            'religion' => 'nullable|string|max:50',
-            'nationality' => 'nullable|string|max:50',
-            'address' => 'required|string',
-            'phone' => 'nullable|string|max:20',
+            'student_id' => 'required|string|max:50|unique:students,student_id,' . $student->id,
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'date_of_birth' => 'required|date',
+            'gender' => 'required|in:male,female',
+            'admission_date' => 'required|date',
+            'guardian_name' => 'required|string|max:255',
+            'guardian_phone' => 'required|string|max:20',
+            'is_active' => 'boolean'
         ]);
 
-        // Update user
         $student->user->update([
-            'name' => $validated['first_name'] . ' ' . $validated['last_name'],
-            'email' => $validated['email'],
-            'phone' => $request->phone,
-            'address' => $validated['address'],
+            'name' => $request->name,
+            'email' => $request->email,
+            'school_id' => $request->school_id,
+            'is_active' => $request->is_active
         ]);
 
-        // Update student
-        $student->update([
-            'class_id' => $validated['class_id'],
-            'section_id' => $validated['section_id'],
-            'parent_id' => $validated['parent_id'],
-            'admission_number' => $validated['admission_number'],
-            'admission_date' => $validated['admission_date'],
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'date_of_birth' => $validated['date_of_birth'],
-            'gender' => $validated['gender'],
-            'blood_group' => $validated['blood_group'],
-            'religion' => $validated['religion'],
-            'nationality' => $validated['nationality'],
-            'address' => $validated['address'],
-        ]);
+        $student->update($request->except(['name', 'email']));
 
-        return redirect()->route('admin.students.index')->with('success', 'Student updated successfully!');
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Student updated successfully',
+                'data' => $student->load('user')
+            ]);
+        }
+
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student updated successfully.');
     }
 
     public function destroy(Student $student)
     {
         $student->user->delete();
         $student->delete();
-        return redirect()->route('admin.students.index')->with('success', 'Student deleted successfully!');
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Student deleted successfully'
+            ]);
+        }
+
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student deleted successfully.');
+    }
+
+    public function toggleStatus(Student $student)
+    {
+        $student->update(['is_active' => !$student->is_active]);
+        $student->user->update(['is_active' => !$student->is_active]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Student status updated successfully',
+            'is_active' => $student->is_active
+        ]);
     }
 }

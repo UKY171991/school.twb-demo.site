@@ -1,186 +1,171 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
-use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\TC\DashboardController as TCDashboardController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+// Redirect root to login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Super Admin Routes
-Route::middleware(['auth', 'role:super-admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
-    Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
-    
-    // Core Management
-    Route::resource('schools', \App\Http\Controllers\SuperAdmin\SchoolController::class);
-    Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
-    Route::resource('roles', \App\Http\Controllers\SuperAdmin\RoleController::class);
-    
-    // System Management
-    Route::get('/settings', [\App\Http\Controllers\SuperAdmin\SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings', [\App\Http\Controllers\SuperAdmin\SettingsController::class, 'update'])->name('settings.update');
-    
-    // Backup & Restore
-    Route::get('/backup', [\App\Http\Controllers\SuperAdmin\BackupController::class, 'index'])->name('backup.index');
-    Route::post('/backup/create', [\App\Http\Controllers\SuperAdmin\BackupController::class, 'create'])->name('backup.create');
-    Route::get('/backup/download/{file}', [\App\Http\Controllers\SuperAdmin\BackupController::class, 'download'])->name('backup.download');
-    Route::delete('/backup/{file}', [\App\Http\Controllers\SuperAdmin\BackupController::class, 'destroy'])->name('backup.destroy');
-    
-    // Reports
-    Route::get('/reports', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/schools', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'schools'])->name('reports.schools');
-    Route::get('/reports/users', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'users'])->name('reports.users');
-    
-    // Activity Logs
-    Route::get('/logs', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'index'])->name('logs.index');
-    Route::delete('/logs/clear', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'clear'])->name('logs.clear');
+// Authentication Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
 });
 
-// School Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
-    // Theme & Language
-    Route::get('/theme', function() { return view('admin.theme.index'); })->name('theme.index');
-    Route::get('/language', function() { return view('admin.language.index'); })->name('language.index');
-    
-    // Administrator
-    Route::get('/users', function() { return view('admin.users.index'); })->name('users.index');
-    Route::get('/roles', function() { return view('admin.roles.index'); })->name('roles.index');
-    Route::get('/permissions', function() { return view('admin.permissions.index'); })->name('permissions.index');
-    
-    // Template
-    Route::get('/templates/email', function() { return view('admin.templates.email'); })->name('templates.email');
-    Route::get('/templates/sms', function() { return view('admin.templates.sms'); })->name('templates.sms');
-    
-    // Front Office
-    Route::get('/front-office/visitors', function() { return view('admin.front-office.visitors'); })->name('front-office.visitors');
-    Route::get('/front-office/calls', function() { return view('admin.front-office.calls'); })->name('front-office.calls');
-    Route::get('/front-office/postal', function() { return view('admin.front-office.postal'); })->name('front-office.postal');
-    
-    // Human Resource
-    Route::get('/human-resource', function() { return view('admin.human-resource.index'); })->name('human-resource.index');
-    Route::get('/human-resource/departments', function() { return view('admin.human-resource.departments'); })->name('human-resource.departments');
-    Route::get('/human-resource/designations', function() { return view('admin.human-resource.designations'); })->name('human-resource.designations');
-    
-    // Manage Leave
-    Route::get('/leaves', function() { return view('admin.leaves.index'); })->name('leaves.index');
-    Route::get('/leaves/types', function() { return view('admin.leaves.types'); })->name('leaves.types');
-    
-    // Core Academic Management
-    Route::resource('teachers', \App\Http\Controllers\Admin\TeacherController::class);
-    Route::get('/class-lectures', function() { return view('admin.class-lectures.index'); })->name('class-lectures.index');
-    Route::get('/live-classes', function() { return view('admin.live-classes.index'); })->name('live-classes.index');
-    Route::resource('classes', \App\Http\Controllers\Admin\ClassController::class);
-    Route::resource('sections', \App\Http\Controllers\Admin\SectionController::class);
-    Route::resource('subjects', \App\Http\Controllers\Admin\SubjectController::class);
-    Route::resource('syllabus', \App\Http\Controllers\Admin\SyllabusController::class);
-    Route::get('/study-materials', function() { return view('admin.study-materials.index'); })->name('study-materials.index');
-    Route::resource('class-routines', \App\Http\Controllers\Admin\ClassRoutineController::class);
-    Route::resource('guardians', \App\Http\Controllers\Admin\GuardianController::class);
-    
-    // Manage Exam
-    Route::resource('exams', \App\Http\Controllers\Admin\ExamController::class);
-    Route::get('/exam-schedules', function() { return view('admin.exam-schedules.index'); })->name('exam-schedules.index');
-    Route::get('/exam-attendance', function() { return view('admin.exam-attendance.index'); })->name('exam-attendance.index');
-    Route::get('/exam-results', function() { return view('admin.exam-results.index'); })->name('exam-results.index');
-    
-    // Promotion & Certificate
-    Route::get('/promotion', function() { return view('admin.promotion.index'); })->name('promotion.index');
-    Route::get('/certificates', function() { return view('admin.certificates.index'); })->name('certificates.index');
-    
-    // Library
-    Route::get('/library-books', function() { return view('admin.library-books.index'); })->name('library-books.index');
-    Route::get('/book-issues', function() { return view('admin.book-issues.index'); })->name('book-issues.index');
-    
-    // Transport
-    Route::get('/transport/vehicles', function() { return view('admin.transport.vehicles'); })->name('transport.vehicles');
-    Route::get('/transport/routes', function() { return view('admin.transport.routes'); })->name('transport.routes');
-    
-    // Hostel
-    Route::get('/hostel/rooms', function() { return view('admin.hostel.rooms'); })->name('hostel.rooms');
-    Route::get('/hostel/members', function() { return view('admin.hostel.members'); })->name('hostel.members');
-    
-    // Communication
-    Route::get('/messages', function() { return view('admin.messages.index'); })->name('messages.index');
-    Route::get('/mail-sms', function() { return view('admin.mail-sms.index'); })->name('mail-sms.index');
-    Route::get('/complains', function() { return view('admin.complains.index'); })->name('complains.index');
-    Route::get('/announcements', function() { return view('admin.announcements.index'); })->name('announcements.index');
-    Route::get('/events', function() { return view('admin.events.index'); })->name('events.index');
-    
-    // Financial
-    Route::get('/payroll', function() { return view('admin.payroll.index'); })->name('payroll.index');
-    Route::get('/accounting/income', function() { return view('admin.accounting.income'); })->name('accounting.income');
-    Route::get('/accounting/expense', function() { return view('admin.accounting.expense'); })->name('accounting.expense');
-    
-    // Reports
-    Route::get('/reports/students', function() { return view('admin.reports.students'); })->name('reports.students');
-    Route::get('/reports/attendance', function() { return view('admin.reports.attendance'); })->name('reports.attendance');
-    Route::get('/reports/financial', function() { return view('admin.reports.financial'); })->name('reports.financial');
-    
-    // Media & Frontend
-    Route::get('/media-gallery', function() { return view('admin.media-gallery.index'); })->name('media-gallery.index');
-    Route::get('/frontend/pages', function() { return view('admin.frontend.pages'); })->name('frontend.pages');
-    Route::get('/frontend/menus', function() { return view('admin.frontend.menus'); })->name('frontend.menus');
-});
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Teacher Routes
-Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
-    Route::get('/dashboard', [TeacherDashboardController::class, 'index'])->name('dashboard');
-});
-
-// Student Routes
-Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')->group(function () {
-    Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
-});
-
-// Guardian Routes
-Route::middleware(['auth', 'role:guardian'])->prefix('guardian')->name('guardian.')->group(function () {
+// Dashboard Routes
+Route::middleware(['auth'])->group(function () {
+    // Super Admin & Admin Dashboard
+    Route::middleware(['user.type:super_admin,admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/stats', [AdminDashboardController::class, 'getStats'])->name('dashboard.stats');
+        
+        // Schools Management
+        Route::resource('schools', 'App\Http\Controllers\Admin\SchoolController');
+        Route::post('schools/{school}/toggle-status', 'App\Http\Controllers\Admin\SchoolController@toggleStatus')->name('schools.toggle-status');
+        
+        // Teachers Management
+        Route::resource('teachers', 'App\Http\Controllers\Admin\TeacherController');
+        Route::post('teachers/{teacher}/toggle-status', 'App\Http\Controllers\Admin\TeacherController@toggleStatus')->name('teachers.toggle-status');
+        
+        // Students Management
+        Route::resource('students', 'App\Http\Controllers\Admin\StudentController');
+        Route::post('students/{student}/toggle-status', 'App\Http\Controllers\Admin\StudentController@toggleStatus')->name('students.toggle-status');
+        
+        // Classes Management
+        Route::resource('classes', 'App\Http\Controllers\Admin\ClassController');
+        Route::post('classes/{class}/toggle-status', 'App\Http\Controllers\Admin\ClassController@toggleStatus')->name('classes.toggle-status');
+        
+        // Subjects Management
+        Route::resource('subjects', 'App\Http\Controllers\Admin\SubjectController');
+        Route::post('subjects/{subject}/toggle-status', 'App\Http\Controllers\Admin\SubjectController@toggleStatus')->name('subjects.toggle-status');
+        
+        // Attendance Management
+        Route::resource('attendance', 'App\Http\Controllers\Admin\AttendanceController');
+        Route::get('attendance/reports', 'App\Http\Controllers\Admin\AttendanceController@reports')->name('attendance.reports');
+        
+        // Grades Management
+        Route::resource('grades', 'App\Http\Controllers\Admin\GradeController');
+        Route::get('grades/reports', 'App\Http\Controllers\Admin\GradeController@reports')->name('grades.reports');
+        
+        // Parents Management
+        Route::resource('parents', 'App\Http\Controllers\Admin\ParentController');
+        
+        // Reports
+        Route::get('reports', 'App\Http\Controllers\Admin\ReportController@index')->name('reports.index');
+        Route::get('reports/students', 'App\Http\Controllers\Admin\ReportController@students')->name('reports.students');
+        Route::get('reports/teachers', 'App\Http\Controllers\Admin\ReportController@teachers')->name('reports.teachers');
+        Route::get('reports/attendance', 'App\Http\Controllers\Admin\ReportController@attendance')->name('reports.attendance');
+        Route::get('reports/grades', 'App\Http\Controllers\Admin\ReportController@grades')->name('reports.grades');
+    });
+    
+    // Teacher Dashboard
+    Route::middleware(['user.type:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('/dashboard', [TCDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/stats', [TCDashboardController::class, 'getStats'])->name('dashboard.stats');
+        
+        // Teacher specific routes
+        Route::get('/classes', 'App\Http\Controllers\TC\ClassController@index')->name('classes');
+        Route::get('/classes/{class}', 'App\Http\Controllers\TC\ClassController@show')->name('classes.show');
+        Route::get('/students', 'App\Http\Controllers\TC\StudentController@index')->name('students');
+        Route::get('/students/{student}', 'App\Http\Controllers\TC\StudentController@show')->name('students.show');
+        Route::get('/subjects', 'App\Http\Controllers\TC\SubjectController@index')->name('subjects');
+        Route::get('/subjects/{subject}', 'App\Http\Controllers\TC\SubjectController@show')->name('subjects.show');
+        
+        // Attendance
+        Route::get('/attendance', 'App\Http\Controllers\TC\AttendanceController@index')->name('attendance');
+        Route::get('/attendance/create', 'App\Http\Controllers\TC\AttendanceController@create')->name('attendance.create');
+        Route::post('/attendance', 'App\Http\Controllers\TC\AttendanceController@store')->name('attendance.store');
+        Route::get('/attendance/{class}/date/{date}', 'App\Http\Controllers\TC\AttendanceController@show')->name('attendance.show');
+        
+        // Grades
+        Route::get('/grades', 'App\Http\Controllers\TC\GradeController@index')->name('grades');
+        Route::get('/grades/create', 'App\Http\Controllers\TC\GradeController@create')->name('grades.create');
+        Route::post('/grades', 'App\Http\Controllers\TC\GradeController@store')->name('grades.store');
+        Route::get('/grades/{grade}', 'App\Http\Controllers\TC\GradeController@show')->name('grades.show');
+        
+        // Profile
+        Route::get('/profile', 'App\Http\Controllers\TC\ProfileController@show')->name('profile');
+        Route::get('/profile/edit', 'App\Http\Controllers\TC\ProfileController@edit')->name('profile.edit');
+        Route::put('/profile', 'App\Http\Controllers\TC\ProfileController@update')->name('profile.update');
+        
+        // Schedule
+        Route::get('/schedule', 'App\Http\Controllers\TC\ScheduleController@index')->name('schedule');
+    });
+    
+    // Student Dashboard
+    Route::middleware(['user.type:student'])->prefix('student')->name('student.')->group(function () {
+        Route::get('/dashboard', 'App\Http\Controllers\Student\DashboardController@index')->name('dashboard');
+        Route::get('/profile', 'App\Http\Controllers\Student\ProfileController@show')->name('profile');
+        Route::get('/attendance', 'App\Http\Controllers\Student\AttendanceController@index')->name('attendance');
+        Route::get('/grades', 'App\Http\Controllers\Student\GradeController@index')->name('grades');
+        Route::get('/subjects', 'App\Http\Controllers\Student\SubjectController@index')->name('subjects');
+    });
+    
+    // Parent Dashboard
+    Route::middleware(['user.type:parent'])->prefix('parent')->name('parent.')->group(function () {
+        Route::get('/dashboard', 'App\Http\Controllers\Parent\DashboardController@index')->name('dashboard');
+        Route::get('/children', 'App\Http\Controllers\Parent\ChildController@index')->name('children');
+        Route::get('/children/{student}', 'App\Http\Controllers\Parent\ChildController@show')->name('children.show');
+        Route::get('/attendance', 'App\Http\Controllers\Parent\AttendanceController@index')->name('attendance');
+        Route::get('/grades', 'App\Http\Controllers\Parent\GradeController@index')->name('grades');
+    });
+    
+    // Common Dashboard Route (redirects based on user type)
     Route::get('/dashboard', function () {
-        return view('guardian.dashboard');
+        $user = auth()->user();
+        
+        if ($user->isSuperAdmin() || $user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->isTeacher()) {
+            return redirect()->route('teacher.dashboard');
+        } elseif ($user->isStudent()) {
+            return redirect()->route('student.dashboard');
+        } elseif ($user->isParent()) {
+            return redirect()->route('parent.dashboard');
+        }
+        
+        return redirect()->route('login');
     })->name('dashboard');
 });
 
-// Accountant Routes
-Route::middleware(['auth', 'role:accountant'])->prefix('accountant')->name('accountant.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('accountant.dashboard');
-    })->name('dashboard');
+// AJAX Routes for all user types
+Route::middleware(['auth'])->prefix('ajax')->name('ajax.')->group(function () {
+    // Common AJAX routes
+    Route::post('/upload-image', 'App\Http\Controllers\Ajax\UploadController@uploadImage')->name('upload-image');
+    Route::get('/search-users', 'App\Http\Controllers\Ajax\SearchController@searchUsers')->name('search-users');
+    
+    // Admin AJAX routes
+    Route::middleware(['user.type:super_admin,admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/schools/select', 'App\Http\Controllers\Ajax\Admin\SchoolController@select')->name('schools.select');
+        Route::get('/teachers/select', 'App\Http\Controllers\Ajax\Admin\TeacherController@select')->name('teachers.select');
+        Route::get('/students/select', 'App\Http\Controllers\Ajax\Admin\StudentController@select')->name('students.select');
+        Route::get('/classes/select', 'App\Http\Controllers\Ajax\Admin\ClassController@select')->name('classes.select');
+        Route::get('/subjects/select', 'App\Http\Controllers\Ajax\Admin\SubjectController@select')->name('subjects.select');
+    });
+    
+    // Teacher AJAX routes
+    Route::middleware(['user.type:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
+        Route::post('/attendance/mark', 'App\Http\Controllers\Ajax\TC\AttendanceController@mark')->name('attendance.mark');
+        Route::post('/grades/save', 'App\Http\Controllers\Ajax\TC\GradeController@save')->name('grades.save');
+    });
 });
-
-// Librarian Routes
-Route::middleware(['auth', 'role:librarian'])->prefix('librarian')->name('librarian.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('librarian.dashboard');
-    })->name('dashboard');
-});
-
-// Receptionist Routes
-Route::middleware(['auth', 'role:receptionist'])->prefix('receptionist')->name('receptionist.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('receptionist.dashboard');
-    })->name('dashboard');
-});
-
-// Staff Routes
-Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('staff.dashboard');
-    })->name('dashboard');
-});
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__.'/auth.php';

@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ClassModel extends Model
 {
+    use HasFactory;
+
     protected $table = 'classes';
-    
+
     protected $fillable = [
         'school_id',
+        'teacher_id',
         'name',
+        'section',
+        'capacity',
+        'room_number',
         'description',
         'is_active',
     ];
@@ -19,19 +26,24 @@ class ClassModel extends Model
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Get the school that owns the class.
-     */
+    // Relationships
     public function school()
     {
         return $this->belongsTo(School::class);
     }
 
-    /**
-     * Get the sections for the class.
-     */
-    public function sections()
+    public function teacher()
     {
-        return $this->hasMany(Section::class, 'class_id');
+        return $this->belongsTo(Teacher::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    public function attendance()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

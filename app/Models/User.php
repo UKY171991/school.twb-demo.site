@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -21,11 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
+        'user_type',
         'school_id',
-        'phone',
-        'address',
-        'avatar',
         'is_active',
     ];
 
@@ -53,67 +51,50 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get the role that owns the user.
-     */
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-    /**
-     * Get the school that owns the user.
-     */
+    // Relationships
     public function school()
     {
         return $this->belongsTo(School::class);
     }
 
-    /**
-     * Check if user has a specific role.
-     */
-    public function hasRole(string $roleSlug): bool
+    public function teacher()
     {
-        return $this->role && $this->role->slug === $roleSlug;
+        return $this->hasOne(Teacher::class);
     }
 
-    /**
-     * Check if user is super admin.
-     */
-    public function isSuperAdmin(): bool
+    public function student()
     {
-        return $this->hasRole('super-admin');
+        return $this->hasOne(Student::class);
     }
 
-    /**
-     * Check if user is admin.
-     */
-    public function isAdmin(): bool
+    public function parent()
     {
-        return $this->hasRole('admin');
+        return $this->hasOne(ParentModel::class);
     }
 
-    /**
-     * Check if user is teacher.
-     */
-    public function isTeacher(): bool
+    // Helper methods
+    public function isSuperAdmin()
     {
-        return $this->hasRole('teacher');
+        return $this->user_type === 'super_admin';
     }
 
-    /**
-     * Check if user is student.
-     */
-    public function isStudent(): bool
+    public function isAdmin()
     {
-        return $this->hasRole('student');
+        return $this->user_type === 'admin';
     }
 
-    /**
-     * Check if user is guardian.
-     */
-    public function isGuardian(): bool
+    public function isTeacher()
     {
-        return $this->hasRole('guardian');
+        return $this->user_type === 'teacher';
+    }
+
+    public function isStudent()
+    {
+        return $this->user_type === 'student';
+    }
+
+    public function isParent()
+    {
+        return $this->user_type === 'parent';
     }
 }

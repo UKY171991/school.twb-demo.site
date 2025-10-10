@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class School extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'code',
@@ -13,8 +16,11 @@ class School extends Model
         'phone',
         'email',
         'website',
-        'logo',
         'description',
+        'logo',
+        'principal_name',
+        'principal_phone',
+        'principal_email',
         'is_active',
     ];
 
@@ -22,19 +28,44 @@ class School extends Model
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Get the users for the school.
-     */
+    // Relationships
     public function users()
     {
         return $this->hasMany(User::class);
     }
 
-    /**
-     * Get the classes for the school.
-     */
+    public function teachers()
+    {
+        return $this->hasMany(Teacher::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
     public function classes()
     {
         return $this->hasMany(ClassModel::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
+
+    public function parents()
+    {
+        return $this->hasMany(ParentModel::class);
+    }
+
+    public function attendance()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
     }
 }

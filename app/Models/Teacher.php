@@ -2,40 +2,69 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id',
         'school_id',
+        'user_id',
         'employee_id',
+        'first_name',
+        'last_name',
+        'middle_name',
+        'phone',
+        'email',
+        'address',
+        'date_of_birth',
+        'gender',
         'qualification',
-        'designation',
-        'joining_date',
-        'salary',
         'experience',
+        'salary',
+        'joining_date',
+        'photo',
         'is_active',
     ];
 
     protected $casts = [
+        'date_of_birth' => 'date',
         'joining_date' => 'date',
         'salary' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    // Relationships
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function school()
+    public function classes()
     {
-        return $this->belongsTo(School::class);
+        return $this->hasMany(ClassModel::class);
     }
 
     public function subjects()
     {
-        return $this->hasMany(Subject::class, 'teacher_id', 'user_id');
+        return $this->hasMany(Subject::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
+    // Accessor
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 }

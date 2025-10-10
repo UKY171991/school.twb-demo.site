@@ -2,62 +2,72 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id',
         'school_id',
+        'user_id',
         'class_id',
-        'section_id',
         'parent_id',
-        'admission_number',
-        'roll_number',
-        'admission_date',
+        'student_id',
         'first_name',
         'last_name',
+        'middle_name',
+        'phone',
+        'email',
+        'address',
         'date_of_birth',
         'gender',
         'blood_group',
-        'religion',
-        'nationality',
-        'address',
+        'emergency_contact',
+        'emergency_phone',
         'photo',
-        'is_active',
+        'status',
+        'admission_date',
     ];
 
     protected $casts = [
-        'admission_date' => 'date',
         'date_of_birth' => 'date',
-        'is_active' => 'boolean',
+        'admission_date' => 'date',
     ];
+
+    // Relationships
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function school()
-    {
-        return $this->belongsTo(School::class);
-    }
-
     public function class()
     {
-        return $this->belongsTo(ClassModel::class, 'class_id');
-    }
-
-    public function section()
-    {
-        return $this->belongsTo(Section::class);
+        return $this->belongsTo(ClassModel::class);
     }
 
     public function parent()
     {
-        return $this->belongsTo(User::class, 'parent_id');
+        return $this->belongsTo(ParentModel::class);
     }
 
+    public function attendance()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
+    // Accessor
     public function getFullNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;

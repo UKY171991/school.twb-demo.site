@@ -1,283 +1,61 @@
-# Multi-School Management System
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-A comprehensive Laravel-based school management system supporting multiple schools with role-based access control, inspired by the [Global Multi School Management System Express](https://codecanyon.net/item/global-multi-school-management-system-express/21975378).
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-## 🎓 Features
+## About Laravel
 
-### Multi-School Support
-- Manage multiple schools from a single platform
-- School-specific data isolation
-- Centralized super admin control
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### Role-Based Access Control
-- **Super Admin**: Full system access across all schools
-- **School Admin**: Complete school management
-- **Teacher**: Class and student management
-- **Student**: Personal dashboard with grades, attendance, and fees
-- **Guardian**: Monitor children's progress
-- **Accountant**: Financial management
-- **Librarian**: Library operations
-- **Receptionist**: Front desk operations
-- **Staff**: General staff access
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-### Core Modules
-- 📊 **Dashboard**: Role-specific dashboards with key metrics
-- 👥 **User Management**: Multi-role user system
-- 🏫 **School Management**: School profiles and settings
-- 👨‍🎓 **Student Management**: Enrollment, profiles, classes
-- 👨‍🏫 **Teacher Management**: Staff profiles and assignments
-- 📚 **Class Management**: Classes and sections
-- ✅ **Attendance**: Daily attendance tracking
-- 💰 **Fee Management**: Fee collection and tracking
-- 📝 **Exam Management**: Examinations and results
-- 📖 **Library Management**: Book inventory and lending
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## 🚀 Installation
+## Learning Laravel
 
-### Requirements
-- PHP 8.2+
-- Composer
-- Node.js & NPM
-- MySQL/SQLite
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-### Setup
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-1. **Clone the repository**
-```bash
-git clone <your-repo-url>
-cd school.twb-demo.site
-```
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-2. **Install dependencies**
-```bash
-composer install
-npm install
-```
+## Laravel Sponsors
 
-3. **Environment configuration**
-```bash
-cp .env.example .env
-php artisan key:generate
-```
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-4. **Database setup**
-```bash
-php artisan migrate:fresh --seed
-```
+### Premium Partners
 
-5. **Build assets**
-```bash
-npm run build
-```
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-6. **Start development server**
-```bash
-php artisan serve
-```
+## Contributing
 
-Visit: `http://localhost:8000`
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-## 🔐 Demo Credentials
+## Code of Conduct
 
-All demo accounts use password: **`password`**
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-### Super Admin
-- **Email**: superadmin@school.com
-- **Access**: Full system control
+## Security Vulnerabilities
 
-### Windsor Park School
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-| Role | Email |
-|------|-------|
-| Admin | admin.windsor@school.com |
-| Teacher | teacher.windsor@school.com |
-| Student | student.windsor@school.com |
-| Guardian | guardian.windsor@school.com |
-| Accountant | accountant.windsor@school.com |
-| Librarian | librarian.windsor@school.com |
-| Receptionist | receptionist.windsor@school.com |
-| Staff | staff.windsor@school.com |
+## License
 
-### Ideal Stevenson School
-
-| Role | Email |
-|------|-------|
-| Admin | admin.stevenson@school.com |
-| Teacher | teacher.stevenson@school.com |
-| Student | student.stevenson@school.com |
-| Guardian | guardian.stevenson@school.com |
-| Accountant | accountant.stevenson@school.com |
-| Librarian | librarian.stevenson@school.com |
-| Receptionist | receptionist.stevenson@school.com |
-| Staff | staff.stevenson@school.com |
-
-## 📁 Project Structure
-
-```
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── SuperAdmin/
-│   │   │   ├── Admin/
-│   │   │   ├── Teacher/
-│   │   │   ├── Student/
-│   │   │   └── Auth/
-│   │   └── Middleware/
-│   │       └── RoleMiddleware.php
-│   └── Models/
-│       ├── User.php
-│       ├── School.php
-│       ├── Role.php
-│       ├── Student.php
-│       ├── Teacher.php
-│       └── ClassModel.php
-├── database/
-│   ├── migrations/
-│   └── seeders/
-├── resources/
-│   └── views/
-│       ├── auth/
-│       │   └── login.blade.php
-│       ├── layouts/
-│       │   └── admin.blade.php
-│       ├── superadmin/
-│       ├── admin/
-│       ├── teacher/
-│       ├── student/
-│       ├── guardian/
-│       ├── accountant/
-│       ├── librarian/
-│       ├── receptionist/
-│       └── staff/
-└── routes/
-    └── web.php
-```
-
-## 🎨 Technology Stack
-
-- **Backend**: Laravel 12.x
-- **Frontend**: Blade Templates, Tailwind CSS, Alpine.js
-- **Database**: MySQL/SQLite
-- **Authentication**: Laravel Breeze
-- **Build Tool**: Vite
-
-## 🔧 Database Schema
-
-### Core Tables
-- `users` - System users with role and school associations
-- `roles` - User roles and permissions
-- `schools` - School profiles and settings
-- `students` - Student records
-- `teachers` - Teacher profiles
-- `classes` - Class definitions
-- `sections` - Class sections
-- `subjects` - Subject definitions
-- `attendance` - Daily attendance records
-- `fees` - Fee management
-- `exams` - Examination records
-- `exam_results` - Student results
-- `library_books` - Library inventory
-- `book_issues` - Book lending records
-
-## 🌐 Routes
-
-### Public Routes
-- `GET /` - Redirects to login
-- `GET /login` - Login page
-- `POST /login` - Authentication
-- `POST /logout` - Logout
-
-### Protected Routes (Role-based)
-- `/superadmin/*` - Super Admin routes
-- `/admin/*` - School Admin routes
-- `/teacher/*` - Teacher routes
-- `/student/*` - Student routes
-- `/guardian/*` - Guardian routes
-- `/accountant/*` - Accountant routes
-- `/librarian/*` - Librarian routes
-- `/receptionist/*` - Receptionist routes
-- `/staff/*` - Staff routes
-
-## 🎯 Key Features Implementation
-
-### Role-Based Middleware
-```php
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Admin routes
-});
-```
-
-### User Helper Methods
-```php
-$user->isSuperAdmin()
-$user->isAdmin()
-$user->isTeacher()
-$user->isStudent()
-$user->hasRole('role-slug')
-```
-
-### Multi-School Data Isolation
-Each user is associated with a school (except Super Admin), ensuring data isolation between schools.
-
-## 📝 Development Notes
-
-### Adding New Modules
-1. Create migration for database tables
-2. Create model with relationships
-3. Create controller in appropriate directory
-4. Add routes with proper middleware
-5. Create views extending the admin layout
-6. Update sidebar navigation
-
-### Extending Roles
-1. Add role in `RoleSeeder.php`
-2. Add route in `AuthenticatedSessionController.php`
-3. Create controller and views
-4. Add navigation items
-
-## 🐛 Common Issues
-
-### Migration Error
-```bash
-php artisan migrate:fresh --seed
-```
-
-### Asset Build Error
-```bash
-npm run build
-```
-
-### Permission Denied
-Ensure storage and cache directories are writable:
-```bash
-chmod -R 775 storage bootstrap/cache
-```
-
-## 📚 Future Enhancements
-
-- [ ] Advanced attendance reports
-- [ ] Fee payment gateway integration
-- [ ] SMS/Email notifications
-- [ ] Online exam module
-- [ ] Parent-teacher communication
-- [ ] Mobile app API
-- [ ] Advanced reporting system
-- [ ] Hostel management
-- [ ] Transport management
-- [ ] HR & Payroll
-
-## 📄 License
-
-This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📞 Support
-
-For support, email support@example.com or create an issue in the repository.
-
----
-
-**Built with ❤️ using Laravel**
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
