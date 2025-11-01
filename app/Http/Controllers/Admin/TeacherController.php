@@ -8,19 +8,42 @@ use App\Models\User;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use DataTables;
 
 class TeacherController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = Teacher::with(['user', 'school'])->paginate(10);
-        return view('admin.teachers.index', compact('teachers'));
+        if ($request->ajax()) {
+            $data = Teacher::with(['user', 'school'])->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row){
+                    $statusBtn = '<button class="btn btn-sm toggle-status-btn '.($row->is_active ? 'btn-success' : 'btn-danger').'" data-url="'.route('admin.teachers.toggle-status', $row).'">';
+                    $statusBtn .= '<i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i> ';
+                    $statusBtn .= '<span>'.($row->is_active ? 'Active' : 'Inactive').'</span>';
+                    $statusBtn .= '</button>';
+                    return $statusBtn;
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.teachers.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.teachers.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.teachers.index');
     }
 
     public function create()
     {
         $schools = School::where('is_active', true)->get();
-        return view('admin.teachers.create', compact('schools'));
+        return view('admin.teachers._form', compact('schools'))->render();
     }
 
     public function store(Request $request)
@@ -86,7 +109,7 @@ class TeacherController extends Controller
     {
         $schools = School::where('is_active', true)->get();
         $teacher->load('user');
-        return view('admin.teachers.edit', compact('teacher', 'schools'));
+        return view('admin.teachers._form', compact('teacher', 'schools'))->render();
     }
 
     public function update(Request $request, Teacher $teacher)
@@ -113,7 +136,13 @@ class TeacherController extends Controller
             'is_active' => $request->is_active
         ]);
 
-        $teacher->update($request->except(['name', 'email']));
+        if ($request->password) {
+            $teacher->user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+
+        $teacher->update($request->except(['name', 'email', 'password']));
 
         if ($request->ajax()) {
             return response()->json([
@@ -155,3 +184,5 @@ class TeacherController extends Controller
         ]);
     }
 }
+
+

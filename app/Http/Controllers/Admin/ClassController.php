@@ -7,20 +7,43 @@ use App\Models\ClassModel;
 use App\Models\School;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use DataTables;
 
 class ClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $classes = ClassModel::with(['school', 'teacher.user', 'students'])->paginate(10);
-        return view('admin.classes.index', compact('classes'));
+        if ($request->ajax()) {
+            $data = ClassModel::with(['school', 'teacher.user'])->withCount('students')->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row){
+                    $statusBtn = '<button class="btn btn-sm toggle-status-btn '.($row->is_active ? 'btn-success' : 'btn-danger').'" data-url="'.route('admin.classes.toggle-status', $row).'">';
+                    $statusBtn .= '<i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i> ';
+                    $statusBtn .= '<span>'.($row->is_active ? 'Active' : 'Inactive').'</span>';
+                    $statusBtn .= '</button>';
+                    return $statusBtn;
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.classes.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.classes.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.classes.index');
     }
 
     public function create()
     {
         $schools = School::where('is_active', true)->get();
         $teachers = Teacher::with('user')->where('is_active', true)->get();
-        return view('admin.classes.create', compact('schools', 'teachers'));
+        return view('admin.classes._form', compact('schools', 'teachers'))->render();
     }
 
     public function store(Request $request)
@@ -59,7 +82,7 @@ class ClassController extends Controller
     {
         $schools = School::where('is_active', true)->get();
         $teachers = Teacher::with('user')->where('is_active', true)->get();
-        return view('admin.classes.edit', compact('class', 'schools', 'teachers'));
+        return view('admin.classes._form', compact('class', 'schools', 'teachers'))->render();
     }
 
     public function update(Request $request, ClassModel $class)

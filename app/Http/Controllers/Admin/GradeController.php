@@ -8,15 +8,36 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Models\ClassModel;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use DataTables;
 
 class GradeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $grades = Grade::with(['student.user', 'subject', 'classModel'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-        return view('admin.grades.index', compact('grades'));
+        if ($request->ajax()) {
+            $data = Grade::with(['student.user', 'subject', 'classModel'])->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('marks', function($row){
+                    return $row->marks_obtained . ' / ' . $row->total_marks;
+                })
+                ->editColumn('exam_date', function ($row) {
+                    return Carbon::parse($row->exam_date)->format('d M, Y');
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.grades.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.grades.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['actions'])
+                ->make(true);
+        }
+
+        return view('admin.grades.index');
     }
 
     public function create()
@@ -24,7 +45,7 @@ class GradeController extends Controller
         $students = Student::with('user')->where('is_active', true)->get();
         $subjects = Subject::where('is_active', true)->get();
         $classes = ClassModel::where('is_active', true)->get();
-        return view('admin.grades.create', compact('students', 'subjects', 'classes'));
+        return view('admin.grades._form', compact('students', 'subjects', 'classes'))->render();
     }
 
     public function store(Request $request)
@@ -66,7 +87,7 @@ class GradeController extends Controller
         $students = Student::with('user')->where('is_active', true)->get();
         $subjects = Subject::where('is_active', true)->get();
         $classes = ClassModel::where('is_active', true)->get();
-        return view('admin.grades.edit', compact('grade', 'students', 'subjects', 'classes'));
+        return view('admin.grades._form', compact('grade', 'students', 'subjects', 'classes'))->render();
     }
 
     public function update(Request $request, Grade $grade)

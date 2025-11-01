@@ -2,124 +2,100 @@
 
 namespace App\Http\Controllers\Student;
 
-use App\Http\Controllers\Controller;
-use App\Models\Student;
-use Carbon\Carbon;
+use App\Http\Controllers\BaseDashboardController;
+use App\Models\Subject;
+use App\Models\Grade;
+use Illuminate\View\View;
+use Illuminate\Http\Request;
 
-class DashboardController extends Controller
+class DashboardController extends BaseDashboardController
 {
-    public function index()
+    public function index(): View
     {
-        $student = auth()->user()->student;
-        $student->load(['classModel', 'school']);
+        // Get base dashboard data
+        $viewData = $this->getDashboardViewData();
+        
+        // Add student-specific data
+        $student = $this->user->student;
+        if ($student) {
+            $student->load(['classModel', 'school']);
+            
+            $viewData['student'] = $student;
+            $viewData['subjects'] = $this->getStudentSubjects($student);
+            $viewData['recentGrades'] = $this->getRecentGrades($student);
+            $viewData['pageTitle'] = 'Student Dashboard - ' . $student->full_name;
+        }
 
-        // Get attendance summary
-        $attendanceSummary = \App\Models\Attendance::where('student_id', $student->id)
-            ->selectRaw('
-                COUNT(*) as total_days,
-                SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present_days,
-                SUM(CASE WHEN status = "absent" THEN 1 ELSE 0 END) as absent_days,
-                SUM(CASE WHEN status = "late" THEN 1 ELSE 0 END) as late_days,
-                SUM(CASE WHEN status = "excused" THEN 1 ELSE 0 END) as excused_days
-            ')
-            ->first();
+        return view('student.dashboard', $viewData);
+    }
 
-        // Get recent attendance
-        $recentAttendance = \App\Models\Attendance::with('classModel')
-            ->where('student_id', $student->id)
-            ->orderBy('date', 'desc')
-            ->limit(10)
-            ->get();
+    /**
+     * Get student's subjects
+     */
+    private function getStudentSubjects($student)
+    {
+        if (!$student || !$student->class_id) {
+            return collect();
+        }
 
-        // Get recent grades
-        $recentGrades = \App\Models\Grade::with(['subject'])
-            ->where('student_id', $student->id)
-            ->orderBy('exam_date', 'desc')
-            ->limit(10)
-            ->get();
-
-        // Get subjects
-        $subjects = \App\Models\Subject::with('teacher.user')
+        return Subject::with('teacher.user')
             ->where('class_id', $student->class_id)
             ->where('is_active', true)
             ->get();
-
-        // Get today's attendance status
-        $todayAttendance = \App\Models\Attendance::where('student_id', $student->id)
-            ->whereDate('date', today())
-            ->first();
-
-        // Get upcoming assignments/exams (sample data)
-        $upcomingEvents = [
-            [
-                'title' => 'Mathematics Quiz',
-                'subject' => 'Mathematics',
-                'date' => Carbon::tomorrow(),
-                'type' => 'quiz'
-            ],
-            [
-                'title' => 'Physics Midterm',
-                'subject' => 'Physics',
-                'date' => Carbon::now()->addDays(3),
-                'type' => 'exam'
-            ],
-            [
-                'title' => 'Chemistry Assignment',
-                'subject' => 'Chemistry',
-                'date' => Carbon::now()->addDays(5),
-                'type' => 'assignment'
-            ]
-        ];
-
-        return view('student.dashboard', compact(
-            'student',
-            'attendanceSummary',
-            'recentAttendance',
-            'recentGrades',
-            'subjects',
-            'todayAttendance',
-            'upcomingEvents'
-        ));
     }
 
-    public function getStats()
+    /**
+     * Get student's recent grades
+     */
+    private function getRecentGrades($student)
     {
-        $student = auth()->user()->student;
-
-        $stats = [
-            'attendance_rate' => 0,
-            'total_subjects' => 0,
-            'average_grade' => 0,
-            'total_assignments' => 0
-        ];
-
-        // Calculate attendance rate
-        $attendanceData = \App\Models\Attendance::where('student_id', $student->id)
-            ->selectRaw('
-                COUNT(*) as total_days,
-                SUM(CASE WHEN status = "present" THEN 1 ELSE 0 END) as present_days
-            ')
-            ->first();
-
-        if ($attendanceData && $attendanceData->total_days > 0) {
-            $stats['attendance_rate'] = round(($attendanceData->present_days / $attendanceData->total_days) * 100, 2);
+        if (!$student) {
+            return collect();
         }
 
-        // Get total subjects
-        $stats['total_subjects'] = \App\Models\Subject::where('class_id', $student->class_id)
-            ->where('is_active', true)
-            ->count();
+        return Grade::with(['subject'])
+            ->where('student_id', $student->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+    }
 
-        // Get average grade
-        $averageGrade = \App\Models\Grade::where('student_id', $student->id)->avg('marks_obtained');
-        $stats['average_grade'] = $averageGrade ? round($averageGrade, 2) : 0;
+    /**
+     * Get student academic data via AJAX
+     */
+    public function getAcademicData(Request $request)
+    {
+        return $this->handleAjaxRequest(function() {
+            $student = $this->user->student;
+            if (!$student) {
+                return $this->errorResponse('Student profile not found');
+            }
 
-        // Get total assignments (sample data)
-        $stats['total_assignments'] = 12;
+            return [
+                'subjects' => $this->getStudentSubjects($student),
+                'recent_grades' => $this->getRecentGrades($student),
+                'statistics' => $this->getDashboardStatistics()
+            ];
+        });
+    }
 
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+    /**
+     * Get student schedule via AJAX
+     */
+    public function getSchedule(Request $request)
+    {
+        return $this->handleAjaxRequest(function() {
+            $student = $this->user->student;
+            if (!$student) {
+                return $this->errorResponse('Student profile not found');
+            }
+
+            // Placeholder implementation - will be enhanced in later tasks
+            return [
+                'today_classes' => [],
+                'upcoming_exams' => [],
+                'assignments' => []
+            ];
+        });
     }
 }

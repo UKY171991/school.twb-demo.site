@@ -8,15 +8,50 @@ use App\Models\Student;
 use App\Models\ClassModel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use DataTables;
 
 class AttendanceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $attendances = Attendance::with(['student.user', 'classModel'])
-            ->orderBy('date', 'desc')
-            ->paginate(20);
-        return view('admin.attendance.index', compact('attendances'));
+        if ($request->ajax()) {
+            $data = Attendance::with(['student.user', 'classModel'])->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->editColumn('date', function ($row) {
+                    return Carbon::parse($row->date)->format('d M, Y');
+                })
+                ->editColumn('status', function ($row) {
+                    $status = 'badge-secondary';
+                    switch ($row->status) {
+                        case 'present':
+                            $status = 'badge-success';
+                            break;
+                        case 'absent':
+                            $status = 'badge-danger';
+                            break;
+                        case 'late':
+                            $status = 'badge-warning';
+                            break;
+                        case 'excused':
+                            $status = 'badge-info';
+                            break;
+                    }
+                    return '<span class="badge ' . $status . '">' . ucfirst($row->status) . '</span>';
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.attendance.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.attendance.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.attendance.index');
     }
 
     public function create()
@@ -73,8 +108,7 @@ class AttendanceController extends Controller
 
     public function edit(Attendance $attendance)
     {
-        $attendance->load(['student.user', 'classModel']);
-        return view('admin.attendance.edit', compact('attendance'));
+        return view('admin.attendance._form', compact('attendance'))->render();
     }
 
     public function update(Request $request, Attendance $attendance)

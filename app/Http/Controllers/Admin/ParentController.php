@@ -8,19 +8,42 @@ use App\Models\User;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use DataTables;
 
 class ParentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $parents = ParentModel::with(['user', 'students.user'])->paginate(10);
-        return view('admin.parents.index', compact('parents'));
+        if ($request->ajax()) {
+            $data = ParentModel::with(['user'])->withCount('students')->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row){
+                    $statusBtn = '<button class="btn btn-sm toggle-status-btn '.($row->is_active ? 'btn-success' : 'btn-danger').'" data-url="'.route('admin.parents.toggle-status', $row).'">';
+                    $statusBtn .= '<i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i> ';
+                    $statusBtn .= '<span>'.($row->is_active ? 'Active' : 'Inactive').'</span>';
+                    $statusBtn .= '</button>';
+                    return $statusBtn;
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.parents.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.parents.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.parents.index');
     }
 
     public function create()
     {
         $students = Student::with('user')->where('is_active', true)->get();
-        return view('admin.parents.create', compact('students'));
+        return view('admin.parents._form', compact('students'))->render();
     }
 
     public function store(Request $request)
@@ -73,7 +96,7 @@ class ParentController extends Controller
 
     public function show(ParentModel $parent)
     {
-        $parent->load(['user', 'students.user.school']);
+        $parent->load(['user', 'students.user.school', 'students.classModel']);
         return view('admin.parents.show', compact('parent'));
     }
 
@@ -81,7 +104,7 @@ class ParentController extends Controller
     {
         $students = Student::with('user')->where('is_active', true)->get();
         $parent->load('user');
-        return view('admin.parents.edit', compact('parent', 'students'));
+        return view('admin.parents._form', compact('parent', 'students'))->render();
     }
 
     public function update(Request $request, ParentModel $parent)
@@ -104,7 +127,13 @@ class ParentController extends Controller
             'is_active' => $request->is_active
         ]);
 
-        $parent->update($request->except(['name', 'email']));
+        if ($request->password) {
+            $parent->user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+
+        $parent->update($request->except(['name', 'email', 'password']));
 
         // Sync students
         $parent->students()->sync($request->students);

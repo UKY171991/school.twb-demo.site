@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Admin Dashboard')
 @section('page-title', 'Dashboard')
@@ -19,7 +19,7 @@
             <div class="icon">
                 <i class="fas fa-school"></i>
             </div>
-            <a href="{{ route('schools.index') }}" class="small-box-footer">
+            <a href="{{ route('admin.schools.index') }}" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -35,7 +35,7 @@
             <div class="icon">
                 <i class="fas fa-chalkboard-teacher"></i>
             </div>
-            <a href="{{ route('teachers.index') }}" class="small-box-footer">
+            <a href="{{ route('admin.teachers.index') }}" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -51,7 +51,7 @@
             <div class="icon">
                 <i class="fas fa-user-graduate"></i>
             </div>
-            <a href="{{ route('students.index') }}" class="small-box-footer">
+            <a href="{{ route('admin.students.index') }}" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -67,7 +67,53 @@
             <div class="icon">
                 <i class="fas fa-door-open"></i>
             </div>
-            <a href="{{ route('classes.index') }}" class="small-box-footer">
+            <a href="{{ route('admin.classes.index') }}" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- New KPI Cards -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-primary">
+            <div class="inner">
+                <h3 id="fees-collected">{{ $stats['total_fees_collected'] ?? 0 }}</h3>
+                <p>Fees Collected</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <a href="#" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-secondary">
+            <div class="inner">
+                <h3 id="pending-fees">{{ $stats['pending_fees'] ?? 0 }}</h3>
+                <p>Pending Fees</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <a href="#" class="small-box-footer">
+                More info <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-dark">
+            <div class="inner">
+                <h3 id="upcoming-exams">{{ $stats['upcoming_exams'] ?? 0 }}</h3>
+                <p>Upcoming Exams</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <a href="#" class="small-box-footer">
                 More info <i class="fas fa-arrow-circle-right"></i>
             </a>
         </div>
@@ -75,13 +121,13 @@
 </div>
 
 <div class="row">
-    <!-- Recent Schools -->
-    <div class="col-md-6">
+    <!-- Charts Section -->
+    <div class="col-md-12">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-school mr-2"></i>
-                    Recent Schools
+                    <i class="fas fa-chart-bar mr-2"></i>
+                    Analytics
                 </h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -90,56 +136,33 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>School Name</th>
-                                <th>Code</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-schools">
-                            @forelse($recentSchools ?? [] as $school)
-                                <tr>
-                                    <td>{{ $school->name }}</td>
-                                    <td>{{ $school->code }}</td>
-                                    <td>
-                                        <span class="badge badge-{{ $school->is_active ? 'success' : 'danger' }}">
-                                            {{ $school->is_active ? 'Active' : 'Inactive' }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('schools.show', $school->id) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No schools found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p class="text-center"><strong>Attendance Trends</strong></p>
+                        <canvas id="attendanceChart" style="height: 200px;"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-center"><strong>Fee Collection Trends</strong></p>
+                        <canvas id="feeTrendsChart" style="height: 200px;"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-center"><strong>Student Performance</strong></p>
+                        <canvas id="studentPerformanceChart" style="height: 200px;"></canvas>
+                    </div>
                 </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="{{ route('schools.index') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> View All Schools
-                </a>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Recent Students -->
+<div class="row">
+    <!-- Recent Admissions -->
     <div class="col-md-6">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-user-graduate mr-2"></i>
-                    Recent Students
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Recent Admissions
                 </h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -147,36 +170,26 @@
                     </button>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Student Name</th>
                                 <th>Class</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th>Admission Date</th>
                             </tr>
                         </thead>
-                        <tbody id="recent-students">
+                        <tbody id="recent-admissions">
                             @forelse($recentStudents ?? [] as $student)
                                 <tr>
-                                    <td>{{ $student->full_name }}</td>
-                                    <td>{{ $student->class->name ?? 'N/A' }}</td>
-                                    <td>
-                                        <span class="badge badge-{{ $student->status === 'active' ? 'success' : 'secondary' }}">
-                                            {{ ucfirst($student->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('students.show', $student->id) }}" class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                    </td>
+                                    <td>{{ $student->user->name }}</td>
+                                    <td>{{ $student->classModel->name ?? 'N/A' }}</td>
+                                    <td>{{ $student->admission_date->format('d M, Y') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No students found</td>
+                                    <td colspan="3" class="text-center">No recent admissions found</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -184,90 +197,20 @@
                 </div>
             </div>
             <div class="card-footer text-center">
-                <a href="{{ route('students.index') }}" class="btn btn-primary btn-sm">
+                <a href="{{ route('admin.students.index') }}" class="btn btn-primary btn-sm">
                     <i class="fas fa-plus"></i> View All Students
                 </a>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row">
-    <!-- Quick Actions -->
-    <div class="col-md-12">
+    <!-- Pending Payments -->
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-bolt mr-2"></i>
-                    Quick Actions
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('schools.create') }}" class="btn btn-info btn-block mb-3">
-                            <i class="fas fa-school mr-2"></i>
-                            Add New School
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('teachers.create') }}" class="btn btn-success btn-block mb-3">
-                            <i class="fas fa-chalkboard-teacher mr-2"></i>
-                            Add New Teacher
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('students.create') }}" class="btn btn-warning btn-block mb-3">
-                            <i class="fas fa-user-graduate mr-2"></i>
-                            Add New Student
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('classes.create') }}" class="btn btn-danger btn-block mb-3">
-                            <i class="fas fa-door-open mr-2"></i>
-                            Add New Class
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('subjects.create') }}" class="btn btn-primary btn-block mb-3">
-                            <i class="fas fa-book mr-2"></i>
-                            Add New Subject
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('attendance.create') }}" class="btn btn-secondary btn-block mb-3">
-                            <i class="fas fa-calendar-check mr-2"></i>
-                            Take Attendance
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="{{ route('grades.create') }}" class="btn btn-dark btn-block mb-3">
-                            <i class="fas fa-star mr-2"></i>
-                            Add Grades
-                        </a>
-                    </div>
-                    <div class="col-md-3 col-sm-6">
-                        <a href="#" class="btn btn-light btn-block mb-3">
-                            <i class="fas fa-chart-bar mr-2"></i>
-                            View Reports
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Chart Section -->
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-line mr-2"></i>
-                    Statistics Overview
+                    <i class="fas fa-money-bill-wave mr-2"></i>
+                    Pending Payments
                 </h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -275,31 +218,140 @@
                     </button>
                 </div>
             </div>
-            <div class="card-body">
-                <canvas id="statsChart" width="400" height="200"></canvas>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-payments">
+                            <tr>
+                                <td colspan="3" class="text-center">No pending payments found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a href="#" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> View All Payments
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Latest Notifications -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bell mr-2"></i>
+                    Latest Notifications
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <ul class="products-list product-list-in-card pl-2 pr-2" id="latest-notifications">
+                    <li class="item text-center">
+                        No new notifications
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="#" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> View All Notifications
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-history mr-2"></i>
+                    Activity Log
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activity-log">
+                            @forelse($activityLog as $log)
+                                <tr>
+                                    <td>{{ $log->user->name }}</td>
+                                    <td>{{ $log->description }}</td>
+                                    <td>{{ $log->created_at->diffForHumans() }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center">No recent activity</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a href="#" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> View Full Log
+                </a>
             </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     $(document).ready(function() {
         // Load dashboard statistics
         loadDashboardStats();
         
-        // Initialize chart
-        initializeChart();
+        // Initialize charts
+        initAttendanceChart();
+        initFeeTrendsChart();
+        initStudentPerformanceChart();
+
+        // Load dynamic data
+        loadPendingPayments();
+        loadLatestNotifications();
+        loadActivityLog();
         
         // Refresh stats every 30 seconds
         setInterval(loadDashboardStats, 30000);
+        setInterval(loadPendingPayments, 60000);
+        setInterval(loadLatestNotifications, 60000);
+        setInterval(loadActivityLog, 30000);
     });
 
     function loadDashboardStats() {
         $.ajax({
-            url: '{{ route("dashboard.stats") }}',
+            url: '{{ route("admin.dashboard.stats") }}',
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -317,75 +369,143 @@
         $('#teachers-count').text(data.teachers || 0);
         $('#students-count').text(data.students || 0);
         $('#classes-count').text(data.classes || 0);
+        $('#fees-collected').text(data.total_fees_collected || 0);
+        $('#pending-fees').text(data.pending_fees || 0);
+        $('#upcoming-exams').text(data.upcoming_exams || 0);
     }
 
-    function initializeChart() {
-        const ctx = document.getElementById('statsChart').getContext('2d');
-        
-        // Get stats data from the page
-        const statsData = {
-            schools: {{ $stats['schools'] ?? 0 }},
-            teachers: {{ $stats['teachers'] ?? 0 }},
-            students: {{ $stats['students'] ?? 0 }},
-            classes: {{ $stats['classes'] ?? 0 }}
-        };
-
+    // Chart functions (placeholders for now)
+    function initAttendanceChart() {
+        const ctx = document.getElementById('attendanceChart').getContext('2d');
         new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ['Schools', 'Teachers', 'Students', 'Classes'],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                 datasets: [{
-                    label: 'Count',
-                    data: [
-                        statsData.schools,
-                        statsData.teachers,
-                        statsData.students,
-                        statsData.classes
-                    ],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.8)',
-                        'rgba(75, 192, 192, 0.8)',
-                        'rgba(255, 206, 86, 0.8)',
-                        'rgba(255, 99, 132, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(255, 99, 132, 1)'
-                    ],
-                    borderWidth: 1
+                    label: 'Attendance %',
+                    data: [65, 59, 80, 81, 56, 55],
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function initFeeTrendsChart() {
+        const ctx = document.getElementById('feeTrendsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Fees Collected',
+                    data: [1200, 1900, 3000, 500, 2000, 3000],
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function initStudentPerformanceChart() {
+        const ctx = document.getElementById('studentPerformanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Excellent', 'Good', 'Average', 'Below Average'],
+                datasets: [{
+                    data: [300, 50, 100, 20],
+                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    }
+
+    // Dynamic data loading functions (placeholders for now)
+    function loadPendingPayments() {
+        $.ajax({
+            url: '{{ route("admin.pending-payments") }}',
+            type: 'GET',
+            success: function(response) {
+                if (response.success && response.data.length > 0) {
+                    let html = '';
+                    response.data.forEach(item => {
+                        html += `<tr>
+                            <td>${item.student_name}</td>
+                            <td>${item.amount}</td>
+                            <td>${item.due_date}</td>
+                        </tr>`;
+                    });
+                    $('#pending-payments').html(html);
+                } else {
+                    $('#pending-payments').html('<tr><td colspan="3" class="text-center">No pending payments found</td></tr>');
                 }
             }
         });
     }
 
-    // Quick action buttons with confirmation
-    $('.btn-block').on('click', function(e) {
-        const action = $(this).text().trim();
-        
-        // Add loading state
-        const originalText = $(this).html();
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Loading...');
-        
-        // Re-enable button after a short delay (in case of navigation)
-        setTimeout(() => {
-            $(this).prop('disabled', false).html(originalText);
-        }, 2000);
-    });
-</script>
-@endsection
+    function loadLatestNotifications() {
+        $.ajax({
+            url: '{{ route("admin.latest-notifications") }}',
+            type: 'GET',
+            success: function(response) {
+                if (response.success && response.data.length > 0) {
+                    let html = '';
+                    response.data.forEach(item => {
+                        html += `<li class="item">
+                            <div class="product-img">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="product-info">
+                                <a href="${item.link}" class="product-title">${item.message}
+                                    <span class="badge badge-warning float-right">${item.time}</span></a>
+                                <span class="product-description">
+                                    ${item.description}
+                                </span>
+                            </div>
+                        </li>`;
+                    });
+                    $('#latest-notifications').html(html);
+                } else {
+                    $('#latest-notifications').html('<li class="item text-center">No new notifications</li>');
+                }
+            }
+        });
+    }
+
+    function loadActivityLog() {
+        $.ajax({
+            url: '{{ route("admin.activity-log") }}',
+            type: 'GET',
+            success: function(response) {
+                if (response.success && response.data.length > 0) {
+                    let html = '';
+                    response.data.forEach(log => {
+                        html += `<tr>
+                            <td>${log.user.name}</td>
+                            <td>${log.description}</td>
+                            <td>${moment(log.created_at).fromNow()}</td>
+                        </tr>`;
+                    });
+                    $('#activity-log').html(html);
+                } else {
+                    $('#activity-log').html('<tr><td colspan="3" class="text-center">No recent activity</td></tr>');
+                }
+            }
+        });
+    }
+@endpush

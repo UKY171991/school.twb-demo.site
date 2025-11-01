@@ -47,7 +47,7 @@ class Student extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function class()
+    public function classModel()
     {
         return $this->belongsTo(ClassModel::class);
     }

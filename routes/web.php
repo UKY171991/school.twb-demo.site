@@ -33,11 +33,39 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Dashboard Routes
-Route::middleware(['auth'])->group(function () {
-    // Super Admin & Admin Dashboard
-    Route::middleware(['user.type:super_admin,admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'school.context'])->group(function () {
+    
+    // Super Admin specific routes
+    Route::middleware(['role:super_admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/switch-school', function(\Illuminate\Http\Request $request) {
+            $schoolId = $request->input('school_id');
+            $success = \App\Services\SchoolContextService::switchSchool($schoolId);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => $success,
+                    'message' => $success ? 'School context switched successfully' : 'Failed to switch school context'
+                ]);
+            }
+            
+            return redirect()->back()->with($success ? 'success' : 'error', 
+                $success ? 'School context switched successfully' : 'Failed to switch school context');
+        })->name('switch-school');
+        
+        // Super Admin school management
+        Route::resource('schools', 'App\Http\Controllers\Admin\SchoolController');
+        Route::resource('users', 'App\Http\Controllers\SuperAdmin\UserController');
+    });
+
+    // Admin Dashboard (School-specific)
+    Route::middleware(['role:admin', 'school.active'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [AdminDashboardController::class, 'getStats'])->name('dashboard.stats');
+        Route::get('/dashboard/pending-payments', [AdminDashboardController::class, 'getPendingPayments'])->name('pending-payments');
+        Route::get('/dashboard/latest-notifications', [AdminDashboardController::class, 'getLatestNotifications'])->name('latest-notifications');
+        Route::get('/dashboard/activity-log', [AdminDashboardController::class, 'getActivityLogData'])->name('activity-log');
+
         
         // Schools Management
         Route::resource('schools', 'App\Http\Controllers\Admin\SchoolController');
@@ -81,7 +109,7 @@ Route::middleware(['auth'])->group(function () {
     // Teacher Dashboard
     Route::middleware(['user.type:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
         Route::get('/dashboard', [TCDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard/stats', [TCDashboardController::class, 'getStats'])->name('dashboard.stats');
+        Route::get('/dashboard/stats', [TCDashboardController::class, 'getStats'])->name('teacher.dashboard.stats');
         
         // Teacher specific routes
         Route::get('/classes', 'App\Http\Controllers\TC\ClassController@index')->name('classes');
@@ -149,8 +177,21 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // AJAX Routes for all user types
-Route::middleware(['auth'])->prefix('ajax')->name('ajax.')->group(function () {
-    // Common AJAX routes
+Route::middleware(['auth', 'school.context'])->prefix('ajax')->name('ajax.')->group(function () {
+    // Common AJAX routes using our new CommonController
+    Route::get('/schools', 'App\Http\Controllers\Ajax\CommonController@getSchools')->name('schools');
+    Route::get('/users', 'App\Http\Controllers\Ajax\CommonController@getUsers')->name('users');
+    Route::get('/students', 'App\Http\Controllers\Ajax\CommonController@getStudents')->name('students');
+    Route::get('/teachers', 'App\Http\Controllers\Ajax\CommonController@getTeachers')->name('teachers');
+    Route::get('/classes', 'App\Http\Controllers\Ajax\CommonController@getClasses')->name('classes');
+    Route::get('/subjects', 'App\Http\Controllers\Ajax\CommonController@getSubjects')->name('subjects');
+    Route::post('/upload-file', 'App\Http\Controllers\Ajax\CommonController@uploadFile')->name('upload-file');
+    Route::delete('/delete-file', 'App\Http\Controllers\Ajax\CommonController@deleteFile')->name('delete-file');
+    Route::get('/notifications', 'App\Http\Controllers\Ajax\CommonController@getNotifications')->name('notifications');
+    Route::post('/notifications/{id}/read', 'App\Http\Controllers\Ajax\CommonController@markNotificationRead')->name('notifications.read');
+    Route::get('/widget-data', 'App\Http\Controllers\Ajax\CommonController@getWidgetData')->name('widget-data');
+    
+    // Legacy routes (to be updated)
     Route::post('/upload-image', 'App\Http\Controllers\Ajax\UploadController@uploadImage')->name('upload-image');
     Route::get('/search-users', 'App\Http\Controllers\Ajax\SearchController@searchUsers')->name('search-users');
     

@@ -5,201 +5,387 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login - {{ config('app.name', 'School Management') }}</title>
+    <title>{{ config('app.name', 'School Management') }} · Sign in</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Nunito:400,600,700" rel="stylesheet">
 
-    <!-- AdminLTE3 CSS -->
+    <!-- AdminLTE3 & dependencies -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-    <!-- Toastr CSS -->
+    <!-- Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at top, #eff3ff 0%, #f4f6fb 45%, #f7f9fc 100%);
             min-height: 100vh;
+            font-family: 'Nunito', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
         }
-        .login-box {
-            margin-top: 10vh;
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1120px;
         }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+        .login-card {
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 28px 60px rgba(20, 34, 70, 0.12);
+            background: #fff;
         }
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px 15px 0 0 !important;
-            text-align: center;
-            padding: 2rem;
+
+        .brand-panel {
+            background: linear-gradient(135deg, #2152ff 0%, #21d4fd 100%);
+            position: relative;
+            padding: 3.5rem 3.5rem 4.5rem;
         }
-        .card-header h3 {
-            color: white;
-            margin: 0;
-            font-weight: 600;
+
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: url('https://adminlte.io/themes/v3/dist/img/boxed-bg.jpg') center/cover;
+            opacity: .25;
+            mix-blend-mode: screen;
         }
-        .login-logo {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
+
+        .brand-panel .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px;
+            height: 72px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(12px);
+            margin-bottom: 2rem;
+        }
+
+        .brand-title {
+            font-size: 2.125rem;
+            font-weight: 700;
+            color: #fff;
             margin-bottom: 1rem;
         }
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 30px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1rem;
+            margin-bottom: 2.25rem;
+            max-width: 280px;
         }
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.9);
         }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.15rem;
+            font-size: 1rem;
+        }
+
+        .feature-list li i {
+            margin-right: 0.75rem;
+            margin-top: 0.2rem;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .form-panel {
+            padding: 3.25rem 3.75rem;
+        }
+
+        .form-heading {
+            margin-bottom: 2rem;
+        }
+
+        .form-heading h2 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2d3d;
+            font-size: 2rem;
+        }
+
+        .form-heading p {
+            color: #6a7a8c;
+            margin-bottom: 0;
+        }
+
         .input-group-text {
-            background: transparent;
             border-right: none;
-            color: #667eea;
+            background: transparent;
+            color: #2152ff;
         }
+
         .form-control {
             border-left: none;
-            border-radius: 0 25px 25px 0;
-            padding: 12px 15px;
+            padding: 0.85rem 1rem;
+            border-radius: 0 0.75rem 0.75rem 0;
         }
+
         .input-group {
+            border: 1px solid #d8e2ef;
+            border-radius: 0.9rem;
+            transition: border-color 0.2s ease;
+            background: #fff;
             margin-bottom: 1.5rem;
         }
-        .input-group:first-child .form-control {
-            border-radius: 25px;
+
+        .input-group:focus-within {
+            border-color: #2152ff;
+            box-shadow: 0 0 0 3px rgba(33, 82, 255, 0.12);
         }
-        .input-group:first-child .input-group-text {
-            border-radius: 25px 0 0 25px;
+
+        .btn-login {
+            background: linear-gradient(135deg, #2152ff 0%, #21d4fd 100%);
+            border: none;
+            border-radius: 0.9rem;
+            padding: 1rem 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .social-auth-links {
-            text-align: center;
-            margin-top: 1rem;
+
+        .btn-login:hover,
+        .btn-login:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(33, 82, 255, 0.25);
         }
-        .social-auth-links a {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            border-radius: 50%;
-            margin: 0 5px;
-            color: white;
+
+        .action-row {
+            margin-bottom: 2rem;
+        }
+
+        .link-muted {
+            color: #6a7a8c;
             text-decoration: none;
-            transition: all 0.3s ease;
         }
-        .social-auth-links a:hover {
-            transform: translateY(-3px);
+
+        .link-muted:hover {
+            color: #2152ff;
         }
-        .bg-facebook { background: #3b5998; }
-        .bg-google { background: #dd4b39; }
-        .bg-twitter { background: #00aced; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2.25rem 0 1.75rem;
+            color: #a1acbd;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e3e9f2;
+        }
+
+        .divider span {
+            margin: 0 0.75rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            margin: 0 0.45rem;
+            color: #fff;
+            font-size: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(18, 38, 63, 0.15);
+        }
+
+        .social-facebook { background: #3b5998; }
+        .social-google { background: #db4437; }
+        .social-twitter { background: #1da1f2; }
+
+        @media (max-width: 1199.98px) {
+            body {
+                padding: 2.5rem 1rem;
+            }
+
+            .login-card {
+                border-radius: 1.5rem;
+            }
+
+            .brand-panel {
+                padding: 3rem 2.75rem 3.5rem;
+            }
+
+            .form-panel {
+                padding: 3rem 3rem;
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            body {
+                padding: 2rem 0.75rem;
+            }
+
+            .brand-panel {
+                padding: 2.75rem 2.5rem 3.25rem;
+            }
+
+            .form-panel {
+                padding: 2.75rem 2.5rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            body {
+                padding: 1.75rem 0.75rem;
+            }
+
+            .form-panel {
+                padding: 2.25rem 1.75rem;
+            }
+
+            .brand-panel {
+                padding: 2.5rem 1.75rem 3rem;
+            }
+        }
     </style>
 </head>
-<body class="hold-transition login-page">
-<div class="login-box">
-    <div class="card">
-        <div class="card-header">
-            <div class="login-logo">
-                <i class="fas fa-school"></i> School Management
-            </div>
-            <h3>Welcome Back!</h3>
-            <p class="text-white-50">Please sign in to your account</p>
-        </div>
-        <div class="card-body login-card-body">
-            <form action="{{ route('login') }}" method="post" id="loginForm">
-                @csrf
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                            <i class="fas fa-envelope"></i>
-                        </span>
-                    </div>
-                    <input type="email" 
-                           class="form-control @error('email') is-invalid @enderror" 
-                           placeholder="Email Address" 
-                           name="email" 
-                           value="{{ old('email') }}" 
-                           required 
-                           autocomplete="email" 
-                           autofocus>
-                    @error('email')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
+<body class="hold-transition">
+<div class="login-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-11">
+                <div class="card login-card">
+                    <div class="row no-gutters">
+                        <div class="col-lg-5 d-none d-lg-flex brand-panel">
+                            <div class="brand-content animate__animated animate__fadeInLeft">
+                                <div class="brand-logo">
+                                    <i class="fas fa-school fa-lg text-white"></i>
+                                </div>
+                                <div class="brand-title">{{ config('app.name', 'School Management') }}</div>
+                                <p class="brand-subtitle">Unified platform to manage schools, staff, parents, and students effortlessly.</p>
+                                <ul class="feature-list">
+                                    <li><i class="fas fa-check"></i> Centralized multi-school management</li>
+                                    <li><i class="fas fa-check"></i> Real-time attendance & academic insights</li>
+                                    <li><i class="fas fa-check"></i> Secure communication for all stakeholders</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 col-12">
+                            <div class="form-panel">
+                                <div class="form-heading">
+                                    <h2 class="mb-1">Welcome back</h2>
+                                    <p>Sign in to continue to your dashboard.</p>
+                                </div>
 
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                    </div>
-                    <input type="password" 
-                           class="form-control @error('password') is-invalid @enderror" 
-                           placeholder="Password" 
-                           name="password" 
-                           required 
-                           autocomplete="current-password">
-                    @error('password')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
+                                <form id="loginForm" action="{{ route('login') }}" method="POST" autocomplete="off">
+                                    @csrf
 
-                <div class="row">
-                    <div class="col-8">
-                        <div class="icheck-primary">
-                            <input type="checkbox" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label for="remember">
-                                Remember Me
-                            </label>
+                                    <div class="form-group mb-3">
+                                        <label class="text-uppercase small text-muted font-weight-semibold" for="email">Email address</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="far fa-envelope"></i>
+                                                </span>
+                                            </div>
+                                            <input type="email"
+                                                   class="form-control @error('email') is-invalid @enderror"
+                                                   id="email"
+                                                   name="email"
+                                                   value="{{ old('email') }}"
+                                                   required
+                                                   autofocus
+                                                   placeholder="name@example.com">
+                                        </div>
+                                        @error('email')
+                                            <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label class="text-uppercase small text-muted font-weight-semibold" for="password">Password</label>
+                                            @if (Route::has('password.request'))
+                                                <a class="link-muted small" href="{{ route('password.request') }}">Forgot password?</a>
+                                            @endif
+                                        </div>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            </div>
+                                            <input type="password"
+                                                   class="form-control @error('password') is-invalid @enderror"
+                                                   id="password"
+                                                   name="password"
+                                                   required
+                                                   placeholder="Enter your password">
+                                        </div>
+                                        @error('password')
+                                            <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                                            <label for="remember">Remember me</label>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-login btn-block" id="loginSubmit">
+                                        <span class="btn-label"><i class="fas fa-sign-in-alt mr-2"></i>Sign in</span>
+                                    </button>
+                                </form>
+
+                                <div class="divider">
+                                    <span>OR CONTINUE WITH</span>
+                                </div>
+
+                                <div class="text-center social-links">
+                                    <a href="#" class="social-facebook" aria-label="Continue with Facebook"><i class="fab fa-facebook-f"></i></a>
+                                    <a href="#" class="social-google" aria-label="Continue with Google"><i class="fab fa-google"></i></a>
+                                    <a href="#" class="social-twitter" aria-label="Continue with Twitter"><i class="fab fa-twitter"></i></a>
+                                </div>
+
+                                <p class="mt-4 text-center text-muted">
+                                    Don’t have an account?
+                                    <a href="{{ route('register') }}" class="font-weight-semibold">Create one now</a>.
+                                </p>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-login">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </button>
-                    </div>
                 </div>
-
-                @if (Route::has('password.request'))
-                    <div class="text-center mt-3">
-                        <a href="{{ route('password.request') }}" class="text-decoration-none">
-                            <i class="fas fa-key"></i> Forgot Your Password?
-                        </a>
-                    </div>
-                @endif
-            </form>
-
-            <div class="social-auth-links text-center mt-4">
-                <p class="mb-3">- OR -</p>
-                <a href="#" class="bg-facebook">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="bg-google">
-                    <i class="fab fa-google"></i>
-                </a>
-                <a href="#" class="bg-twitter">
-                    <i class="fab fa-twitter"></i>
-                </a>
-            </div>
-
-            <div class="text-center mt-4">
-                <p class="mb-0">Don't have an account? 
-                    <a href="{{ route('register') }}" class="text-decoration-none">
-                        <strong>Sign up here</strong>
-                    </a>
-                </p>
             </div>
         </div>
     </div>
@@ -209,100 +395,82 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
+<!-- AdminLTE -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-
-<!-- Toastr JS -->
+<!-- Toastr -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script>
-    // Toastr configuration
     toastr.options = {
-        "closeButton": true,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": true,
-        "positionClass": "toast-top-right",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        timeOut: 5000,
+        extendedTimeOut: 1000,
     };
 
-    // CSRF token setup for AJAX
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    // Show validation errors if any
-    @if($errors->any())
-        @foreach($errors->all() as $error)
+    @if (session('status'))
+        toastr.info('{{ session('status') }}');
+    @endif
+
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
             toastr.error('{{ $error }}');
         @endforeach
     @endif
 
-    // Show success message if redirected from registration
-    @if(session('success'))
-        toastr.success('{{ session('success') }}');
-    @endif
+    $('#loginForm').on('submit', function (event) {
+        event.preventDefault();
 
-    // AJAX form submission
-    $('#loginForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        var form = $(this);
-        var formData = form.serialize();
-        
+        const $form = $(this);
+        const $button = $('#loginSubmit');
+
         $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: formData,
-            beforeSend: function() {
-                $('.btn-login').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Signing In...');
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            headers: {
+                'Accept': 'application/json'
             },
-            success: function(response) {
+            beforeSend: function () {
+                $button.prop('disabled', true);
+                $button.find('.btn-label').html('<i class="fas fa-spinner fa-spin mr-2"></i>Signing in');
+            },
+            success: function (response) {
                 if (response.success) {
-                    toastr.success('Login successful! Redirecting...');
-                    setTimeout(function() {
-                        window.location.href = response.redirect;
-                    }, 1000);
+                    toastr.success(response.message || 'Login successful');
+                    setTimeout(function () {
+                        window.location.href = response.redirect || '{{ route('dashboard') }}';
+                    }, 900);
                 } else {
                     toastr.error(response.message || 'Login failed. Please try again.');
-                    $('.btn-login').prop('disabled', false).html('<i class="fas fa-sign-in-alt"></i> Sign In');
+                    resetButton();
                 }
             },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    var errors = xhr.responseJSON.errors;
-                    for (var field in errors) {
-                        toastr.error(errors[field][0]);
-                    }
+            error: function (xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    Object.values(xhr.responseJSON.errors).forEach(function (messages) {
+                        toastr.error(messages[0]);
+                    });
                 } else if (xhr.status === 401) {
-                    toastr.error('Invalid credentials. Please check your email and password.');
+                    toastr.error(xhr.responseJSON?.message || 'Invalid credentials provided.');
                 } else {
-                    toastr.error('An error occurred. Please try again.');
+                    toastr.error('Something went wrong. Please try again.');
                 }
-                $('.btn-login').prop('disabled', false).html('<i class="fas fa-sign-in-alt"></i> Sign In');
+                resetButton();
             }
         });
-    });
 
-    // Add animation to input fields
-    $('.form-control').on('focus', function() {
-        $(this).parent().addClass('focused');
-    });
-
-    $('.form-control').on('blur', function() {
-        if (!$(this).val()) {
-            $(this).parent().removeClass('focused');
+        function resetButton() {
+            $button.prop('disabled', false);
+            $button.find('.btn-label').html('<i class="fas fa-sign-in-alt mr-2"></i>Sign in');
         }
     });
 </script>

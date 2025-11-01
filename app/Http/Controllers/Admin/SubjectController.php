@@ -7,20 +7,43 @@ use App\Models\Subject;
 use App\Models\School;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use DataTables;
 
 class SubjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::with(['school', 'teacher.user'])->paginate(10);
-        return view('admin.subjects.index', compact('subjects'));
+        if ($request->ajax()) {
+            $data = Subject::with(['school', 'teacher.user'])->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row){
+                    $statusBtn = '<button class="btn btn-sm toggle-status-btn '.($row->is_active ? 'btn-success' : 'btn-danger').'" data-url="'.route('admin.subjects.toggle-status', $row).'">';
+                    $statusBtn .= '<i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i> ';
+                    $statusBtn .= '<span>'.($row->is_active ? 'Active' : 'Inactive').'</span>';
+                    $statusBtn .= '</button>';
+                    return $statusBtn;
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.subjects.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.subjects.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.subjects.index');
     }
 
     public function create()
     {
         $schools = School::where('is_active', true)->get();
         $teachers = Teacher::with('user')->where('is_active', true)->get();
-        return view('admin.subjects.create', compact('schools', 'teachers'));
+        return view('admin.subjects._form', compact('schools', 'teachers'))->render();
     }
 
     public function store(Request $request)
@@ -59,7 +82,7 @@ class SubjectController extends Controller
     {
         $schools = School::where('is_active', true)->get();
         $teachers = Teacher::with('user')->where('is_active', true)->get();
-        return view('admin.subjects.edit', compact('subject', 'schools', 'teachers'));
+        return view('admin.subjects._form', compact('subject', 'schools', 'teachers'))->render();
     }
 
     public function update(Request $request, Subject $subject)

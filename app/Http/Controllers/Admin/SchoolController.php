@@ -6,13 +6,36 @@ use App\Http\Controllers\Controller;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use DataTables;
 
 class SchoolController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $schools = School::withCount(['teachers', 'students'])->paginate(10);
-        return view('admin.schools.index', compact('schools'));
+        if ($request->ajax()) {
+            $data = School::withCount(['teachers', 'students'])->latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status', function($row){
+                    $statusBtn = '<button class="btn btn-sm toggle-status-btn '.($row->is_active ? 'btn-success' : 'btn-danger').'" data-url="'.route('admin.schools.toggle-status', $row).'">';
+                    $statusBtn .= '<i class="fas '.($row->is_active ? 'fa-toggle-on' : 'fa-toggle-off').'"></i> ';
+                    $statusBtn .= '<span>'.($row->is_active ? 'Active' : 'Inactive').'</span>';
+                    $statusBtn .= '</button>';
+                    return $statusBtn;
+                })
+                ->addColumn('actions', function($row){
+                    $actionBtn = '<div class="btn-group" role="group">';
+                    $actionBtn .= '<a href="'.route('admin.schools.show', $row).'" class="btn btn-info btn-sm" data-toggle="tooltip" title="View"><i class="fas fa-eye"></i></a>';
+                    $actionBtn .= '<button type="button" class="btn btn-warning btn-sm edit-btn" data-id="'.$row->id.'" data-toggle="tooltip" title="Edit"><i class="fas fa-edit"></i></button>';
+                    $actionBtn .= '<button type="button" class="btn btn-danger btn-sm delete-btn" data-url="'.route('admin.schools.destroy', $row).'" data-toggle="tooltip" title="Delete"><i class="fas fa-trash"></i></button>';
+                    $actionBtn .= '</div>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['status', 'actions'])
+                ->make(true);
+        }
+
+        return view('admin.schools.index');
     }
 
     public function create()
@@ -55,7 +78,7 @@ class SchoolController extends Controller
 
     public function edit(School $school)
     {
-        return view('admin.schools.edit', compact('school'));
+        return response()->json($school);
     }
 
     public function update(Request $request, School $school)
@@ -111,3 +134,5 @@ class SchoolController extends Controller
         ]);
     }
 }
+
+

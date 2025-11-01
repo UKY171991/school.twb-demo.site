@@ -1,40 +1,6 @@
 // Admin JavaScript for AJAX functionality and notifications
 
 $(document).ready(function() {
-    // Initialize DataTables
-    $('.datatable').DataTable({
-        "responsive": true,
-        "lengthChange": false,
-        "autoWidth": false,
-        "pageLength": 25,
-        "language": {
-            "search": "Search:",
-            "lengthMenu": "Show _MENU_ entries",
-            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
-            "infoEmpty": "Showing 0 to 0 of 0 entries",
-            "infoFiltered": "(filtered from _MAX_ total entries)",
-            "paginate": {
-                "first": "First",
-                "last": "Last",
-                "next": "Next",
-                "previous": "Previous"
-            }
-        }
-    });
-
-    // Initialize Select2
-    $('.select2').select2({
-        theme: 'bootstrap4',
-        width: '100%'
-    });
-
-    // Initialize date picker
-    $('.datepicker').datepicker({
-        format: 'yyyy-mm-dd',
-        autoclose: true,
-        todayHighlight: true
-    });
-
     // CSRF token setup for AJAX
     $.ajaxSetup({
         headers: {
@@ -42,289 +8,643 @@ $(document).ready(function() {
         }
     });
 
-    // Global AJAX error handler
-    $(document).ajaxError(function(event, xhr, settings, thrownError) {
-        if (xhr.status === 422) {
-            // Validation errors
-            const errors = xhr.responseJSON.errors;
-            let errorMessage = 'Validation failed:\n';
-            for (let field in errors) {
-                errorMessage += errors[field][0] + '\n';
-            }
-            showToast('error', errorMessage);
-        } else if (xhr.status === 403) {
-            showToast('error', 'Access denied');
-        } else if (xhr.status === 404) {
-            showToast('error', 'Resource not found');
-        } else if (xhr.status >= 500) {
-            showToast('error', 'Server error occurred');
-        } else {
-            showToast('error', 'An error occurred: ' + thrownError);
-        }
-    });
-
-    // Toggle status functionality
-    $(document).on('click', '.toggle-status', function(e) {
-        e.preventDefault();
-        const url = $(this).data('url');
-        const button = $(this);
-        
-        $.ajax({
-            url: url,
-            type: 'POST',
-            dataType: 'json',
-            beforeSend: function() {
-                button.prop('disabled', true);
-            },
-            success: function(response) {
-                if (response.success) {
-                    showToast('success', response.message);
-                    // Update button text and icon
-                    const isActive = response.is_active;
-                    button.find('i').removeClass('fa-toggle-off fa-toggle-on')
-                        .addClass(isActive ? 'fa-toggle-on' : 'fa-toggle-off');
-                    button.find('span').text(isActive ? 'Active' : 'Inactive');
-                    button.removeClass('btn-success btn-danger')
-                        .addClass(isActive ? 'btn-success' : 'btn-danger');
-                } else {
-                    showToast('error', response.message);
-                }
-            },
-            error: function() {
-                showToast('error', 'Failed to update status');
-            },
-            complete: function() {
-                button.prop('disabled', false);
-            }
+    // Toast notification function
+    function showToast(type, message, title = '') {
+        toastr[type](message, title, { 
+            progressBar: true,
+            positionClass: 'toast-top-right'
         });
-    });
-
-    // Delete confirmation
-    $(document).on('click', '.btn-delete', function(e) {
-        e.preventDefault();
-        const url = $(this).data('url');
-        const name = $(this).data('name') || 'item';
-        
-        if (confirm(`Are you sure you want to delete this ${name}?`)) {
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        showToast('success', response.message);
-                        // Reload the page or remove the row
-                        location.reload();
-                    } else {
-                        showToast('error', response.message);
-                    }
-                }
-            });
-        }
-    });
-
-    // Form submission with AJAX
-    $(document).on('submit', '.ajax-form', function(e) {
-        e.preventDefault();
-        const form = $(this);
-        const url = form.attr('action');
-        const method = form.find('input[name="_method"]').val() || 'POST';
-        const formData = new FormData(this);
-        
-        // Add method override for PUT/PATCH/DELETE
-        if (method !== 'POST') {
-            formData.append('_method', method);
-        }
-        
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            beforeSend: function() {
-                form.find('button[type="submit"]').prop('disabled', true);
-            },
-            success: function(response) {
-                if (response.success) {
-                    showToast('success', response.message);
-                    if (response.redirect) {
-                        window.location.href = response.redirect;
-                    } else {
-                        // Reset form or redirect
-                        form[0].reset();
-                        location.reload();
-                    }
-                } else {
-                    showToast('error', response.message);
-                }
-            },
-            complete: function() {
-                form.find('button[type="submit"]').prop('disabled', false);
-            }
-        });
-    });
-
-    // Search functionality
-    $('.search-input').on('input', debounce(function() {
-        const query = $(this).val();
-        const url = $(this).data('url');
-        const target = $(this).data('target');
-        
-        if (query.length >= 2) {
-            $.ajax({
-                url: url,
-                type: 'GET',
-                data: { query: query },
-                success: function(response) {
-                    if (response.success) {
-                        $(target).html(response.data);
-                    }
-                }
-            });
-        }
-    }, 300));
-
-    // File upload with progress
-    $(document).on('change', '.file-input', function() {
-        const file = this.files[0];
-        const uploadUrl = $(this).data('upload-url');
-        const preview = $(this).data('preview');
-        
-        if (file && uploadUrl) {
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            $.ajax({
-                url: uploadUrl,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                xhr: function() {
-                    const xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", function(evt) {
-                        if (evt.lengthComputable) {
-                            const percentComplete = evt.loaded / evt.total * 100;
-                            $('.progress-bar').css('width', percentComplete + '%');
-                        }
-                    }, false);
-                    return xhr;
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showToast('success', response.message);
-                        if (preview && response.data.url) {
-                            $(preview).attr('src', response.data.url).show();
-                        }
-                    } else {
-                        showToast('error', response.message);
-                    }
-                }
-            });
-        }
-    });
-
-    // Initialize tooltips
-    $('[data-toggle="tooltip"]').tooltip();
-
-    // Initialize popovers
-    $('[data-toggle="popover"]').popover();
-
-    // Auto-refresh data every 30 seconds
-    setInterval(function() {
-        $('.auto-refresh').each(function() {
-            const url = $(this).data('url');
-            if (url) {
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(response) {
-                        if (response.success) {
-                            $('.auto-refresh').html(response.data);
-                        }
-                    }
-                });
-            }
-        });
-    }, 30000);
-});
-
-// Toast notification function
-function showToast(type, message, title = '') {
-    const options = {
-        closeButton: true,
-        debug: false,
-        newestOnTop: false,
-        progressBar: true,
-        positionClass: "toast-top-right",
-        preventDuplicates: false,
-        onclick: null,
-        showDuration: "300",
-        hideDuration: "1000",
-        timeOut: "5000",
-        extendedTimeOut: "1000",
-        showEasing: "swing",
-        hideEasing: "linear",
-        showMethod: "fadeIn",
-        hideMethod: "fadeOut"
-    };
-
-    switch(type) {
-        case 'success':
-            toastr.success(message, title, options);
-            break;
-        case 'error':
-            toastr.error(message, title, options);
-            break;
-        case 'warning':
-            toastr.warning(message, title, options);
-            break;
-        case 'info':
-            toastr.info(message, title, options);
-            break;
-        default:
-            toastr.info(message, title, options);
     }
-}
 
-// Debounce function for search
-function debounce(func, wait, immediate) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            timeout = null;
-            if (!immediate) func(...args);
-        };
-        const callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func(...args);
-    };
-}
+    // Schools
+    var schools_table = $('#schools-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/schools",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'address', name: 'address' },
+            { data: 'phone', name: 'phone' },
+            { data: 'email', name: 'email' },
+            { data: 'principal_name', name: 'principal_name' },
+            { data: 'teachers_count', name: 'teachers_count', searchable: false },
+            { data: 'students_count', name: 'students_count', searchable: false },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
 
-// Utility functions
-function formatDate(date) {
-    return new Date(date).toLocaleDateString();
-}
+    $('#add-school-btn').on('click', function() {
+        $('#school-form')[0].reset();
+        $('#school-modal-label').text('Add New School');
+        $('#school-form-method').val('POST');
+        $('#school-form').attr('action', "/admin/schools");
+        $('#school-id').val('');
+        $('#school-modal').modal('show');
+    });
 
-function formatDateTime(date) {
-    return new Date(date).toLocaleString();
-}
+    $('#schools-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $.get("/admin/schools/" + id + '/edit', function(data) {
+            $('#school-modal-label').text('Edit School');
+            $('#school-form-method').val('PUT');
+            $('#school-form').attr('action', "/admin/schools/" + id);
+            $('#school-id').val(data.id);
+            $('#name').val(data.name);
+            $('#address').val(data.address);
+            $('#phone').val(data.phone);
+            $('#email').val(data.email);
+            $('#principal_name').val(data.principal_name);
+            $('#established_year').val(data.established_year);
+            $('#description').val(data.description);
+            $('#is_active').prop('checked', data.is_active);
+            $('#school-modal').modal('show');
+        });
+    });
 
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
-}
+    $('#save-school-btn').on('click', function() {
+        var form = $('#school-form');
+        var url = form.attr('action');
+        var method = $('#school-form-method').val();
+        var data = form.serialize();
 
-// Export functions for use in other scripts
-window.AdminJS = {
-    showToast: showToast,
-    formatDate: formatDate,
-    formatDateTime: formatDateTime,
-    formatCurrency: formatCurrency
-};
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#school-modal').modal('hide');
+                    schools_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Teachers
+    var teachers_table = $('#teachers-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/teachers",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'user.name', name: 'user.name' },
+            { data: 'user.email', name: 'user.email' },
+            { data: 'school.name', name: 'school.name' },
+            { data: 'phone', name: 'phone' },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-teacher-btn').on('click', function() {
+        $('#teacher-modal-label').text('Add New Teacher');
+        $('#teacher-form-method').val('POST');
+        $('#teacher-form').attr('action', "/admin/teachers");
+        $('#teacher-id').val('');
+        $.get("/admin/teachers/create", function(data) {
+            $('#teacher-form-content').html(data);
+            $('.select2').select2();
+            $('#teacher-modal').modal('show');
+        });
+    });
+
+    $('#teachers-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#teacher-modal-label').text('Edit Teacher');
+        $('#teacher-form-method').val('PUT');
+        $('#teacher-form').attr('action', "/admin/teachers/" + id);
+        $('#teacher-id').val(id);
+        $.get("/admin/teachers/" + id + '/edit', function(data) {
+            $('#teacher-form-content').html(data);
+            $('.select2').select2();
+            $('#teacher-modal').modal('show');
+        });
+    });
+
+    $('#save-teacher-btn').on('click', function() {
+        var form = $('#teacher-form');
+        var url = form.attr('action');
+        var method = $('#teacher-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#teacher-modal').modal('hide');
+                    teachers_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Students
+    var students_table = $('#students-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/students",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'user.name', name: 'user.name' },
+            { data: 'user.email', name: 'user.email' },
+            { data: 'school.name', name: 'school.name' },
+            { data: 'class_model.name', name: 'classModel.name' },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-student-btn').on('click', function() {
+        $('#student-modal-label').text('Add New Student');
+        $('#student-form-method').val('POST');
+        $('#student-form').attr('action', "/admin/students");
+        $('#student-id').val('');
+        $.get("/admin/students/create", function(data) {
+            $('#student-form-content').html(data);
+            $('.select2').select2();
+            $('#student-modal').modal('show');
+        });
+    });
+
+    $('#students-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#student-modal-label').text('Edit Student');
+        $('#student-form-method').val('PUT');
+        $('#student-form').attr('action', "/admin/students/" + id);
+        $('#student-id').val(id);
+        $.get("/admin/students/" + id + '/edit', function(data) {
+            $('#student-form-content').html(data);
+            $('.select2').select2();
+            $('#student-modal').modal('show');
+        });
+    });
+
+    $('#save-student-btn').on('click', function() {
+        var form = $('#student-form');
+        var url = form.attr('action');
+        var method = $('#student-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#student-modal').modal('hide');
+                    students_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Classes
+    var classes_table = $('#classes-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/classes",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'school.name', name: 'school.name' },
+            { data: 'teacher.user.name', name: 'teacher.user.name' },
+            { data: 'students_count', name: 'students_count', searchable: false },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-class-btn').on('click', function() {
+        $('#class-modal-label').text('Add New Class');
+        $('#class-form-method').val('POST');
+        $('#class-form').attr('action', "/admin/classes");
+        $('#class-id').val('');
+        $.get("/admin/classes/create", function(data) {
+            $('#class-form-content').html(data);
+            $('.select2').select2();
+            $('#class-modal').modal('show');
+        });
+    });
+
+    $('#classes-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#class-modal-label').text('Edit Class');
+        $('#class-form-method').val('PUT');
+        $('#class-form').attr('action', "/admin/classes/" + id);
+        $('#class-id').val(id);
+        $.get("/admin/classes/" + id + '/edit', function(data) {
+            $('#class-form-content').html(data);
+            $('.select2').select2();
+            $('#class-modal').modal('show');
+        });
+    });
+
+    $('#save-class-btn').on('click', function() {
+        var form = $('#class-form');
+        var url = form.attr('action');
+        var method = $('#class-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#class-modal').modal('hide');
+                    classes_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Subjects
+    var subjects_table = $('#subjects-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/subjects",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'name', name: 'name' },
+            { data: 'code', name: 'code' },
+            { data: 'school.name', name: 'school.name' },
+            { data: 'teacher.user.name', name: 'teacher.user.name' },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-subject-btn').on('click', function() {
+        $('#subject-modal-label').text('Add New Subject');
+        $('#subject-form-method').val('POST');
+        $('#subject-form').attr('action', "/admin/subjects");
+        $('#subject-id').val('');
+        $.get("/admin/subjects/create", function(data) {
+            $('#subject-form-content').html(data);
+            $('.select2').select2();
+            $('#subject-modal').modal('show');
+        });
+    });
+
+    $('#subjects-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#subject-modal-label').text('Edit Subject');
+        $('#subject-form-method').val('PUT');
+        $('#subject-form').attr('action', "/admin/subjects/" + id);
+        $('#subject-id').val(id);
+        $.get("/admin/subjects/" + id + '/edit', function(data) {
+            $('#subject-form-content').html(data);
+            $('.select2').select2();
+            $('#subject-modal').modal('show');
+        });
+    });
+
+    $('#save-subject-btn').on('click', function() {
+        var form = $('#subject-form');
+        var url = form.attr('action');
+        var method = $('#subject-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#subject-modal').modal('hide');
+                    subjects_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Parents
+    var parents_table = $('#parents-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/parents",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'user.name', name: 'user.name' },
+            { data: 'user.email', name: 'user.email' },
+            { data: 'phone', name: 'phone' },
+            { data: 'students_count', name: 'students_count', searchable: false },
+            { data: 'status', name: 'status', searchable: false, orderable: false },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-parent-btn').on('click', function() {
+        $('#parent-modal-label').text('Add New Parent');
+        $('#parent-form-method').val('POST');
+        $('#parent-form').attr('action', "/admin/parents");
+        $('#parent-id').val('');
+        $.get("/admin/parents/create", function(data) {
+            $('#parent-form-content').html(data);
+            $('.select2').select2();
+            $('#parent-modal').modal('show');
+        });
+    });
+
+    $('#parents-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#parent-modal-label').text('Edit Parent');
+        $('#parent-form-method').val('PUT');
+        $('#parent-form').attr('action', "/admin/parents/" + id);
+        $('#parent-id').val(id);
+        $.get("/admin/parents/" + id + '/edit', function(data) {
+            $('#parent-form-content').html(data);
+            $('.select2').select2();
+            $('#parent-modal').modal('show');
+        });
+    });
+
+    $('#save-parent-btn').on('click', function() {
+        var form = $('#parent-form');
+        var url = form.attr('action');
+        var method = $('#parent-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#parent-modal').modal('hide');
+                    parents_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Attendance
+    var attendance_table = $('#attendance-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/attendance",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'student.user.name', name: 'student.user.name' },
+            { data: 'class_model.name', name: 'classModel.name' },
+            { data: 'date', name: 'date' },
+            { data: 'status', name: 'status' },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#attendance-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#attendance-modal-label').text('Edit Attendance');
+        $('#attendance-form-method').val('PUT');
+        $('#attendance-form').attr('action', "/admin/attendance/" + id);
+        $('#attendance-id').val(id);
+        $.get("/admin/attendance/" + id + '/edit', function(data) {
+            $('#attendance-form-content').html(data);
+            $('#attendance-modal').modal('show');
+        });
+    });
+
+    $('#save-attendance-btn').on('click', function() {
+        var form = $('#attendance-form');
+        var url = form.attr('action');
+        var method = $('#attendance-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#attendance-modal').modal('hide');
+                    attendance_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    showToast('error', response.message || 'An error occurred.');
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Grades
+    var grades_table = $('#grades-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/admin/grades",
+        columns: [
+            { data: 'id', name: 'id' },
+            { data: 'student.user.name', name: 'student.user.name' },
+            { data: 'subject.name', name: 'subject.name' },
+            { data: 'class_model.name', name: 'classModel.name' },
+            { data: 'marks', name: 'marks', searchable: false, orderable: false },
+            { data: 'grade', name: 'grade' },
+            { data: 'exam_date', name: 'exam_date' },
+            { data: 'actions', name: 'actions', searchable: false, orderable: false }
+        ]
+    });
+
+    $('#add-grade-btn').on('click', function() {
+        $('#grade-modal-label').text('Add New Grade');
+        $('#grade-form-method').val('POST');
+        $('#grade-form').attr('action', "/admin/grades");
+        $('#grade-id').val('');
+        $.get("/admin/grades/create", function(data) {
+            $('#grade-form-content').html(data);
+            $('.select2').select2();
+            $('#grade-modal').modal('show');
+        });
+    });
+
+    $('#grades-table').on('click', '.edit-btn', function() {
+        var id = $(this).data('id');
+        $('#grade-modal-label').text('Edit Grade');
+        $('#grade-form-method').val('PUT');
+        $('#grade-form').attr('action', "/admin/grades/" + id);
+        $('#grade-id').val(id);
+        $.get("/admin/grades/" + id + '/edit', function(data) {
+            $('#grade-form-content').html(data);
+            $('.select2').select2();
+            $('#grade-modal').modal('show');
+        });
+    });
+
+    $('#save-grade-btn').on('click', function() {
+        var form = $('#grade-form');
+        var url = form.attr('action');
+        var method = $('#grade-form-method').val();
+        var data = form.serialize();
+
+        $.ajax({
+            url: url,
+            type: method,
+            data: data,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#grade-modal').modal('hide');
+                    grades_table.ajax.reload();
+                    showToast('success', response.message);
+                } else {
+                    var errors = response.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    showToast('error', errorMessages);
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    // Common Delete and Toggle Status
+    var deleteUrl;
+    $(document).on('click', '.delete-btn', function() {
+        deleteUrl = $(this).data('url');
+        $('#delete-modal').modal('show');
+    });
+
+    $('#confirm-delete-btn').on('click', function() {
+        $.ajax({
+            url: deleteUrl,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.success) {
+                    $('#delete-modal').modal('hide');
+                    showToast('success', response.message);
+                    if (typeof schools_table !== 'undefined') { schools_table.ajax.reload(); }
+                    if (typeof teachers_table !== 'undefined') { teachers_table.ajax.reload(); }
+                    if (typeof students_table !== 'undefined') { students_table.ajax.reload(); }
+                    if (typeof classes_table !== 'undefined') { classes_table.ajax.reload(); }
+                    if (typeof subjects_table !== 'undefined') { subjects_table.ajax.reload(); }
+                    if (typeof parents_table !== 'undefined') { parents_table.ajax.reload(); }
+                    if (typeof attendance_table !== 'undefined') { attendance_table.ajax.reload(); }
+                    if (typeof grades_table !== 'undefined') { grades_table.ajax.reload(); }
+                }
+            },
+            error: function(xhr) {
+                var response = xhr.responseJSON;
+                var message = response.message || 'An error occurred.';
+                showToast('error', message);
+            }
+        });
+    });
+
+    $(document).on('click', '.toggle-status-btn', function() {
+        var url = $(this).data('url');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showToast('success', response.message);
+                    if (typeof schools_table !== 'undefined') { schools_table.ajax.reload(); }
+                    if (typeof teachers_table !== 'undefined') { teachers_table.ajax.reload(); }
+                    if (typeof students_table !== 'undefined') { students_table.ajax.reload(); }
+                    if (typeof classes_table !== 'undefined') { classes_table.ajax.reload(); }
+                    if (typeof subjects_table !== 'undefined') { subjects_table.ajax.reload(); }
+                    if (typeof parents_table !== 'undefined') { parents_table.ajax.reload(); }
+                }
+            }
+        });
+    });
+});
