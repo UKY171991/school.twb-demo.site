@@ -80,6 +80,11 @@ class School extends Model
         return $this->hasMany(SystemNotification::class);
     }
 
+    public function configurations()
+    {
+        return $this->hasMany(SchoolConfiguration::class);
+    }
+
     public function activityLogs()
     {
         return $this->hasMany(ActivityLog::class);

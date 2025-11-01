@@ -52,7 +52,9 @@
   - Set up model factories and seeders for comprehensive test data
   - _Requirements: 1.2, 2.1, 7.4_
 
-- [-] 2.1 Enhance existing models
+- [x] 2.1 Enhance existing models
+
+
 
   - Add dashboard route methods, menu generation, and school access validation to User model
   - Implement statistics methods, configuration management, and active counts in School model
@@ -60,13 +62,19 @@
   - _Requirements: 1.2, 2.1, 4.1_
 
 - [ ] 2.2 Create new models and migrations
+
+
+
+
+
   - Create DashboardWidget model for customizable user dashboard components
   - Implement SystemNotification model for in-app notifications and alerts
   - Write SchoolConfiguration model for school-specific settings and preferences
   - Create database migrations for new tables with proper indexes and foreign key constraints
   - _Requirements: 4.3, 5.5, 6.3_
 
-- [ ] 2.3 Set up model factories and seeders
+- [-] 2.3 Set up model factories and seeders
+
   - Create comprehensive factories for all models with realistic test data
   - Implement seeders for different user roles, schools, and sample academic data
   - Write database seeder for complete multi-school test environment setup

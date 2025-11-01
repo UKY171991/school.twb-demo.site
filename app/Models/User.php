@@ -85,6 +85,11 @@ class User extends Authenticatable
         return $this->hasMany(SystemNotification::class);
     }
 
+    public function dashboardWidgets()
+    {
+        return $this->hasMany(DashboardWidget::class)->ordered();
+    }
+
     public function activityLogs()
     {
         return $this->hasMany(ActivityLog::class);
