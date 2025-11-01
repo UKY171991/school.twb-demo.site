@@ -35,7 +35,9 @@
   - Create reusable blade components for forms, cards, and data tables
   - _Requirements: 6.1, 6.4, 7.3_
 
-- [-] 1.4 Create AJAX and notification infrastructure
+- [x] 1.4 Create AJAX and notification infrastructure
+
+
 
   - Implement AjaxResponseService for consistent JSON response formatting
   - Set up toaster notification system with Toastr.js integration
@@ -50,7 +52,8 @@
   - Set up model factories and seeders for comprehensive test data
   - _Requirements: 1.2, 2.1, 7.4_
 
-- [ ] 2.1 Enhance existing models
+- [-] 2.1 Enhance existing models
+
   - Add dashboard route methods, menu generation, and school access validation to User model
   - Implement statistics methods, configuration management, and active counts in School model
   - Enhance Student, Teacher, and Parent models with additional helper methods and relationships
