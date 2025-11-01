@@ -229,17 +229,14 @@ class CommonController extends BaseAjaxController
         if ($ajaxCheck) return $ajaxCheck;
 
         return $this->handleAjaxRequest(function() use ($request) {
-            // Placeholder implementation - will be enhanced when notification system is implemented
-            $notifications = [
-                [
-                    'id' => 1,
-                    'title' => 'Welcome to the system',
-                    'message' => 'Your account has been successfully created.',
-                    'type' => 'info',
-                    'created_at' => now()->subHours(2)->toISOString(),
-                    'is_read' => false
-                ]
-            ];
+            $limit = $request->get('limit', 10);
+            $unreadOnly = $request->get('unread_only', false);
+            
+            $notifications = \App\Services\NotificationService::getForUser(
+                $this->user->id, 
+                $limit, 
+                $unreadOnly
+            );
             
             return $this->successResponse('Notifications loaded successfully', $notifications);
         });
@@ -248,20 +245,49 @@ class CommonController extends BaseAjaxController
     /**
      * Mark notification as read
      */
-    public function markNotificationRead(Request $request): JsonResponse
+    public function markNotificationRead(Request $request, int $notificationId): JsonResponse
     {
         $ajaxCheck = $this->requireAjaxRequest($request);
         if ($ajaxCheck) return $ajaxCheck;
 
-        return $this->handleAjaxRequest(function() use ($request) {
-            $this->validateAjaxRequest($request, [
-                'notification_id' => 'required|integer'
-            ]);
-
-            $notificationId = $request->get('notification_id');
+        return $this->handleAjaxRequest(function() use ($notificationId) {
+            $success = \App\Services\NotificationService::markAsRead($notificationId, $this->user->id);
             
-            // Placeholder implementation
-            return $this->successResponse('Notification marked as read');
+            if ($success) {
+                return $this->successResponse('Notification marked as read');
+            } else {
+                return $this->notFoundResponse('Notification not found');
+            }
+        });
+    }
+
+    /**
+     * Mark all notifications as read
+     */
+    public function markAllNotificationsRead(Request $request): JsonResponse
+    {
+        $ajaxCheck = $this->requireAjaxRequest($request);
+        if ($ajaxCheck) return $ajaxCheck;
+
+        return $this->handleAjaxRequest(function() {
+            $count = \App\Services\NotificationService::markAllAsReadForUser($this->user->id);
+            
+            return $this->successResponse("Marked {$count} notifications as read");
+        });
+    }
+
+    /**
+     * Get notification count
+     */
+    public function getNotificationCount(Request $request): JsonResponse
+    {
+        $ajaxCheck = $this->requireAjaxRequest($request);
+        if ($ajaxCheck) return $ajaxCheck;
+
+        return $this->handleAjaxRequest(function() {
+            $count = \App\Services\NotificationService::getUnreadCountForUser($this->user->id);
+            
+            return $this->successResponse('Notification count retrieved', ['count' => $count]);
         });
     }
 

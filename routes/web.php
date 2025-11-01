@@ -188,7 +188,9 @@ Route::middleware(['auth', 'school.context'])->prefix('ajax')->name('ajax.')->gr
     Route::post('/upload-file', 'App\Http\Controllers\Ajax\CommonController@uploadFile')->name('upload-file');
     Route::delete('/delete-file', 'App\Http\Controllers\Ajax\CommonController@deleteFile')->name('delete-file');
     Route::get('/notifications', 'App\Http\Controllers\Ajax\CommonController@getNotifications')->name('notifications');
-    Route::post('/notifications/{id}/read', 'App\Http\Controllers\Ajax\CommonController@markNotificationRead')->name('notifications.read');
+    Route::get('/notifications/count', 'App\Http\Controllers\Ajax\CommonController@getNotificationCount')->name('notifications.count');
+    Route::post('/notifications/{notification}/read', 'App\Http\Controllers\Ajax\CommonController@markNotificationRead')->name('notifications.read');
+    Route::post('/notifications/mark-all-read', 'App\Http\Controllers\Ajax\CommonController@markAllNotificationsRead')->name('notifications.mark-all-read');
     Route::get('/widget-data', 'App\Http\Controllers\Ajax\CommonController@getWidgetData')->name('widget-data');
     
     // Legacy routes (to be updated)

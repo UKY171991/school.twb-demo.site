@@ -173,7 +173,12 @@
     <!-- Tempusdominus Bootstrap 4 -->
     <script src="{{ asset('vendor/adminlte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js') }}"></script>
     
+    <!-- jQuery Validation Plugin -->
+    <script src="{{ asset('vendor/adminlte/plugins/jquery-validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('vendor/adminlte/plugins/jquery-validation/additional-methods.min.js') }}"></script>
+    
     <!-- Custom JavaScript -->
+    <script src="{{ asset('js/validation.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
     
     <script>
@@ -187,6 +192,9 @@
             routes: {
                 ajax: {
                     notifications: '{{ route('ajax.notifications') }}',
+                    notificationsCount: '{{ route('ajax.notifications.count') }}',
+                    notificationsMarkRead: '{{ route('ajax.notifications.read', ':id') }}',
+                    notificationsMarkAllRead: '{{ route('ajax.notifications.mark-all-read') }}',
                     widgetData: '{{ route('ajax.widget-data') }}',
                     uploadFile: '{{ route('ajax.upload-file') }}',
                     schools: '{{ route('ajax.schools') }}',
