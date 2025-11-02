@@ -13,17 +13,31 @@ return new class extends Migration
     {
         // Enhance users table
         Schema::table('users', function (Blueprint $table) {
-            $table->string('profile_photo')->nullable()->after('password');
-            $table->string('phone', 20)->nullable()->after('profile_photo');
-            $table->timestamp('last_login_at')->nullable()->after('phone');
-            $table->json('preferences')->nullable()->after('last_login_at');
+            if (!Schema::hasColumn('users', 'profile_photo')) {
+                $table->string('profile_photo')->nullable()->after('password');
+            }
+            if (!Schema::hasColumn('users', 'phone')) {
+                $table->string('phone', 20)->nullable()->after('profile_photo');
+            }
+            if (!Schema::hasColumn('users', 'last_login_at')) {
+                $table->timestamp('last_login_at')->nullable()->after('phone');
+            }
+            if (!Schema::hasColumn('users', 'preferences')) {
+                $table->json('preferences')->nullable()->after('last_login_at');
+            }
         });
 
         // Enhance schools table
         Schema::table('schools', function (Blueprint $table) {
-            $table->json('configuration')->nullable()->after('is_active');
-            $table->date('established_date')->nullable()->after('configuration');
-            $table->string('timezone', 50)->default('UTC')->after('established_date');
+            if (!Schema::hasColumn('schools', 'configuration')) {
+                $table->json('configuration')->nullable()->after('is_active');
+            }
+            if (!Schema::hasColumn('schools', 'established_date')) {
+                $table->date('established_date')->nullable()->after('configuration');
+            }
+            if (!Schema::hasColumn('schools', 'timezone')) {
+                $table->string('timezone', 50)->default('UTC')->after('established_date');
+            }
         });
 
         // Add indexes for better performance

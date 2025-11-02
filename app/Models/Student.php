@@ -79,6 +79,12 @@ class Student extends Model
         return $this->belongsToMany(Subject::class, 'student_subjects');
     }
 
+    public function parents()
+    {
+        return $this->belongsToMany(User::class, 'student_parents', 'student_id', 'parent_id')
+                   ->where('user_type', 'parent');
+    }
+
     // Accessors
     public function getFullNameAttribute(): string
     {

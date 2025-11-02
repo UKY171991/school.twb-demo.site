@@ -75,6 +75,11 @@ class Teacher extends Model
         return $this->hasManyThrough(Student::class, ClassModel::class);
     }
 
+    public function schedules()
+    {
+        return $this->hasMany(ClassSchedule::class);
+    }
+
     // Accessors
     public function getFullNameAttribute(): string
     {

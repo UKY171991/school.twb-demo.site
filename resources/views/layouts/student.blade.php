@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Student Dashboard') - {{ config('app.name') }}</title>
+    <title>@yield('title', 'Student Portal') - {{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -14,13 +15,12 @@
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
-    <!-- Chart.js -->
-    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/chart.js/Chart.min.css') }}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     <!-- Toastr -->
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/toastr/toastr.min.css') }}">
-    <!-- Custom styles -->
-    <link rel="stylesheet" href="{{ asset('css/student.css') }}">
-    @stack('styles')
+    @yield('css')
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -44,6 +44,34 @@
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
+            <!-- Notifications Dropdown Menu -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="far fa-bell"></i>
+                    <span class="badge badge-warning navbar-badge">3</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">3 Notifications</span>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-star mr-2"></i> New grade posted
+                        <span class="float-right text-muted text-sm">3 mins</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-calendar mr-2"></i> Assignment due tomorrow
+                        <span class="float-right text-muted text-sm">12 hours</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-envelope mr-2"></i> Message from teacher
+                        <span class="float-right text-muted text-sm">2 days</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+                </div>
+            </li>
+
             <!-- User Account Menu -->
             <li class="nav-item dropdown user-menu">
                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
@@ -52,7 +80,7 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <!-- User image -->
-                    <li class="user-header bg-info">
+                    <li class="user-header bg-primary">
                         <img src="{{ asset('vendor/adminlte/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
                         <p>
                             {{ auth()->user()->name }}
@@ -73,7 +101,7 @@
     </nav>
 
     <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-info elevation-4">
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="{{ route('student.dashboard') }}" class="brand-link">
             <img src="{{ asset('vendor/adminlte/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
@@ -103,19 +131,19 @@
                         </a>
                     </li>
 
-                    <!-- Attendance -->
-                    <li class="nav-item">
-                        <a href="{{ route('student.attendance') }}" class="nav-link {{ request()->routeIs('student.attendance') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-calendar-check"></i>
-                            <p>Attendance</p>
-                        </a>
-                    </li>
-
                     <!-- Grades -->
                     <li class="nav-item">
                         <a href="{{ route('student.grades') }}" class="nav-link {{ request()->routeIs('student.grades') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-star"></i>
-                            <p>Grades</p>
+                            <p>My Grades</p>
+                        </a>
+                    </li>
+
+                    <!-- Attendance -->
+                    <li class="nav-item">
+                        <a href="{{ route('student.attendance') }}" class="nav-link {{ request()->routeIs('student.attendance') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-calendar-check"></i>
+                            <p>My Attendance</p>
                         </a>
                     </li>
 
@@ -123,7 +151,7 @@
                     <li class="nav-item">
                         <a href="{{ route('student.subjects') }}" class="nav-link {{ request()->routeIs('student.subjects') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Subjects</p>
+                            <p>My Subjects</p>
                         </a>
                     </li>
 
@@ -131,7 +159,7 @@
                     <li class="nav-item">
                         <a href="{{ route('student.profile') }}" class="nav-link {{ request()->routeIs('student.profile') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-user"></i>
-                            <p>Profile</p>
+                            <p>My Profile</p>
                         </a>
                     </li>
                 </ul>
@@ -142,26 +170,11 @@
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">@yield('page-title', 'Student Dashboard')</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            @yield('breadcrumbs')
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @yield('content_header')
 
         <!-- Main content -->
         <section class="content">
-            <div class="container-fluid">
-                @yield('content')
-            </div>
+            @yield('content')
         </section>
     </div>
 
@@ -186,12 +199,10 @@
 <script src="{{ asset('vendor/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<!-- Chart.js -->
-<script src="{{ asset('vendor/adminlte/plugins/chart.js/Chart.min.js') }}"></script>
+<!-- Select2 -->
+<script src="{{ asset('vendor/adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
 <!-- Toastr -->
 <script src="{{ asset('vendor/adminlte/plugins/toastr/toastr.min.js') }}"></script>
-<!-- Custom Student JS -->
-<script src="{{ asset('js/student.js') }}"></script>
-@stack('scripts')
+@yield('js')
 </body>
 </html>

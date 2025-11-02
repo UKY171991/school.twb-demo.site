@@ -37,7 +37,15 @@ Route::middleware(['auth', 'school.context'])->group(function () {
     
     // Super Admin specific routes
     Route::middleware(['role:super_admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', 'App\Http\Controllers\SuperAdmin\DashboardController@index')->name('dashboard');
+        
+        // Dashboard AJAX endpoints
+        Route::get('/dashboard/enrollment-trends', 'App\Http\Controllers\SuperAdmin\DashboardController@getEnrollmentTrends')->name('dashboard.enrollment-trends');
+        Route::get('/dashboard/user-activity', 'App\Http\Controllers\SuperAdmin\DashboardController@getUserActivity')->name('dashboard.user-activity');
+        Route::get('/dashboard/school-performance', 'App\Http\Controllers\SuperAdmin\DashboardController@getSchoolPerformance')->name('dashboard.school-performance');
+        Route::get('/dashboard/system-health', 'App\Http\Controllers\SuperAdmin\DashboardController@getSystemHealth')->name('dashboard.system-health');
+        Route::get('/dashboard/recent-activities', 'App\Http\Controllers\SuperAdmin\DashboardController@getRecentActivities')->name('dashboard.recent-activities');
+        
         Route::post('/switch-school', function(\Illuminate\Http\Request $request) {
             $schoolId = $request->input('school_id');
             $success = \App\Services\SchoolContextService::switchSchool($schoolId);
@@ -54,14 +62,40 @@ Route::middleware(['auth', 'school.context'])->group(function () {
         })->name('switch-school');
         
         // Super Admin school management
-        Route::resource('schools', 'App\Http\Controllers\Admin\SchoolController');
-        Route::resource('users', 'App\Http\Controllers\SuperAdmin\UserController');
+        Route::resource('schools', 'App\Http\Controllers\SuperAdmin\SchoolController');
+        Route::post('schools/{school}/toggle-status', 'App\Http\Controllers\SuperAdmin\SchoolController@toggleStatus')->name('schools.toggle-status');
+        
+        // Super Admin reporting system
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', 'App\Http\Controllers\SuperAdmin\ReportController@index')->name('index');
+            Route::get('/system-overview', 'App\Http\Controllers\SuperAdmin\ReportController@getSystemOverview')->name('system-overview');
+            Route::get('/school-performance', 'App\Http\Controllers\SuperAdmin\ReportController@getSchoolPerformance')->name('school-performance');
+            Route::get('/user-analytics', 'App\Http\Controllers\SuperAdmin\ReportController@getUserAnalytics')->name('user-analytics');
+            Route::get('/enrollment-trends', 'App\Http\Controllers\SuperAdmin\ReportController@getEnrollmentTrends')->name('enrollment-trends');
+            
+            // Export routes
+            Route::get('/export/system-overview', 'App\Http\Controllers\SuperAdmin\ReportController@exportSystemOverview')->name('export.system-overview');
+            Route::get('/export/school-performance', 'App\Http\Controllers\SuperAdmin\ReportController@exportSchoolPerformance')->name('export.school-performance');
+            Route::get('/export/user-analytics', 'App\Http\Controllers\SuperAdmin\ReportController@exportUserAnalytics')->name('export.user-analytics');
+            
+            // Scheduled reports
+            Route::post('/schedule', 'App\Http\Controllers\SuperAdmin\ReportController@scheduleReport')->name('schedule');
+            Route::get('/scheduled', 'App\Http\Controllers\SuperAdmin\ReportController@getScheduledReports')->name('scheduled');
+            Route::put('/scheduled/{schedule}', 'App\Http\Controllers\SuperAdmin\ReportController@updateScheduledReport')->name('scheduled.update');
+            Route::delete('/scheduled/{schedule}', 'App\Http\Controllers\SuperAdmin\ReportController@deleteScheduledReport')->name('scheduled.delete');
+        });
+        
+        // Route::resource('users', 'App\Http\Controllers\SuperAdmin\UserController'); // To be implemented in future tasks
     });
 
     // Admin Dashboard (School-specific)
     Route::middleware(['role:admin', 'school.active'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [AdminDashboardController::class, 'getStats'])->name('dashboard.stats');
+        Route::get('/dashboard/enrollment-trends', [AdminDashboardController::class, 'getEnrollmentTrends'])->name('dashboard.enrollment-trends');
+        Route::get('/dashboard/class-performance', [AdminDashboardController::class, 'getClassPerformance'])->name('dashboard.class-performance');
+        Route::get('/dashboard/teacher-workload', [AdminDashboardController::class, 'getTeacherWorkload'])->name('dashboard.teacher-workload');
+        Route::post('/dashboard/save-widgets', [AdminDashboardController::class, 'saveWidgetConfiguration'])->name('dashboard.save-widgets');
         Route::get('/dashboard/pending-payments', [AdminDashboardController::class, 'getPendingPayments'])->name('pending-payments');
         Route::get('/dashboard/latest-notifications', [AdminDashboardController::class, 'getLatestNotifications'])->name('latest-notifications');
         Route::get('/dashboard/activity-log', [AdminDashboardController::class, 'getActivityLogData'])->name('activity-log');
@@ -73,19 +107,56 @@ Route::middleware(['auth', 'school.context'])->group(function () {
         
         // Teachers Management
         Route::resource('teachers', 'App\Http\Controllers\Admin\TeacherController');
+        Route::get('teachers-data', 'App\Http\Controllers\Admin\TeacherController@getData')->name('teachers.data');
         Route::post('teachers/{teacher}/toggle-status', 'App\Http\Controllers\Admin\TeacherController@toggleStatus')->name('teachers.toggle-status');
+        Route::post('teachers/bulk-action', 'App\Http\Controllers\Admin\TeacherController@bulkAction')->name('teachers.bulk-action');
+        Route::get('teachers/{teacher}/performance', 'App\Http\Controllers\Admin\TeacherController@getPerformanceData')->name('teachers.performance');
+        Route::post('teachers/check-schedule-conflicts', 'App\Http\Controllers\Admin\TeacherController@checkScheduleConflicts')->name('teachers.check-conflicts');
         
         // Students Management
         Route::resource('students', 'App\Http\Controllers\Admin\StudentController');
+        Route::get('students-data', 'App\Http\Controllers\Admin\StudentController@getData')->name('students.data');
         Route::post('students/{student}/toggle-status', 'App\Http\Controllers\Admin\StudentController@toggleStatus')->name('students.toggle-status');
+        Route::post('students/bulk-action', 'App\Http\Controllers\Admin\StudentController@bulkAction')->name('students.bulk-action');
         
         // Classes Management
         Route::resource('classes', 'App\Http\Controllers\Admin\ClassController');
+        Route::get('classes-data', 'App\Http\Controllers\Admin\ClassController@getData')->name('classes.data');
         Route::post('classes/{class}/toggle-status', 'App\Http\Controllers\Admin\ClassController@toggleStatus')->name('classes.toggle-status');
+        Route::post('classes/{class}/enroll-students', 'App\Http\Controllers\Admin\ClassController@enrollStudents')->name('classes.enroll-students');
+        Route::post('classes/{class}/remove-students', 'App\Http\Controllers\Admin\ClassController@removeStudents')->name('classes.remove-students');
+        Route::get('classes/{class}/performance', 'App\Http\Controllers\Admin\ClassController@getPerformanceData')->name('classes.performance');
+        Route::post('classes/bulk-action', 'App\Http\Controllers\Admin\ClassController@bulkAction')->name('classes.bulk-action');
         
         // Subjects Management
         Route::resource('subjects', 'App\Http\Controllers\Admin\SubjectController');
+        Route::get('subjects-data', 'App\Http\Controllers\Admin\SubjectController@getData')->name('subjects.data');
         Route::post('subjects/{subject}/toggle-status', 'App\Http\Controllers\Admin\SubjectController@toggleStatus')->name('subjects.toggle-status');
+        Route::post('subjects/bulk-action', 'App\Http\Controllers\Admin\SubjectController@bulkAction')->name('subjects.bulk-action');
+        
+        // Class Scheduling
+        Route::prefix('schedules')->name('schedules.')->group(function () {
+            Route::get('/', 'App\Http\Controllers\Admin\ScheduleController@index')->name('index');
+            Route::get('/create', 'App\Http\Controllers\Admin\ScheduleController@create')->name('create');
+            Route::post('/', 'App\Http\Controllers\Admin\ScheduleController@store')->name('store');
+            Route::get('/{schedule}', 'App\Http\Controllers\Admin\ScheduleController@show')->name('show');
+            Route::get('/{schedule}/edit', 'App\Http\Controllers\Admin\ScheduleController@edit')->name('edit');
+            Route::put('/{schedule}', 'App\Http\Controllers\Admin\ScheduleController@update')->name('update');
+            Route::delete('/{schedule}', 'App\Http\Controllers\Admin\ScheduleController@destroy')->name('destroy');
+            Route::post('/check-conflicts', 'App\Http\Controllers\Admin\ScheduleController@checkConflicts')->name('check-conflicts');
+            Route::get('/class/{class}', 'App\Http\Controllers\Admin\ScheduleController@getClassSchedule')->name('class');
+        });
+        
+        // Academic Year and Semester Management
+        Route::prefix('academic')->name('academic.')->group(function () {
+            Route::get('/years', 'App\Http\Controllers\Admin\AcademicYearController@index')->name('years.index');
+            Route::post('/years', 'App\Http\Controllers\Admin\AcademicYearController@store')->name('years.store');
+            Route::get('/years/{year}', 'App\Http\Controllers\Admin\AcademicYearController@show')->name('years.show');
+            Route::put('/years/{year}', 'App\Http\Controllers\Admin\AcademicYearController@update')->name('years.update');
+            Route::delete('/years/{year}', 'App\Http\Controllers\Admin\AcademicYearController@destroy')->name('years.destroy');
+            Route::post('/years/{year}/activate', 'App\Http\Controllers\Admin\AcademicYearController@activate')->name('years.activate');
+            Route::post('/years/{year}/progress', 'App\Http\Controllers\Admin\AcademicYearController@progressSemester')->name('years.progress');
+        });
         
         // Attendance Management
         Route::resource('attendance', 'App\Http\Controllers\Admin\AttendanceController');
@@ -104,32 +175,61 @@ Route::middleware(['auth', 'school.context'])->group(function () {
         Route::get('reports/teachers', 'App\Http\Controllers\Admin\ReportController@teachers')->name('reports.teachers');
         Route::get('reports/attendance', 'App\Http\Controllers\Admin\ReportController@attendance')->name('reports.attendance');
         Route::get('reports/grades', 'App\Http\Controllers\Admin\ReportController@grades')->name('reports.grades');
+        Route::get('reports/class-performance', 'App\Http\Controllers\Admin\ReportController@classPerformance')->name('reports.class-performance');
+        Route::post('reports/send-progress-reports', 'App\Http\Controllers\Admin\ReportController@sendProgressReports')->name('reports.send-progress-reports');
     });
     
     // Teacher Dashboard
     Route::middleware(['user.type:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
         Route::get('/dashboard', [TCDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard/stats', [TCDashboardController::class, 'getStats'])->name('teacher.dashboard.stats');
+        Route::get('/dashboard/stats', [TCDashboardController::class, 'getStats'])->name('dashboard.stats');
+        Route::post('/dashboard/quick-attendance', [TCDashboardController::class, 'quickAttendance'])->name('dashboard.quick-attendance');
         
         // Teacher specific routes
         Route::get('/classes', 'App\Http\Controllers\TC\ClassController@index')->name('classes');
         Route::get('/classes/{class}', 'App\Http\Controllers\TC\ClassController@show')->name('classes.show');
+        Route::get('/classes/{class}/roster', 'App\Http\Controllers\TC\ClassController@getRoster')->name('classes.roster');
+        Route::post('/classes/{class}/message', 'App\Http\Controllers\TC\ClassController@sendMessage')->name('classes.message');
+        Route::get('/classes/{class}/performance', 'App\Http\Controllers\TC\ClassController@getPerformanceAnalytics')->name('classes.performance');
+        Route::post('/classes/{class}/lesson-plan', 'App\Http\Controllers\TC\ClassController@createLessonPlan')->name('classes.lesson-plan');
+        Route::get('/classes/{class}/lesson-plans', 'App\Http\Controllers\TC\ClassController@getLessonPlans')->name('classes.lesson-plans');
+        
+        // Teacher Reports
+        Route::get('/reports', 'App\Http\Controllers\TC\ReportController@index')->name('reports');
+        Route::get('/reports/class-performance', 'App\Http\Controllers\TC\ReportController@classPerformance')->name('reports.class-performance');
+        Route::get('/reports/parent-communication', 'App\Http\Controllers\TC\ReportController@parentCommunication')->name('reports.parent-communication');
+        Route::get('/reports/teaching-effectiveness', 'App\Http\Controllers\TC\ReportController@teachingEffectiveness')->name('reports.teaching-effectiveness');
+        Route::post('/reports/export', 'App\Http\Controllers\TC\ReportController@export')->name('reports.export');
+        
         Route::get('/students', 'App\Http\Controllers\TC\StudentController@index')->name('students');
         Route::get('/students/{student}', 'App\Http\Controllers\TC\StudentController@show')->name('students.show');
         Route::get('/subjects', 'App\Http\Controllers\TC\SubjectController@index')->name('subjects');
         Route::get('/subjects/{subject}', 'App\Http\Controllers\TC\SubjectController@show')->name('subjects.show');
         
         // Attendance
-        Route::get('/attendance', 'App\Http\Controllers\TC\AttendanceController@index')->name('attendance');
+        Route::get('/attendance', 'App\Http\Controllers\TC\AttendanceController@index')->name('attendance.index');
         Route::get('/attendance/create', 'App\Http\Controllers\TC\AttendanceController@create')->name('attendance.create');
         Route::post('/attendance', 'App\Http\Controllers\TC\AttendanceController@store')->name('attendance.store');
-        Route::get('/attendance/{class}/date/{date}', 'App\Http\Controllers\TC\AttendanceController@show')->name('attendance.show');
+        Route::get('/attendance/{class}', 'App\Http\Controllers\TC\AttendanceController@show')->name('attendance.show');
+        Route::get('/attendance/data', 'App\Http\Controllers\TC\AttendanceController@getAttendanceData')->name('attendance.data');
+        Route::get('/attendance/students', 'App\Http\Controllers\TC\AttendanceController@getStudentsForAttendance')->name('attendance.students');
+        Route::get('/attendance/by-date', 'App\Http\Controllers\TC\AttendanceController@getAttendanceByDateForView')->name('attendance.by-date');
+        Route::post('/attendance/report', 'App\Http\Controllers\TC\AttendanceController@generateReport')->name('attendance.report');
+        Route::get('/attendance/analytics', 'App\Http\Controllers\TC\AttendanceController@getAnalytics')->name('attendance.analytics');
+        Route::get('/attendance/reports', 'App\Http\Controllers\TC\AttendanceController@reports')->name('attendance.reports');
         
         // Grades
         Route::get('/grades', 'App\Http\Controllers\TC\GradeController@index')->name('grades');
         Route::get('/grades/create', 'App\Http\Controllers\TC\GradeController@create')->name('grades.create');
         Route::post('/grades', 'App\Http\Controllers\TC\GradeController@store')->name('grades.store');
         Route::get('/grades/{grade}', 'App\Http\Controllers\TC\GradeController@show')->name('grades.show');
+        Route::get('/grades/{grade}/edit', 'App\Http\Controllers\TC\GradeController@edit')->name('grades.edit');
+        Route::put('/grades/{grade}', 'App\Http\Controllers\TC\GradeController@update')->name('grades.update');
+        Route::delete('/grades/{grade}', 'App\Http\Controllers\TC\GradeController@destroy')->name('grades.destroy');
+        Route::get('/grades/data', 'App\Http\Controllers\TC\GradeController@getGradeData')->name('grades.data');
+        Route::get('/grades/students', 'App\Http\Controllers\TC\GradeController@getStudentsForGrading')->name('grades.students');
+        Route::post('/grades/bulk-store', 'App\Http\Controllers\TC\GradeController@bulkStore')->name('grades.bulk-store');
+        Route::get('/grades/analytics', 'App\Http\Controllers\TC\GradeController@getAnalytics')->name('grades.analytics');
         
         // Profile
         Route::get('/profile', 'App\Http\Controllers\TC\ProfileController@show')->name('profile');
@@ -162,7 +262,9 @@ Route::middleware(['auth', 'school.context'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
         
-        if ($user->isSuperAdmin() || $user->isAdmin()) {
+        if ($user->isSuperAdmin()) {
+            return redirect()->route('superadmin.dashboard');
+        } elseif ($user->isAdmin()) {
             return redirect()->route('admin.dashboard');
         } elseif ($user->isTeacher()) {
             return redirect()->route('teacher.dashboard');
@@ -209,6 +311,8 @@ Route::middleware(['auth', 'school.context'])->prefix('ajax')->name('ajax.')->gr
     // Teacher AJAX routes
     Route::middleware(['user.type:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
         Route::post('/attendance/mark', 'App\Http\Controllers\Ajax\TC\AttendanceController@mark')->name('attendance.mark');
+        Route::post('/attendance/update', 'App\Http\Controllers\Ajax\TC\AttendanceController@update')->name('attendance.update');
+        Route::get('/classes', 'App\Http\Controllers\Ajax\TC\ClassController@index')->name('classes');
         Route::post('/grades/save', 'App\Http\Controllers\Ajax\TC\GradeController@save')->name('grades.save');
     });
 });

@@ -82,7 +82,7 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->hasMany(SystemNotification::class);
+        return $this->hasMany(Notification::class);
     }
 
     public function dashboardWidgets()

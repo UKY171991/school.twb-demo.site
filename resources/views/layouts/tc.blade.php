@@ -200,7 +200,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('teacher.attendance') }}" class="nav-link {{ request()->routeIs('teacher.attendance') ? 'active' : '' }}">
+                                <a href="{{ route('teacher.attendance.index') }}" class="nav-link {{ request()->routeIs('teacher.attendance.index') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>View Attendance</p>
                                 </a>
@@ -209,6 +209,12 @@
                                 <a href="{{ route('teacher.attendance.create') }}" class="nav-link {{ request()->routeIs('teacher.attendance.create') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Mark Attendance</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('teacher.attendance.reports') }}" class="nav-link {{ request()->routeIs('teacher.attendance.reports') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Reports & Analytics</p>
                                 </a>
                             </li>
                         </ul>
@@ -245,6 +251,43 @@
                             <i class="nav-icon fas fa-calendar-alt"></i>
                             <p>Schedule</p>
                         </a>
+                    </li>
+
+                    <!-- Reports -->
+                    <li class="nav-item {{ request()->routeIs('teacher.reports.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('teacher.reports.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <p>
+                                Reports & Analytics
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('teacher.reports') }}" class="nav-link {{ request()->routeIs('teacher.reports') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('teacher.reports.class-performance') }}" class="nav-link {{ request()->routeIs('teacher.reports.class-performance') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Class Performance</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('teacher.reports.parent-communication') }}" class="nav-link {{ request()->routeIs('teacher.reports.parent-communication') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Communication Log</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('teacher.reports.teaching-effectiveness') }}" class="nav-link {{ request()->routeIs('teacher.reports.teaching-effectiveness') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Teaching Effectiveness</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <!-- Profile -->

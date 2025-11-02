@@ -257,6 +257,50 @@
                         </ul>
                     </li>
 
+                    <!-- Schedules -->
+                    <li class="nav-item {{ request()->routeIs('admin.schedules.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-calendar-alt"></i>
+                            <p>
+                                Schedules
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.index') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>All Schedules</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.schedules.create') }}" class="nav-link {{ request()->routeIs('admin.schedules.create') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Create Schedule</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Academic Years -->
+                    <li class="nav-item {{ request()->routeIs('admin.academic.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('admin.academic.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>
+                                Academic Years
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('admin.academic.years.index') }}" class="nav-link {{ request()->routeIs('admin.academic.years.*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Manage Years</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <!-- Attendance -->
                     <li class="nav-item {{ request()->routeIs('admin.attendance.*') ? 'menu-open' : '' }}">
                         <a href="#" class="nav-link {{ request()->routeIs('admin.attendance.*') ? 'active' : '' }}">

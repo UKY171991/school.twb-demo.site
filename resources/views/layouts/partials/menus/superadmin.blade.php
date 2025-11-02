@@ -57,34 +57,11 @@
 </li>
 
 <!-- System Reports -->
-<li class="nav-item {{ request()->routeIs('superadmin.reports.*') ? 'menu-open' : '' }}">
-    <a href="#" class="nav-link {{ request()->routeIs('superadmin.reports.*') ? 'active' : '' }}">
+<li class="nav-item">
+    <a href="{{ route('superadmin.reports.index') }}" class="nav-link {{ request()->routeIs('superadmin.reports.*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-chart-bar"></i>
-        <p>
-            System Reports
-            <i class="right fas fa-angle-left"></i>
-        </p>
+        <p>System Reports</p>
     </a>
-    <ul class="nav nav-treeview">
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Schools Overview</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>User Statistics</p>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>System Performance</p>
-            </a>
-        </li>
-    </ul>
 </li>
 
 <!-- System Settings -->

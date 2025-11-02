@@ -38,6 +38,7 @@ class AttendanceController extends Controller
             // Create new attendance records
             foreach ($request->attendance_data as $data) {
                 Attendance::create([
+                    'school_id' => $class->school_id,
                     'student_id' => $data['student_id'],
                     'class_id' => $request->class_id,
                     'date' => $date,

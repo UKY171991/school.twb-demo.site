@@ -1,511 +1,714 @@
-@extends('layouts.admin')
+@extends('layouts.school-admin')
 
-@section('title', 'Admin Dashboard')
-@section('page-title', 'Dashboard')
-
-@section('breadcrumbs')
-    <li class="breadcrumb-item active">Dashboard</li>
-@endsection
+@section('title', 'School Admin Dashboard')
 
 @section('content')
-<div class="row">
-    <!-- Schools Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3 id="schools-count">{{ $stats['schools'] ?? 0 }}</h3>
-                <p>Total Schools</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-school"></i>
-            </div>
-            <a href="{{ route('admin.schools.index') }}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- Teachers Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3 id="teachers-count">{{ $stats['teachers'] ?? 0 }}</h3>
-                <p>Total Teachers</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-chalkboard-teacher"></i>
-            </div>
-            <a href="{{ route('admin.teachers.index') }}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- Students Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3 id="students-count">{{ $stats['students'] ?? 0 }}</h3>
-                <p>Total Students</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <a href="{{ route('admin.students.index') }}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- Classes Card -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3 id="classes-count">{{ $stats['classes'] ?? 0 }}</h3>
-                <p>Total Classes</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-door-open"></i>
-            </div>
-            <a href="{{ route('admin.classes.index') }}" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <!-- New KPI Cards -->
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-primary">
-            <div class="inner">
-                <h3 id="fees-collected">{{ $stats['total_fees_collected'] ?? 0 }}</h3>
-                <p>Fees Collected</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-money-bill-wave"></i>
-            </div>
-            <a href="#" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-secondary">
-            <div class="inner">
-                <h3 id="pending-fees">{{ $stats['pending_fees'] ?? 0 }}</h3>
-                <p>Pending Fees</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-hourglass-half"></i>
-            </div>
-            <a href="#" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-dark">
-            <div class="inner">
-                <h3 id="upcoming-exams">{{ $stats['upcoming_exams'] ?? 0 }}</h3>
-                <p>Upcoming Exams</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-calendar-alt"></i>
-            </div>
-            <a href="#" class="small-box-footer">
-                More info <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Charts Section -->
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-chart-bar mr-2"></i>
-                    Analytics
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+<div class="content-wrapper">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">School Administration Dashboard</h1>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <p class="text-center"><strong>Attendance Trends</strong></p>
-                        <canvas id="attendanceChart" style="height: 200px;"></canvas>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="text-center"><strong>Fee Collection Trends</strong></p>
-                        <canvas id="feeTrendsChart" style="height: 200px;"></canvas>
-                    </div>
-                    <div class="col-md-4">
-                        <p class="text-center"><strong>Student Performance</strong></p>
-                        <canvas id="studentPerformanceChart" style="height: 200px;"></canvas>
+                <div class="col-sm-6">
+                    <div class="float-sm-right">
+                        <button type="button" class="btn btn-outline-primary btn-sm mr-2" data-toggle="modal" data-target="#widgetConfigModal">
+                            <i class="fas fa-cogs mr-1"></i>
+                            Customize Dashboard
+                        </button>
+                        <ol class="breadcrumb d-inline-block mb-0">
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            
+            <!-- School Info Card -->
+            @if($currentSchool)
+            <div class="row">
+                <div class="col-12">
+                    <div class="school-info-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="mb-1">{{ $currentSchool->name }}</h4>
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    {{ $currentSchool->address }}
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-phone mr-1"></i>
+                                    {{ $currentSchool->phone }} | 
+                                    <i class="fas fa-envelope mr-1"></i>
+                                    {{ $currentSchool->email }}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <div class="school-logo">
+                                    @if($currentSchool->logo)
+                                        <img src="{{ $currentSchool->getLogoUrlAttribute() }}" alt="School Logo" class="img-fluid" style="max-height: 60px;">
+                                    @else
+                                        <i class="fas fa-school fa-3x"></i>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-bolt mr-2"></i>
+                                Quick Actions
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach($quickActions as $action)
+                                <div class="col-md-2 col-sm-4 col-6 mb-3">
+                                    <a href="{{ $action['url'] }}" class="btn btn-{{ $action['color'] }} btn-block quick-action-btn">
+                                        <i class="{{ $action['icon'] }} fa-2x mb-2"></i>
+                                        <br>
+                                        <small>{{ $action['title'] }}</small>
+                                    </a>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Statistics Cards -->
+            <div class="row">
+                <!-- Students Card -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3 id="students-count">{{ $stats['total_students'] ?? 0 }}</h3>
+                            <p>Total Students</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <a href="{{ route('admin.students.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Teachers Card -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3 id="teachers-count">{{ $stats['total_teachers'] ?? 0 }}</h3>
+                            <p>Total Teachers</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <a href="{{ route('admin.teachers.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Classes Card -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3 id="classes-count">{{ $stats['total_classes'] ?? 0 }}</h3>
+                            <p>Total Classes</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-door-open"></i>
+                        </div>
+                        <a href="{{ route('admin.classes.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Subjects Card -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3 id="subjects-count">{{ $stats['total_subjects'] ?? 0 }}</h3>
+                            <p>Total Subjects</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <a href="{{ route('admin.subjects.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Attendance Today -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-primary">
+                        <div class="inner">
+                            <h3 id="attendance-rate">{{ $stats['attendance_rate'] ?? 0 }}%</h3>
+                            <p>Today's Attendance</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <a href="{{ route('admin.attendance.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Enrollments -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-secondary">
+                        <div class="inner">
+                            <h3 id="recent-enrollments">{{ $stats['recent_enrollments'] ?? 0 }}</h3>
+                            <p>New This Month</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <a href="{{ route('admin.students.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Average Grade -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-dark">
+                        <div class="inner">
+                            <h3 id="average-grade">{{ $stats['average_grade'] ?? 0 }}</h3>
+                            <p>Average Grade</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <a href="{{ route('admin.grades.index') }}" class="small-box-footer">
+                            More info <i class="fas fa-arrow-circle-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Student-Teacher Ratio -->
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-light">
+                        <div class="inner">
+                            <h3 id="student-teacher-ratio" class="text-dark">{{ $stats['student_teacher_ratio'] ?? 0 }}:1</h3>
+                            <p class="text-dark">Student-Teacher Ratio</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-balance-scale text-dark"></i>
+                        </div>
+                        <div class="small-box-footer bg-light">
+                            <span class="text-dark">Ratio Analysis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Analytics -->
+            <div class="row">
+                <!-- Enrollment Trends -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line mr-2"></i>
+                                Enrollment Trends
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="enrollmentTrendsChart" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Performance -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-bar mr-2"></i>
+                                Class Performance
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="classPerformanceChart" style="height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Workload and Attendance -->
+            <div class="row">
+                <!-- Teacher Workload -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-users mr-2"></i>
+                                Teacher Workload
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="teacherWorkloadTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Teacher</th>
+                                            <th>Subjects</th>
+                                            <th>Classes</th>
+                                            <th>Students</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data loaded via AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Attendance Summary -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-check mr-2"></i>
+                                Today's Attendance Summary
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <div class="description-block border-right">
+                                        <span class="description-percentage text-success">
+                                            <i class="fas fa-check"></i> {{ $stats['present_today'] ?? 0 }}
+                                        </span>
+                                        <h5 class="description-header">Present</h5>
+                                        <span class="description-text">Students</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="description-block border-right">
+                                        <span class="description-percentage text-danger">
+                                            <i class="fas fa-times"></i> {{ $stats['absent_today'] ?? 0 }}
+                                        </span>
+                                        <h5 class="description-header">Absent</h5>
+                                        <span class="description-text">Students</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="description-block">
+                                        <span class="description-percentage text-info">
+                                            <i class="fas fa-percentage"></i> {{ $stats['attendance_rate'] ?? 0 }}%
+                                        </span>
+                                        <h5 class="description-header">Rate</h5>
+                                        <span class="description-text">Overall</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities and Upcoming Events -->
+            <div class="row">
+                <!-- Recent Admissions -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Recent Admissions
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Class</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-admissions">
+                                        @forelse($recentStudents ?? [] as $student)
+                                            <tr>
+                                                <td>{{ $student->user->name }}</td>
+                                                <td>{{ $student->classModel->name ?? 'N/A' }}</td>
+                                                <td>{{ $student->created_at->format('d M') }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center">No recent admissions</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{{ route('admin.students.index') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> View All Students
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-alt mr-2"></i>
+                                Upcoming Events
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="products-list product-list-in-card pl-2 pr-2">
+                                @forelse($upcomingEvents ?? [] as $event)
+                                    <li class="item">
+                                        <div class="product-img">
+                                            <i class="fas fa-calendar text-{{ $event['type'] === 'exam' ? 'danger' : ($event['type'] === 'meeting' ? 'warning' : 'info') }}"></i>
+                                        </div>
+                                        <div class="product-info">
+                                            <a href="#" class="product-title">{{ $event['title'] }}
+                                                <span class="badge badge-{{ $event['type'] === 'exam' ? 'danger' : ($event['type'] === 'meeting' ? 'warning' : 'info') }} float-right">
+                                                    {{ $event['date']->format('M d') }}
+                                                </span>
+                                            </a>
+                                            <span class="product-description">
+                                                {{ $event['description'] }}
+                                            </span>
+                                        </div>
+                                    </li>
+                                @empty
+                                    <li class="item text-center">
+                                        No upcoming events
+                                    </li>
+                                @endforelse
+                            </ul>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="#" class="btn btn-primary btn-sm">
+                                <i class="fas fa-calendar"></i> View Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-history mr-2"></i>
+                                Recent Activity
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Action</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="activity-log">
+                                        @forelse($recentActivities ?? [] as $activity)
+                                            <tr>
+                                                <td>{{ $activity->user->name ?? 'System' }}</td>
+                                                <td>{{ $activity->description ?? 'Activity' }}</td>
+                                                <td>{{ $activity->created_at->diffForHumans() }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center">No recent activity</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="#" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> View Full Log
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
 </div>
 
-<div class="row">
-    <!-- Recent Admissions -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-user-plus mr-2"></i>
-                    Recent Admissions
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Class</th>
-                                <th>Admission Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-admissions">
-                            @forelse($recentStudents ?? [] as $student)
-                                <tr>
-                                    <td>{{ $student->user->name }}</td>
-                                    <td>{{ $student->classModel->name ?? 'N/A' }}</td>
-                                    <td>{{ $student->admission_date->format('d M, Y') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center">No recent admissions found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="{{ route('admin.students.index') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> View All Students
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Payments -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-money-bill-wave mr-2"></i>
-                    Pending Payments
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Amount</th>
-                                <th>Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pending-payments">
-                            <tr>
-                                <td colspan="3" class="text-center">No pending payments found</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="#" class="btn btn-primary btn-sm">
-                    <i class="fas fa-eye"></i> View All Payments
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Latest Notifications -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-bell mr-2"></i>
-                    Latest Notifications
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <ul class="products-list product-list-in-card pl-2 pr-2" id="latest-notifications">
-                    <li class="item text-center">
-                        No new notifications
-                    </li>
-                </ul>
-            </div>
-            <div class="card-footer text-center">
-                <a href="#" class="btn btn-primary btn-sm">
-                    <i class="fas fa-eye"></i> View All Notifications
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Activity Log -->
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-history mr-2"></i>
-                    Activity Log
-                </h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="activity-log">
-                            @forelse($activityLog as $log)
-                                <tr>
-                                    <td>{{ $log->user->name }}</td>
-                                    <td>{{ $log->description }}</td>
-                                    <td>{{ $log->created_at->diffForHumans() }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center">No recent activity</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card-footer text-center">
-                <a href="#" class="btn btn-primary btn-sm">
-                    <i class="fas fa-eye"></i> View Full Log
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Include Widget Configuration Modal -->
+@include('admin.partials.widget-config-modal')
 @endsection
 
+@push('styles')
+<style>
+    .dashboard-widget {
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    .metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+</style>
+@endpush
+
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ asset('vendor/adminlte/plugins/chart.js/Chart.min.js') }}"></script>
 <script>
-    $(document).ready(function() {
-        // Load dashboard statistics
-        loadDashboardStats();
-        
-        // Initialize charts
-        initAttendanceChart();
-        initFeeTrendsChart();
-        initStudentPerformanceChart();
+$(document).ready(function() {
+    // Load dashboard statistics
+    loadDashboardStats();
+    
+    // Initialize charts
+    initEnrollmentTrendsChart();
+    initClassPerformanceChart();
+    
+    // Load dynamic data
+    loadTeacherWorkload();
+    
+    // Refresh data periodically
+    setInterval(loadDashboardStats, 30000);
+    setInterval(loadTeacherWorkload, 60000);
+});
 
-        // Load dynamic data
-        loadPendingPayments();
-        loadLatestNotifications();
-        loadActivityLog();
-        
-        // Refresh stats every 30 seconds
-        setInterval(loadDashboardStats, 30000);
-        setInterval(loadPendingPayments, 60000);
-        setInterval(loadLatestNotifications, 60000);
-        setInterval(loadActivityLog, 30000);
+function loadDashboardStats() {
+    $.ajax({
+        url: '{{ route("admin.dashboard.stats") }}',
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                updateStatsDisplay(response.data);
+            }
+        },
+        error: function(xhr) {
+            console.log('Error loading dashboard stats');
+        }
     });
+}
 
-    function loadDashboardStats() {
-        $.ajax({
-            url: '{{ route("admin.dashboard.stats") }}',
-            type: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    updateStatsDisplay(response.data);
-                }
-            },
-            error: function(xhr) {
-                console.log('Error loading dashboard stats');
+function updateStatsDisplay(data) {
+    $('#students-count').text(data.total_students || 0);
+    $('#teachers-count').text(data.total_teachers || 0);
+    $('#classes-count').text(data.total_classes || 0);
+    $('#subjects-count').text(data.total_subjects || 0);
+    $('#attendance-rate').text((data.attendance_rate || 0) + '%');
+    $('#recent-enrollments').text(data.recent_enrollments || 0);
+    $('#average-grade').text(data.average_grade || 0);
+    $('#student-teacher-ratio').text((data.student_teacher_ratio || 0) + ':1');
+}
+
+function initEnrollmentTrendsChart() {
+    $.ajax({
+        url: '{{ route("admin.dashboard.enrollment-trends") }}',
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                const ctx = document.getElementById('enrollmentTrendsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: response.data.months,
+                        datasets: response.data.datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Monthly Enrollment Trends'
+                            }
+                        }
+                    }
+                });
             }
-        });
-    }
+        }
+    });
+}
 
-    function updateStatsDisplay(data) {
-        $('#schools-count').text(data.schools || 0);
-        $('#teachers-count').text(data.teachers || 0);
-        $('#students-count').text(data.students || 0);
-        $('#classes-count').text(data.classes || 0);
-        $('#fees-collected').text(data.total_fees_collected || 0);
-        $('#pending-fees').text(data.pending_fees || 0);
-        $('#upcoming-exams').text(data.upcoming_exams || 0);
-    }
-
-    // Chart functions (placeholders for now)
-    function initAttendanceChart() {
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Attendance %',
-                    data: [65, 59, 80, 81, 56, 55],
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true } }
+function initClassPerformanceChart() {
+    $.ajax({
+        url: '{{ route("admin.dashboard.class-performance") }}',
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                const ctx = document.getElementById('classPerformanceChart').getContext('2d');
+                const classes = response.data.classes;
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: classes.map(c => c.name),
+                        datasets: [{
+                            label: 'Students',
+                            data: classes.map(c => c.students),
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                            yAxisID: 'y'
+                        }, {
+                            label: 'Average Grade',
+                            data: classes.map(c => c.average_grade),
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                beginAtZero: true
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                beginAtZero: true,
+                                grid: {
+                                    drawOnChartArea: false,
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Class Performance Overview'
+                            }
+                        }
+                    }
+                });
             }
-        });
-    }
+        }
+    });
+}
 
-    function initFeeTrendsChart() {
-        const ctx = document.getElementById('feeTrendsChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Fees Collected',
-                    data: [1200, 1900, 3000, 500, 2000, 3000],
-                    backgroundColor: 'rgba(75, 192, 192, 0.8)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true } }
+function loadTeacherWorkload() {
+    $.ajax({
+        url: '{{ route("admin.dashboard.teacher-workload") }}',
+        type: 'GET',
+        success: function(response) {
+            if (response.success) {
+                let html = '';
+                response.data.teachers.forEach(teacher => {
+                    html += `<tr>
+                        <td>${teacher.name}</td>
+                        <td><span class="badge badge-info">${teacher.subjects}</span></td>
+                        <td><span class="badge badge-success">${teacher.classes}</span></td>
+                        <td><span class="badge badge-warning">${teacher.students}</span></td>
+                    </tr>`;
+                });
+                $('#teacherWorkloadTable tbody').html(html);
             }
-        });
-    }
+        }
+    });
+}
 
-    function initStudentPerformanceChart() {
-        const ctx = document.getElementById('studentPerformanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Excellent', 'Good', 'Average', 'Below Average'],
-                datasets: [{
-                    data: [300, 50, 100, 20],
-                    backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-            }
-        });
-    }
+// Utility functions
+function showSuccess(message) {
+    toastr.success(message);
+}
 
-    // Dynamic data loading functions (placeholders for now)
-    function loadPendingPayments() {
-        $.ajax({
-            url: '{{ route("admin.pending-payments") }}',
-            type: 'GET',
-            success: function(response) {
-                if (response.success && response.data.length > 0) {
-                    let html = '';
-                    response.data.forEach(item => {
-                        html += `<tr>
-                            <td>${item.student_name}</td>
-                            <td>${item.amount}</td>
-                            <td>${item.due_date}</td>
-                        </tr>`;
-                    });
-                    $('#pending-payments').html(html);
-                } else {
-                    $('#pending-payments').html('<tr><td colspan="3" class="text-center">No pending payments found</td></tr>');
-                }
-            }
-        });
-    }
+function showError(message) {
+    toastr.error(message);
+}
 
-    function loadLatestNotifications() {
-        $.ajax({
-            url: '{{ route("admin.latest-notifications") }}',
-            type: 'GET',
-            success: function(response) {
-                if (response.success && response.data.length > 0) {
-                    let html = '';
-                    response.data.forEach(item => {
-                        html += `<li class="item">
-                            <div class="product-img">
-                                <i class="fas fa-bell"></i>
-                            </div>
-                            <div class="product-info">
-                                <a href="${item.link}" class="product-title">${item.message}
-                                    <span class="badge badge-warning float-right">${item.time}</span></a>
-                                <span class="product-description">
-                                    ${item.description}
-                                </span>
-                            </div>
-                        </li>`;
-                    });
-                    $('#latest-notifications').html(html);
-                } else {
-                    $('#latest-notifications').html('<li class="item text-center">No new notifications</li>');
-                }
-            }
-        });
-    }
-
-    function loadActivityLog() {
-        $.ajax({
-            url: '{{ route("admin.activity-log") }}',
-            type: 'GET',
-            success: function(response) {
-                if (response.success && response.data.length > 0) {
-                    let html = '';
-                    response.data.forEach(log => {
-                        html += `<tr>
-                            <td>${log.user.name}</td>
-                            <td>${log.description}</td>
-                            <td>${moment(log.created_at).fromNow()}</td>
-                        </tr>`;
-                    });
-                    $('#activity-log').html(html);
-                } else {
-                    $('#activity-log').html('<tr><td colspan="3" class="text-center">No recent activity</td></tr>');
-                }
-            }
-        });
-    }
+function showInfo(message) {
+    toastr.info(message);
+}
+</script>
 @endpush
