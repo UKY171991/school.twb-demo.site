@@ -239,7 +239,7 @@ class DashboardController extends BaseDashboardController
     /**
      * Get current school information
      */
-    private function getCurrentSchool()
+    protected function getCurrentSchool(): ?\App\Models\School
     {
         return $this->user->school;
     }

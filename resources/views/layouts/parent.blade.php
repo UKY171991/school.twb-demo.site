@@ -154,6 +154,45 @@
                             <p>Grades</p>
                         </a>
                     </li>
+
+                    <!-- Communication -->
+                    <li class="nav-item {{ request()->routeIs('parent.communication.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('parent.communication.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-comments"></i>
+                            <p>
+                                Communication
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('parent.communication.index') }}" class="nav-link {{ request()->routeIs('parent.communication.index') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Overview</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('parent.communication.messages') }}" class="nav-link {{ request()->routeIs('parent.communication.messages') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Messages</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('parent.communication.meetings') }}" class="nav-link {{ request()->routeIs('parent.communication.meetings') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Meetings</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Family Management -->
+                    <li class="nav-item">
+                        <a href="{{ route('parent.family.index') }}" class="nav-link {{ request()->routeIs('parent.family.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-home"></i>
+                            <p>Family Management</p>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>

@@ -264,26 +264,38 @@
 
         <!-- Quick Actions -->
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <a href="{{ route('student.academic.grades') }}" class="btn btn-primary btn-block">
                     <i class="fas fa-star mr-2"></i>
                     View All Grades
                 </a>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <a href="{{ route('student.academic.attendance') }}" class="btn btn-success btn-block">
                     <i class="fas fa-calendar-check mr-2"></i>
                     Attendance Details
                 </a>
             </div>
-            <div class="col-md-3">
-                <a href="{{ route('student.academic.progress-reports') }}" class="btn btn-warning btn-block">
+            <div class="col-md-2">
+                <a href="{{ route('student.academic.schedule') }}" class="btn btn-info btn-block">
+                    <i class="fas fa-calendar mr-2"></i>
+                    Class Schedule
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ route('student.academic.assignments') }}" class="btn btn-warning btn-block">
+                    <i class="fas fa-tasks mr-2"></i>
+                    Assignments
+                </a>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ route('student.academic.progress-reports') }}" class="btn btn-secondary btn-block">
                     <i class="fas fa-chart-bar mr-2"></i>
                     Progress Reports
                 </a>
             </div>
-            <div class="col-md-3">
-                <button class="btn btn-info btn-block" onclick="exportAcademicData()">
+            <div class="col-md-2">
+                <button class="btn btn-dark btn-block" onclick="exportAcademicData()">
                     <i class="fas fa-download mr-2"></i>
                     Export Data
                 </button>

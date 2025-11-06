@@ -131,6 +131,43 @@
                         </a>
                     </li>
 
+                    <!-- Academic Progress -->
+                    <li class="nav-item {{ request()->routeIs('student.academic.*') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('student.academic.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <p>
+                                Academic Progress
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('student.academic.index') }}" class="nav-link {{ request()->routeIs('student.academic.index') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Overview</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('student.academic.grades') }}" class="nav-link {{ request()->routeIs('student.academic.grades') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Grade History</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('student.academic.attendance') }}" class="nav-link {{ request()->routeIs('student.academic.attendance') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Attendance Details</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('student.academic.progress-reports') }}" class="nav-link {{ request()->routeIs('student.academic.progress-reports') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Progress Reports</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     <!-- Grades -->
                     <li class="nav-item">
                         <a href="{{ route('student.grades') }}" class="nav-link {{ request()->routeIs('student.grades') ? 'active' : '' }}">

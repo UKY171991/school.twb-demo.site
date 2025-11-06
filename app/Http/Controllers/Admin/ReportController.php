@@ -705,7 +705,7 @@ class ReportController extends BaseController
     /**
      * Get current school
      */
-    private function getCurrentSchool()
+    protected function getCurrentSchool(): ?\App\Models\School
     {
         return School::find($this->getCurrentSchoolId());
     }

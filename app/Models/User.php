@@ -80,6 +80,11 @@ class User extends Authenticatable
         return $this->hasOne(ParentModel::class);
     }
 
+    public function children()
+    {
+        return $this->hasMany(Student::class, 'parent_id');
+    }
+
     public function notifications()
     {
         return $this->hasMany(Notification::class);

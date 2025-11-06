@@ -243,7 +243,33 @@ Route::middleware(['auth', 'school.context'])->group(function () {
     // Student Dashboard
     Route::middleware(['user.type:student'])->prefix('student')->name('student.')->group(function () {
         Route::get('/dashboard', 'App\Http\Controllers\Student\DashboardController@index')->name('dashboard');
-        Route::get('/profile', 'App\Http\Controllers\Student\ProfileController@show')->name('profile');
+        
+        // Academic Progress Routes
+        Route::get('/academic', 'App\Http\Controllers\Student\AcademicController@index')->name('academic.index');
+        Route::get('/academic/grades', 'App\Http\Controllers\Student\AcademicController@grades')->name('academic.grades');
+        Route::get('/academic/attendance', 'App\Http\Controllers\Student\AcademicController@attendance')->name('academic.attendance');
+        Route::get('/academic/progress-reports', 'App\Http\Controllers\Student\AcademicController@progressReports')->name('academic.progress-reports');
+        Route::get('/academic/schedule', 'App\Http\Controllers\Student\AcademicController@schedule')->name('academic.schedule');
+        Route::get('/academic/assignments', 'App\Http\Controllers\Student\AcademicController@assignments')->name('academic.assignments');
+        Route::get('/academic/export-grades', 'App\Http\Controllers\Student\AcademicController@exportGrades')->name('academic.export-grades');
+        
+        // Communication Routes
+        Route::get('/communication', 'App\Http\Controllers\Student\CommunicationController@index')->name('communication.index');
+        Route::get('/communication/messages', 'App\Http\Controllers\Student\CommunicationController@messages')->name('communication.messages');
+        Route::get('/communication/messages/{message}', 'App\Http\Controllers\Student\CommunicationController@showMessage')->name('communication.message');
+        Route::post('/communication/send-message', 'App\Http\Controllers\Student\CommunicationController@sendMessage')->name('communication.send-message');
+        Route::post('/communication/messages/{message}/reply', 'App\Http\Controllers\Student\CommunicationController@replyMessage')->name('communication.reply-message');
+        Route::get('/communication/announcements', 'App\Http\Controllers\Student\CommunicationController@announcements')->name('communication.announcements');
+        Route::get('/communication/announcements/{announcement}', 'App\Http\Controllers\Student\CommunicationController@showAnnouncement')->name('communication.announcement');
+        Route::get('/communication/feedback', 'App\Http\Controllers\Student\CommunicationController@feedback')->name('communication.feedback');
+        Route::post('/communication/submit-feedback', 'App\Http\Controllers\Student\CommunicationController@submitFeedback')->name('communication.submit-feedback');
+        
+        Route::get('/profile', 'App\Http\Controllers\Student\ProfileController@show')->name('profile.show');
+        Route::get('/profile/edit', 'App\Http\Controllers\Student\ProfileController@edit')->name('profile.edit');
+        Route::put('/profile', 'App\Http\Controllers\Student\ProfileController@update')->name('profile.update');
+        Route::post('/profile/password', 'App\Http\Controllers\Student\ProfileController@updatePassword')->name('profile.update-password');
+        Route::post('/profile/preferences', 'App\Http\Controllers\Student\ProfileController@updatePreferences')->name('profile.update-preferences');
+        Route::get('/profile/academic-records', 'App\Http\Controllers\Student\ProfileController@academicRecords')->name('profile.academic-records');
         Route::get('/attendance', 'App\Http\Controllers\Student\AttendanceController@index')->name('attendance');
         Route::get('/grades', 'App\Http\Controllers\Student\GradeController@index')->name('grades');
         Route::get('/subjects', 'App\Http\Controllers\Student\SubjectController@index')->name('subjects');
@@ -254,8 +280,36 @@ Route::middleware(['auth', 'school.context'])->group(function () {
         Route::get('/dashboard', 'App\Http\Controllers\Parent\DashboardController@index')->name('dashboard');
         Route::get('/children', 'App\Http\Controllers\Parent\ChildController@index')->name('children');
         Route::get('/children/{student}', 'App\Http\Controllers\Parent\ChildController@show')->name('children.show');
+        Route::get('/children/{student}/attendance-analysis', 'App\Http\Controllers\Parent\ChildController@attendanceAnalysis')->name('children.attendance-analysis');
+        Route::get('/children/{student}/grade-tracking', 'App\Http\Controllers\Parent\ChildController@gradeTracking')->name('children.grade-tracking');
+        Route::get('/children/{student}/performance-trends', 'App\Http\Controllers\Parent\ChildController@performanceTrends')->name('children.performance-trends');
+        Route::get('/children/{student}/attendance-data', 'App\Http\Controllers\Parent\ChildController@getChildAttendance')->name('children.attendance-data');
+        Route::get('/children/{student}/grade-data', 'App\Http\Controllers\Parent\ChildController@getChildGrades')->name('children.grade-data');
         Route::get('/attendance', 'App\Http\Controllers\Parent\AttendanceController@index')->name('attendance');
         Route::get('/grades', 'App\Http\Controllers\Parent\GradeController@index')->name('grades');
+        
+        // Communication Routes
+        Route::get('/communication', 'App\Http\Controllers\Parent\CommunicationController@index')->name('communication.index');
+        Route::get('/communication/messages', 'App\Http\Controllers\Parent\CommunicationController@messages')->name('communication.messages');
+        Route::post('/communication/send-message', 'App\Http\Controllers\Parent\CommunicationController@sendMessage')->name('communication.send-message');
+        Route::get('/communication/meetings', 'App\Http\Controllers\Parent\CommunicationController@meetings')->name('communication.meetings');
+        Route::post('/communication/request-meeting', 'App\Http\Controllers\Parent\CommunicationController@requestMeeting')->name('communication.request-meeting');
+        Route::get('/communication/download-attachment/{message}', 'App\Http\Controllers\Parent\CommunicationController@downloadAttachment')->name('communication.download-attachment');
+        Route::post('/communication/mark-as-read', 'App\Http\Controllers\Parent\CommunicationController@markAsRead')->name('communication.mark-as-read');
+        
+        // Family Management Routes
+        Route::get('/family', 'App\Http\Controllers\Parent\FamilyController@index')->name('family.index');
+        Route::get('/family/profile', 'App\Http\Controllers\Parent\FamilyController@profile')->name('family.profile');
+        Route::post('/family/profile', 'App\Http\Controllers\Parent\FamilyController@updateProfile')->name('family.update-profile');
+        Route::get('/family/permissions', 'App\Http\Controllers\Parent\FamilyController@permissions')->name('family.permissions');
+        Route::put('/family/permissions/{permission}', 'App\Http\Controllers\Parent\FamilyController@updatePermission')->name('family.update-permission');
+        Route::get('/family/emergency-contacts', 'App\Http\Controllers\Parent\FamilyController@emergencyContacts')->name('family.emergency-contacts');
+        Route::post('/family/emergency-contacts', 'App\Http\Controllers\Parent\FamilyController@storeEmergencyContact')->name('family.store-emergency-contact');
+        Route::put('/family/emergency-contacts/{contact}', 'App\Http\Controllers\Parent\FamilyController@updateEmergencyContact')->name('family.update-emergency-contact');
+        Route::delete('/family/emergency-contacts/{contact}', 'App\Http\Controllers\Parent\FamilyController@deleteEmergencyContact')->name('family.delete-emergency-contact');
+        Route::get('/family/preferences', 'App\Http\Controllers\Parent\FamilyController@preferences')->name('family.preferences');
+        Route::post('/family/preferences', 'App\Http\Controllers\Parent\FamilyController@updatePreferences')->name('family.update-preferences');
+        Route::get('/family/children-overview', 'App\Http\Controllers\Parent\FamilyController@childrenOverview')->name('family.children-overview');
     });
     
     // Common Dashboard Route (redirects based on user type)

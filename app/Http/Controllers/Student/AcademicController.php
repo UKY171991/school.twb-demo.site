@@ -7,6 +7,8 @@ use App\Models\Student;
 use App\Models\Grade;
 use App\Models\Attendance;
 use App\Models\Subject;
+use App\Models\Assignment;
+use App\Models\ClassSchedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -130,6 +132,97 @@ class AcademicController extends Controller
         ];
 
         return view('student.academic.progress-reports', compact('student', 'progressData', 'reportType', 'period'));
+    }
+
+    /**
+     * Display class schedule and assignments
+     */
+    public function schedule(Request $request)
+    {
+        $user = auth()->user();
+        $student = Student::where('user_id', $user->id)->first();
+        
+        if (!$student) {
+            return redirect()->route('login')->with('error', 'Student profile not found.');
+        }
+
+        $view = $request->get('view', 'weekly'); // daily, weekly, monthly
+        $date = $request->get('date', now()->format('Y-m-d'));
+        $currentDate = Carbon::parse($date);
+
+        $scheduleData = [
+            'class_schedule' => $this->getClassSchedule($student, $view, $currentDate),
+            'upcoming_assignments' => $this->getUpcomingAssignments($student),
+            'exam_schedule' => $this->getExamSchedule($student, $currentDate),
+            'academic_calendar' => $this->getAcademicCalendar($student, $currentDate),
+            'schedule_conflicts' => $this->getScheduleConflicts($student, $currentDate)
+        ];
+
+        return view('student.academic.schedule', compact('student', 'scheduleData', 'view', 'currentDate'));
+    }
+
+    /**
+     * Display assignments and homework
+     */
+    public function assignments(Request $request)
+    {
+        $user = auth()->user();
+        $student = Student::where('user_id', $user->id)->first();
+        
+        if (!$student) {
+            return redirect()->route('login')->with('error', 'Student profile not found.');
+        }
+
+        $status = $request->get('status', 'all'); // all, pending, overdue, completed
+        $subject = $request->get('subject_id');
+        $type = $request->get('type'); // homework, project, quiz, exam
+
+        $assignmentsQuery = Assignment::where('class_id', $student->class_id)
+            ->where('status', 'published')
+            ->with(['subject', 'teacher']);
+
+        // Apply filters
+        if ($status !== 'all') {
+            switch ($status) {
+                case 'pending':
+                    $assignmentsQuery->where('due_date', '>=', today());
+                    break;
+                case 'overdue':
+                    $assignmentsQuery->overdue();
+                    break;
+                case 'completed':
+                    // This would need assignment submissions to be properly implemented
+                    break;
+            }
+        }
+
+        if ($subject) {
+            $assignmentsQuery->where('subject_id', $subject);
+        }
+
+        if ($type) {
+            $assignmentsQuery->where('type', $type);
+        }
+
+        $assignments = $assignmentsQuery->orderBy('due_date', 'asc')->paginate(20);
+
+        // Get subjects for filter dropdown
+        $subjects = Subject::whereIn('id', function($query) use ($student) {
+            $query->select('subject_id')
+                  ->from('assignments')
+                  ->where('class_id', $student->class_id)
+                  ->where('status', 'published')
+                  ->distinct();
+        })->get();
+
+        $assignmentStats = [
+            'total_assignments' => Assignment::where('class_id', $student->class_id)->where('status', 'published')->count(),
+            'pending_assignments' => Assignment::where('class_id', $student->class_id)->where('status', 'published')->where('due_date', '>=', today())->count(),
+            'overdue_assignments' => Assignment::where('class_id', $student->class_id)->overdue()->count(),
+            'due_this_week' => Assignment::where('class_id', $student->class_id)->dueSoon(7)->count()
+        ];
+
+        return view('student.academic.assignments', compact('student', 'assignments', 'subjects', 'assignmentStats', 'status', 'subject', 'type'));
     }
 
     /**
@@ -584,6 +677,266 @@ class AcademicController extends Controller
         }
 
         return $months;
+    }
+
+    /**
+     * Get class schedule for different views
+     */
+    private function getClassSchedule($student, $view, $currentDate)
+    {
+        $schedules = ClassSchedule::where('class_id', $student->class_id)
+            ->where('is_active', true)
+            ->with(['subject', 'teacher'])
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+
+        switch ($view) {
+            case 'daily':
+                return $this->getDailySchedule($schedules, $currentDate);
+            case 'weekly':
+                return $this->getWeeklySchedule($schedules, $currentDate);
+            case 'monthly':
+                return $this->getMonthlySchedule($schedules, $currentDate);
+            default:
+                return $this->getWeeklySchedule($schedules, $currentDate);
+        }
+    }
+
+    /**
+     * Get daily schedule
+     */
+    private function getDailySchedule($schedules, $date)
+    {
+        $dayOfWeek = strtolower($date->format('l'));
+        
+        return $schedules->filter(function($schedule) use ($dayOfWeek) {
+            return $schedule->day_of_week === $dayOfWeek;
+        })->map(function($schedule) use ($date) {
+            return [
+                'subject' => $schedule->subject->name ?? 'Unknown',
+                'teacher' => $schedule->teacher->full_name ?? 'Unknown',
+                'start_time' => $schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : 'N/A',
+                'end_time' => $schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : 'N/A',
+                'room' => $schedule->room_number ?? 'TBA',
+                'duration' => $schedule->duration_minutes,
+                'date' => $date->format('Y-m-d'),
+                'day' => $date->format('l')
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Get weekly schedule
+     */
+    private function getWeeklySchedule($schedules, $date)
+    {
+        $startOfWeek = $date->copy()->startOfWeek();
+        $weekSchedule = [];
+        
+        $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        
+        foreach ($daysOfWeek as $index => $day) {
+            $currentDay = $startOfWeek->copy()->addDays($index);
+            $daySchedules = $schedules->filter(function($schedule) use ($day) {
+                return $schedule->day_of_week === $day;
+            });
+
+            $weekSchedule[$day] = [
+                'date' => $currentDay->format('Y-m-d'),
+                'day_name' => $currentDay->format('l'),
+                'day_short' => $currentDay->format('D'),
+                'is_today' => $currentDay->isToday(),
+                'schedules' => $daySchedules->map(function($schedule) use ($currentDay) {
+                    return [
+                        'subject' => $schedule->subject->name ?? 'Unknown',
+                        'teacher' => $schedule->teacher->full_name ?? 'Unknown',
+                        'start_time' => $schedule->start_time ? Carbon::parse($schedule->start_time)->format('H:i') : 'N/A',
+                        'end_time' => $schedule->end_time ? Carbon::parse($schedule->end_time)->format('H:i') : 'N/A',
+                        'room' => $schedule->room_number ?? 'TBA',
+                        'duration' => $schedule->duration_minutes
+                    ];
+                })->values()->all()
+            ];
+        }
+        
+        return $weekSchedule;
+    }
+
+    /**
+     * Get monthly schedule
+     */
+    private function getMonthlySchedule($schedules, $date)
+    {
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth = $date->copy()->endOfMonth();
+        $monthSchedule = [];
+        
+        $current = $startOfMonth->copy();
+        while ($current <= $endOfMonth) {
+            $dayOfWeek = strtolower($current->format('l'));
+            $daySchedules = $schedules->filter(function($schedule) use ($dayOfWeek) {
+                return $schedule->day_of_week === $dayOfWeek;
+            });
+
+            if ($daySchedules->isNotEmpty()) {
+                $monthSchedule[$current->format('Y-m-d')] = [
+                    'date' => $current->format('Y-m-d'),
+                    'day_name' => $current->format('l'),
+                    'day_number' => $current->format('j'),
+                    'is_today' => $current->isToday(),
+                    'is_weekend' => $current->isWeekend(),
+                    'schedule_count' => $daySchedules->count(),
+                    'schedules' => $daySchedules->map(function($schedule) {
+                        return [
+                            'subject' => $schedule->subject->name ?? 'Unknown',
+                            'time_slot' => $schedule->time_slot
+                        ];
+                    })->values()->all()
+                ];
+            }
+            
+            $current->addDay();
+        }
+        
+        return $monthSchedule;
+    }
+
+    /**
+     * Get upcoming assignments
+     */
+    private function getUpcomingAssignments($student)
+    {
+        return Assignment::where('class_id', $student->class_id)
+            ->where('status', 'published')
+            ->where('due_date', '>=', today())
+            ->with(['subject', 'teacher'])
+            ->orderBy('due_date')
+            ->limit(10)
+            ->get()
+            ->map(function($assignment) {
+                return [
+                    'id' => $assignment->id,
+                    'title' => $assignment->title,
+                    'subject' => $assignment->subject->name ?? 'Unknown',
+                    'teacher' => $assignment->teacher->full_name ?? 'Unknown',
+                    'type' => $assignment->type,
+                    'due_date' => $assignment->due_date->format('Y-m-d'),
+                    'due_time' => $assignment->due_time ? Carbon::parse($assignment->due_time)->format('H:i') : null,
+                    'days_until_due' => $assignment->days_until_due,
+                    'priority' => $assignment->getPriority(),
+                    'priority_color' => $assignment->getPriorityColor(),
+                    'is_overdue' => $assignment->is_overdue,
+                    'total_marks' => $assignment->total_marks
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get exam schedule
+     */
+    private function getExamSchedule($student, $currentDate)
+    {
+        // Get exams from grades table where exam_type is 'exam', 'midterm', or 'final'
+        $examTypes = ['exam', 'midterm', 'final'];
+        $startDate = $currentDate->copy()->startOfMonth();
+        $endDate = $currentDate->copy()->endOfMonth();
+
+        return Grade::where('student_id', $student->id)
+            ->whereIn('exam_type', $examTypes)
+            ->whereBetween('exam_date', [$startDate, $endDate])
+            ->with(['subject', 'teacher'])
+            ->orderBy('exam_date')
+            ->get()
+            ->map(function($exam) {
+                return [
+                    'subject' => $exam->subject->name ?? 'Unknown',
+                    'teacher' => $exam->teacher->full_name ?? 'Unknown',
+                    'exam_type' => $exam->exam_type,
+                    'exam_date' => $exam->exam_date->format('Y-m-d'),
+                    'total_marks' => $exam->total_marks,
+                    'duration' => '2 hours', // Default duration
+                    'room' => 'TBA' // To be announced
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * Get academic calendar events
+     */
+    private function getAcademicCalendar($student, $currentDate)
+    {
+        $events = [];
+        
+        // Add assignment due dates
+        $assignments = Assignment::where('class_id', $student->class_id)
+            ->where('status', 'published')
+            ->whereBetween('due_date', [$currentDate->copy()->startOfMonth(), $currentDate->copy()->endOfMonth()])
+            ->with('subject')
+            ->get();
+
+        foreach ($assignments as $assignment) {
+            $events[] = [
+                'date' => $assignment->due_date->format('Y-m-d'),
+                'title' => $assignment->title,
+                'type' => 'assignment',
+                'subject' => $assignment->subject->name ?? 'Unknown',
+                'priority' => $assignment->getPriority(),
+                'color' => $assignment->getPriorityColor()
+            ];
+        }
+
+        // Add exam dates
+        $exams = Grade::where('student_id', $student->id)
+            ->whereIn('exam_type', ['exam', 'midterm', 'final'])
+            ->whereBetween('exam_date', [$currentDate->copy()->startOfMonth(), $currentDate->copy()->endOfMonth()])
+            ->with('subject')
+            ->get();
+
+        foreach ($exams as $exam) {
+            $events[] = [
+                'date' => $exam->exam_date->format('Y-m-d'),
+                'title' => ucfirst($exam->exam_type) . ' - ' . ($exam->subject->name ?? 'Unknown'),
+                'type' => 'exam',
+                'subject' => $exam->subject->name ?? 'Unknown',
+                'priority' => 'high',
+                'color' => 'danger'
+            ];
+        }
+
+        // Sort events by date
+        usort($events, function($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+
+        return $events;
+    }
+
+    /**
+     * Get schedule conflicts (if any)
+     */
+    private function getScheduleConflicts($student, $currentDate)
+    {
+        // Check for overlapping class schedules
+        $schedules = ClassSchedule::where('class_id', $student->class_id)
+            ->where('is_active', true)
+            ->get();
+
+        $conflicts = [];
+        
+        foreach ($schedules as $schedule) {
+            $scheduleConflicts = $schedule->getConflicts();
+            if (!empty($scheduleConflicts)) {
+                $conflicts[] = [
+                    'schedule' => $schedule,
+                    'conflicts' => $scheduleConflicts
+                ];
+            }
+        }
+
+        return $conflicts;
     }
 
     // Additional methods for progress reports would be implemented here
