@@ -299,6 +299,9 @@
                             <div class="form-panel">
                                 <div class="form-heading">
                                     <h2 class="mb-1">Welcome back</h2>
+                                    <div class="alert alert-info mt-2" role="alert">
+                                        <strong>Demo Login:</strong> Email <code>admin@example.com</code> | Password <code>password</code>
+                                    </div>
                                     <p>Sign in to continue to your dashboard.</p>
                                 </div>
 
