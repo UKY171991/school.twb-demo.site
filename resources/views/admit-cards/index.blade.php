@@ -82,11 +82,28 @@
                             <td>{{ $student->section }}</td>
                             <td>{{ $student->father_name }}</td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-primary" 
-                                        onclick="generateAdmitCard({{ $student->id }}, '{{ $student->name }}')"
-                                        data-toggle="modal" data-target="#generateModal">
-                                    <i class="fas fa-id-card"></i> Generate
-                                </button>
+                                <div class="btn-group" role="group" aria-label="Actions">
+                                    <button type="button" class="btn btn-sm btn-primary" 
+                                            onclick="generateAdmitCard({{ $student->id }}, '{{ $student->name }}')"
+                                            data-toggle="modal" data-target="#generateModal"
+                                            title="Generate Admit Card">
+                                        <i class="fas fa-id-card"></i>
+                                    </button>
+                                    <a href="{{ route('students.edit', $student->id) }}" 
+                                       class="btn btn-sm btn-warning"
+                                       title="Edit Student">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('students.destroy', $student->id) }}" method="POST" style="display: inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('Are you sure you want to delete {{ addslashes($student->name) }}? This will also delete all related marksheets and admit card history. This action cannot be undone.')"
+                                                title="Delete Student">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
