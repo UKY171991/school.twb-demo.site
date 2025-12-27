@@ -143,4 +143,5 @@
 @stop
 
 @section('js')
+<script src="{{ asset('js/image-upload.js') }}"></script>
 @stop

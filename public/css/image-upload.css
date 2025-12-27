@@ -24,11 +24,18 @@
     text-align: center;
     background: white;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .image-upload-input:hover {
     border-color: #007bff;
     background: #f8f9ff;
+}
+
+.image-upload-input.dragover {
+    border-color: #28a745;
+    background: #f8fff8;
+    transform: scale(1.02);
 }
 
 .image-upload-input input[type="file"] {
@@ -58,4 +65,12 @@
     color: #495057;
     margin-bottom: 10px;
     display: block;
+}
+
+.image-preview-new {
+    display: block;
+    margin: 10px auto;
+    border: 2px solid #28a745;
+    border-radius: 5px;
+    padding: 2px;
 }

@@ -6,6 +6,10 @@
     <h1>Edit School</h1>
 @stop
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
+@stop
+
 @section('content')
     <div class="card">
         <div class="card-header">
@@ -117,32 +121,43 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="logo">School Logo</label>
+                        <div class="image-upload-section">
+                            <label for="logo" class="form-label">School Logo</label>
                             
                             @if($school->logo)
-                                <div class="mb-2">
-                                    <img src="{{ $school->getImageUrl($school->logo) }}" alt="Current Logo" 
-                                         class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                <div class="current-image-section">
+                                    <span class="current-image-label">Current Logo:</span>
+                                    <p><small>Path: {{ $school->logo }}</small></p>
+                                    <p><small>URL: {{ $school->logo_url }}</small></p>
+                                    <img src="{{ $school->logo_url }}" alt="Current Logo" 
+                                         class="image-preview" 
+                                         onerror="this.style.border='2px solid red'; this.alt='Image failed to load';">
                                     <div class="mt-2">
                                         <a href="{{ route('schools.remove-logo', $school->id) }}" 
-                                           class="btn btn-sm btn-danger"
+                                           class="btn btn-sm btn-danger remove-image-btn"
                                            onclick="return confirm('Are you sure you want to remove this logo?')">
                                             <i class="fas fa-trash"></i> Remove Logo
                                         </a>
                                     </div>
                                 </div>
+                            @else
+                                <div class="alert alert-info">
+                                    <small>No logo uploaded yet.</small>
+                                </div>
                             @endif
                             
-                            <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
-                                   id="logo" accept="image/*">
-                            @error('logo')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">
-                                Upload new school logo (JPG, PNG, GIF - Max 2MB)
-                                @if($school->logo) - This will replace the current logo @endif
-                            </small>
+                            <div class="image-upload-input">
+                                <i class="fas fa-image fa-2x text-muted mb-2"></i>
+                                <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
+                                       id="logo" accept="image/*">
+                                @error('logo')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <div class="image-upload-help">
+                                    Upload new school logo (JPG, PNG, GIF - Max 2MB)
+                                    @if($school->logo) - This will replace the current logo @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,4 +187,8 @@
             </div>
         </form>
     </div>
+@stop
+
+@section('js')
+<script src="{{ asset('js/image-upload.js') }}"></script>
 @stop

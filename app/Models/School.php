@@ -86,14 +86,6 @@ class School extends Model
      */
     public function getLogoUrlAttribute()
     {
-        return $this->getImageUrl($this->logo);
-    }
-
-    /**
-     * Get default logo if no logo
-     */
-    public function getLogoAttribute($value)
-    {
-        return $value ? $this->getImageUrl($value) : asset('images/default-school-logo.png');
+        return $this->getImageUrl($this->attributes['logo'] ?? null);
     }
 }

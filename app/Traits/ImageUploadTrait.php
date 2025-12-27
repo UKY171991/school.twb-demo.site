@@ -49,7 +49,7 @@ trait ImageUploadTrait
         }
         
         if (Storage::disk('public')->exists($imagePath)) {
-            return Storage::disk('public')->url($imagePath);
+            return url('storage/' . $imagePath);
         }
         
         return asset('images/default-avatar.svg');

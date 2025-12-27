@@ -61,14 +61,6 @@ class Student extends Model
      */
     public function getImageUrlAttribute()
     {
-        return $this->getImageUrl($this->image);
-    }
-
-    /**
-     * Get default avatar if no image
-     */
-    public function getAvatarAttribute()
-    {
-        return $this->image ? $this->getImageUrl($this->image) : asset('images/default-student.png');
+        return $this->getImageUrl($this->attributes['image'] ?? null);
     }
 }

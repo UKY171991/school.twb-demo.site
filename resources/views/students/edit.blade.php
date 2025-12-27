@@ -114,8 +114,11 @@
                             @if($student->image)
                                 <div class="current-image-section">
                                     <span class="current-image-label">Current Photo:</span>
-                                    <img src="{{ $student->getImageUrl($student->image) }}" alt="Current Photo" 
-                                         class="image-preview">
+                                    <p><small>Path: {{ $student->image }}</small></p>
+                                    <p><small>URL: {{ $student->image_url }}</small></p>
+                                    <img src="{{ $student->image_url }}" alt="Current Photo" 
+                                         class="image-preview"
+                                         onerror="this.style.border='2px solid red'; this.alt='Image failed to load';">
                                     <div class="mt-2">
                                         <a href="{{ route('students.remove-image', $student->id) }}" 
                                            class="btn btn-sm btn-danger remove-image-btn"
@@ -123,6 +126,10 @@
                                             <i class="fas fa-trash"></i> Remove Image
                                         </a>
                                     </div>
+                                </div>
+                            @else
+                                <div class="alert alert-info">
+                                    <small>No photo uploaded yet.</small>
                                 </div>
                             @endif
                             
@@ -156,4 +163,5 @@
 @stop
 
 @section('js')
+<script src="{{ asset('js/image-upload.js') }}"></script>
 @stop

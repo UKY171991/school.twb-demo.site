@@ -11,6 +11,11 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
+    // Test route for debugging images
+    Route::get('/test-images', function() {
+        return view('test-images');
+    });
+    
     // API routes for dynamic loading
     Route::get('/api/schools/{school}/grades', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
     Route::get('/api/grades/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
@@ -19,13 +24,13 @@ Route::middleware('auth')->group(function () {
     // School routes
     Route::resource('schools', App\Http\Controllers\SchoolController::class);
     Route::post('schools/{school}/switch', [App\Http\Controllers\SchoolController::class, 'switchSchool'])->name('schools.switch');
-    Route::delete('schools/{school}/remove-logo', [App\Http\Controllers\SchoolController::class, 'removeLogo'])->name('schools.remove-logo');
+    Route::get('schools/{school}/remove-logo', [App\Http\Controllers\SchoolController::class, 'removeLogo'])->name('schools.remove-logo');
     
     Route::resource('grades', App\Http\Controllers\GradeController::class);
     Route::resource('teachers', App\Http\Controllers\TeacherController::class);
-    Route::delete('teachers/{teacher}/remove-image', [App\Http\Controllers\TeacherController::class, 'removeImage'])->name('teachers.remove-image');
+    Route::get('teachers/{teacher}/remove-image', [App\Http\Controllers\TeacherController::class, 'removeImage'])->name('teachers.remove-image');
     Route::resource('students', App\Http\Controllers\StudentController::class);
-    Route::delete('students/{student}/remove-image', [App\Http\Controllers\StudentController::class, 'removeImage'])->name('students.remove-image');
+    Route::get('students/{student}/remove-image', [App\Http\Controllers\StudentController::class, 'removeImage'])->name('students.remove-image');
     Route::resource('subjects', App\Http\Controllers\SubjectController::class);
     Route::resource('attendances', App\Http\Controllers\AttendanceController::class);
     Route::resource('marks', App\Http\Controllers\MarkController::class);

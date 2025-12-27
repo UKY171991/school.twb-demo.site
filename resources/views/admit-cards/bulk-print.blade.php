@@ -274,7 +274,7 @@
                 <div class="student-photo">
                     <div class="photo-placeholder">
                         @if($student->image)
-                            <img src="{{ $student->getImageUrl($student->image) }}" alt="{{ $student->name }}">
+                            <img src="{{ $student->image_url }}" alt="{{ $student->name }}">
                         @endif
                     </div>
                     <div style="margin-top: 5px; font-size: 8px; font-weight: bold;">

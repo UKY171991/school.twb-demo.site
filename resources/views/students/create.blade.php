@@ -150,4 +150,5 @@
 
 @section('js')
 <script src="{{ asset('js/school-cascade.js') }}"></script>
+<script src="{{ asset('js/image-upload.js') }}"></script>
 @stop
