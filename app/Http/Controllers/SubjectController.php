@@ -80,10 +80,18 @@ class SubjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Subject $subject)
+    public function edit(Subject $subject, Request $request)
     {
-        $grades = \App\Models\Grade::all();
-        $teachers = \App\Models\Teacher::all();
+        $query = function($model) use ($request) {
+            $q = $model::query();
+            if ($request->has('current_school_id')) {
+                $q->where('school_id', $request->get('current_school_id'));
+            }
+            return $q;
+        };
+        
+        $grades = $query(\App\Models\Grade::class)->get();
+        $teachers = $query(\App\Models\Teacher::class)->get();
         return view('subjects.edit', compact('subject', 'grades', 'teachers'));
     }
 
