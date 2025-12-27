@@ -189,4 +189,66 @@ class ExamTimetableController extends Controller
 
         return response()->json($timetables);
     }
+
+    /**
+     * Print timetable for a specific class and exam
+     */
+    public function printTimetable(Request $request)
+    {
+        $currentSchoolId = Session::get('current_school_id');
+        $school = \App\Models\School::find($currentSchoolId);
+        
+        $timetables = ExamTimetable::where('school_id', $currentSchoolId)
+            ->where('class', $request->class)
+            ->where('section', $request->section)
+            ->where('exam_type_id', $request->exam_type_id)
+            ->where('academic_year', $request->academic_year)
+            ->where('is_active', true)
+            ->with(['subject', 'examType'])
+            ->orderBy('exam_date')
+            ->orderBy('start_time')
+            ->get();
+
+        $examType = \App\Models\ExamType::find($request->exam_type_id);
+        $class = $request->class;
+        $section = $request->section;
+        $academic_year = $request->academic_year;
+
+        return view('exam-timetables.print', compact('school', 'examType', 'timetables', 'class', 'section', 'academic_year'));
+    }
+
+    /**
+     * Print all timetables for school
+     */
+    public function printAllTimetables(Request $request)
+    {
+        $currentSchoolId = Session::get('current_school_id');
+        $school = \App\Models\School::find($currentSchoolId);
+
+        $query = ExamTimetable::where('school_id', $currentSchoolId)
+            ->where('is_active', true)
+            ->with(['subject', 'examType']);
+
+        if ($request->exam_type_id) {
+            $query->where('exam_type_id', $request->exam_type_id);
+        }
+
+        if ($request->academic_year) {
+            $query->where('academic_year', $request->academic_year);
+        }
+
+        $timetables = $query->orderBy('class')
+            ->orderBy('section')
+            ->orderBy('exam_date')
+            ->orderBy('start_time')
+            ->get()
+            ->groupBy(function($item) {
+                return $item->class . '-' . $item->section;
+            });
+
+        $examType = $request->exam_type_id ? \App\Models\ExamType::find($request->exam_type_id) : null;
+        $academic_year = $request->academic_year;
+
+        return view('exam-timetables.print-all', compact('school', 'examType', 'timetables', 'academic_year'));
+    }
 }

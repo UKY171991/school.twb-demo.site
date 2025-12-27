@@ -20,7 +20,7 @@
             padding: 15px;
             background: white;
             page-break-after: always;
-            min-height: 90vh;
+            min-height: 85vh;
         }
         .page:last-child {
             page-break-after: avoid;
