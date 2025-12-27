@@ -86,6 +86,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="max_marks">Maximum Marks</label>
+                            <input type="number" name="max_marks" class="form-control @error('max_marks') is-invalid @enderror" 
+                                   id="max_marks" placeholder="e.g., 100" value="{{ old('max_marks', $subject->max_marks) }}" min="1">
+                            @error('max_marks')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="pass_marks">Pass Marks</label>
+                            <input type="number" name="pass_marks" class="form-control @error('pass_marks') is-invalid @enderror" 
+                                   id="pass_marks" placeholder="e.g., 40" value="{{ old('pass_marks', $subject->pass_marks) }}" min="1">
+                            @error('pass_marks')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="card-footer">

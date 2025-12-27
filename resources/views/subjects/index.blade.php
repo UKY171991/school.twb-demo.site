@@ -32,6 +32,7 @@
                         <th>Code</th>
                         <th>Grade/Class</th>
                         <th>Teacher</th>
+                        <th>Max/Pass Marks</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -51,6 +52,13 @@
                         </td>
                         <td>{{ $subject->teacher->name ?? 'Not Assigned' }}</td>
                         <td>
+                            @if($subject->max_marks || $subject->pass_marks)
+                                <span class="badge badge-secondary">{{ $subject->max_marks ?? 'N/A' }}/{{ $subject->pass_marks ?? 'N/A' }}</span>
+                            @else
+                                <span class="text-muted">Not Set</span>
+                            @endif
+                        </td>
+                        <td>
                             <a href="{{ route('subjects.edit', $subject->id) }}" class="btn btn-info btn-sm">Edit</a>
                             <form action="{{ route('subjects.destroy', $subject->id) }}" method="POST" style="display:inline-block;">
                                 @csrf
@@ -61,7 +69,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center">No subjects found.</td>
+                        <td colspan="7" class="text-center">No subjects found.</td>
                     </tr>
                     @endforelse
                 </tbody>
