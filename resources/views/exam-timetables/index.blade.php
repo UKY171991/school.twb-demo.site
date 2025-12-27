@@ -242,3 +242,40 @@
     </div>
 </div>
 @stop
+
+@section('js')
+<script>
+function printClassTimetable() {
+    $('#printClassModal').modal('show');
+}
+
+function printAllTimetables() {
+    $('#printAllModal').modal('show');
+}
+
+// Form submission handlers
+$('#printClassForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = $(this).serialize();
+    const url = $(this).attr('action') + '?' + formData;
+    
+    // Open in new window for printing
+    window.open(url, '_blank');
+    
+    $('#printClassModal').modal('hide');
+});
+
+$('#printAllForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = $(this).serialize();
+    const url = $(this).attr('action') + '?' + formData;
+    
+    // Open in new window for printing
+    window.open(url, '_blank');
+    
+    $('#printAllModal').modal('hide');
+});
+</script>
+@stop

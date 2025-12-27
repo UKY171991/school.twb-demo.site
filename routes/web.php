@@ -77,4 +77,6 @@ Route::middleware('auth')->group(function () {
     Route::get('exam-timetables-bulk-create', [App\Http\Controllers\ExamTimetableController::class, 'bulkCreate'])->name('exam-timetables.bulk-create');
     Route::post('exam-timetables-bulk-store', [App\Http\Controllers\ExamTimetableController::class, 'bulkStore'])->name('exam-timetables.bulk-store');
     Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
+    Route::get('exam-timetables-print', [App\Http\Controllers\ExamTimetableController::class, 'printTimetable'])->name('exam-timetables.print');
+    Route::get('exam-timetables-print-all', [App\Http\Controllers\ExamTimetableController::class, 'printAllTimetables'])->name('exam-timetables.print-all');
 });

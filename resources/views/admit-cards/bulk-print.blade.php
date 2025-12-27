@@ -295,8 +295,8 @@
                             <tr>
                                 <th style="width: 8%;">S.No</th>
                                 <th style="width: 52%;">Subject</th>
-                                <th style="width: 20%;">Max Marks</th>
-                                <th style="width: 20%;">Pass Marks</th>
+                                <th style="width: 20%;">Exam Date</th>
+                                <th style="width: 20%;">Exam Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -304,18 +304,11 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td style="text-align: left; padding-left: 8px;">{{ $schedule->subject->name }}</td>
-                                    <td>{{ $schedule->subject->max_marks }}</td>
-                                    <td>{{ $schedule->subject->pass_marks }}</td>
+                                    <td>{{ $schedule->exam_date->format('d M Y') }}</td>
+                                    <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
-                        <tfoot>
-                            <tr style="background-color: #ecf0f1; font-weight: bold;">
-                                <td colspan="2">TOTAL</td>
-                                <td>{{ $timetable->sum(function($t) { return $t->subject->max_marks; }) }}</td>
-                                <td>{{ $timetable->sum(function($t) { return $t->subject->pass_marks; }) }}</td>
-                            </tr>
-                        </tfoot>
                     </table>
                 @else
                     <table class="subjects-table">
@@ -346,17 +339,6 @@
                         </tfoot>
                     </table>
                 @endif
-            </div>
-
-            <div class="instructions">
-                <h4>Important Instructions:</h4>
-                <ul>
-                    <li>Bring this admit card to the examination hall.</li>
-                    <li>Arrive 30 minutes before exam time.</li>
-                    <li>Mobile phones are strictly prohibited.</li>
-                    <li>Bring your own stationery.</li>
-                    <li>Follow all safety protocols.</li>
-                </ul>
             </div>
 
             <div class="signature-section">

@@ -266,12 +266,10 @@
                 <table class="subjects-table">
                     <thead>
                         <tr>
-                            <th style="width: 10%;">S.No</th>
-                            <th style="width: 40%;">Subject Name</th>
-                            <th style="width: 15%;">Date</th>
-                            <th style="width: 15%;">Time</th>
-                            <th style="width: 10%;">Max Marks</th>
-                            <th style="width: 10%;">Pass Marks</th>
+                            <th style="width: 8%;">S.No</th>
+                            <th style="width: 52%;">Subject Name</th>
+                            <th style="width: 20%;">Exam Date</th>
+                            <th style="width: 20%;">Exam Time</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -280,28 +278,19 @@
                                 <td>{{ $index + 1 }}</td>
                                 <td style="text-align: left; padding-left: 15px;">{{ $schedule->subject->name }}</td>
                                 <td>{{ $schedule->exam_date->format('d M Y') }}</td>
-                                <td>{{ $schedule->start_time->format('H:i') }}</td>
-                                <td>{{ $schedule->subject->max_marks }}</td>
-                                <td>{{ $schedule->subject->pass_marks }}</td>
+                                <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
-                    <tfoot>
-                        <tr style="background-color: #ecf0f1; font-weight: bold;">
-                            <td colspan="4">TOTAL</td>
-                            <td>{{ $timetable->sum(function($t) { return $t->subject->max_marks; }) }}</td>
-                            <td>{{ $timetable->sum(function($t) { return $t->subject->pass_marks; }) }}</td>
-                        </tr>
-                    </tfoot>
                 </table>
             @else
                 <table class="subjects-table">
                     <thead>
                         <tr>
                             <th style="width: 10%;">S.No</th>
-                            <th style="width: 60%;">Subject Name</th>
-                            <th style="width: 15%;">Max Marks</th>
-                            <th style="width: 15%;">Pass Marks</th>
+                            <th style="width: 50%;">Subject Name</th>
+                            <th style="width: 20%;">Max Marks</th>
+                            <th style="width: 20%;">Pass Marks</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -323,20 +312,6 @@
                     </tfoot>
                 </table>
             @endif
-        </div>
-
-        <div class="instructions">
-            <h4><i class="fas fa-exclamation-triangle"></i> Important Instructions:</h4>
-            <ul>
-                <li>Students must bring this admit card to the examination hall.</li>
-                <li>Entry to the examination hall will not be allowed without this admit card.</li>
-                <li>Students must arrive at the examination center 30 minutes before the exam time.</li>
-                <li>Mobile phones and electronic devices are strictly prohibited in the examination hall.</li>
-                <li>Students must bring their own stationery (pen, pencil, eraser, etc.).</li>
-                <li>Any form of malpractice will result in disqualification from the examination.</li>
-                <li>Students must follow all COVID-19 safety protocols if applicable.</li>
-                <li>In case of any discrepancy, contact the school office immediately.</li>
-            </ul>
         </div>
 
         <div class="signature-section">
