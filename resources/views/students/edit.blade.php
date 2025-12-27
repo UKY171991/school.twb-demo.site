@@ -108,16 +108,17 @@
                     </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="image">Student Photo</label>
+                        <div class="image-upload-section">
+                            <label for="image" class="form-label">Student Photo</label>
                             
                             @if($student->image)
-                                <div class="mb-2">
+                                <div class="current-image-section">
+                                    <span class="current-image-label">Current Photo:</span>
                                     <img src="{{ $student->getImageUrl($student->image) }}" alt="Current Photo" 
-                                         class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                         class="image-preview">
                                     <div class="mt-2">
                                         <a href="{{ route('students.remove-image', $student->id) }}" 
-                                           class="btn btn-sm btn-danger"
+                                           class="btn btn-sm btn-danger remove-image-btn"
                                            onclick="return confirm('Are you sure you want to remove this image?')">
                                             <i class="fas fa-trash"></i> Remove Image
                                         </a>
@@ -125,15 +126,18 @@
                                 </div>
                             @endif
                             
-                            <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
-                                   id="image" accept="image/*">
-                            @error('image')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">
-                                Upload new student photo (JPG, PNG, GIF - Max 2MB)
-                                @if($student->image) - This will replace the current image @endif
-                            </small>
+                            <div class="image-upload-input">
+                                <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                                <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
+                                       id="image" accept="image/*">
+                                @error('image')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <div class="image-upload-help">
+                                    Upload new student photo (JPG, PNG, GIF - Max 2MB)
+                                    @if($student->image) - This will replace the current image @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,6 +152,7 @@
 @stop
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
 @stop
 
 @section('js')

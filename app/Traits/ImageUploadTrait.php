@@ -45,14 +45,14 @@ trait ImageUploadTrait
     public function getImageUrl(string $imagePath = null): string
     {
         if (!$imagePath) {
-            return asset('images/default-avatar.png');
+            return asset('images/default-avatar.svg');
         }
         
         if (Storage::disk('public')->exists($imagePath)) {
             return Storage::disk('public')->url($imagePath);
         }
         
-        return asset('images/default-avatar.png');
+        return asset('images/default-avatar.svg');
     }
 
     /**

@@ -118,14 +118,19 @@
                     </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="image">Student Photo</label>
-                            <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
-                                   id="image" accept="image/*">
-                            @error('image')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">Upload student photo (JPG, PNG, GIF - Max 2MB)</small>
+                        <div class="image-upload-section">
+                            <label for="image" class="form-label">Student Photo</label>
+                            <div class="image-upload-input">
+                                <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                                <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
+                                       id="image" accept="image/*">
+                                @error('image')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <div class="image-upload-help">
+                                    Upload student photo (JPG, PNG, GIF - Max 2MB)
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,6 +145,7 @@
 @stop
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
 @stop
 
 @section('js')

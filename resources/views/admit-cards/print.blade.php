@@ -93,6 +93,12 @@
             display: inline-block;
             background: #f8f9fa;
             position: relative;
+            overflow: hidden;
+        }
+        .photo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .photo-placeholder::after {
             content: "STUDENT\APHOTO";
@@ -279,9 +285,17 @@
                 </table>
             </div>
             <div class="student-photo">
-                <div class="photo-placeholder"></div>
+                <div class="photo-placeholder">
+                    @if($student->image)
+                        <img src="{{ $student->getImageUrl($student->image) }}" alt="{{ $student->name }}">
+                    @endif
+                </div>
                 <div style="margin-top: 10px; font-size: 12px; font-weight: bold;">
-                    Paste Recent<br>Photograph Here
+                    @if($student->image)
+                        Student Photo
+                    @else
+                        Paste Recent<br>Photograph Here
+                    @endif
                 </div>
             </div>
         </div>
