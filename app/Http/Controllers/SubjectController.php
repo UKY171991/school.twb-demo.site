@@ -10,9 +10,16 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::latest()->paginate(10);
+        $query = Subject::with(['grade', 'teacher', 'school']);
+        
+        // Filter by current school if available
+        if ($request->has('current_school_id')) {
+            $query->where('school_id', $request->get('current_school_id'));
+        }
+        
+        $subjects = $query->latest()->paginate(10);
         return view('subjects.index', compact('subjects'));
     }
 
@@ -21,7 +28,9 @@ class SubjectController extends Controller
      */
     public function create()
     {
-        return view('subjects.create');
+        $grades = \App\Models\Grade::all();
+        $teachers = \App\Models\Teacher::all();
+        return view('subjects.create', compact('grades', 'teachers'));
     }
 
     /**
@@ -31,13 +40,21 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:subjects,code',
-            'max_marks' => 'required|integer|min:1',
-            'pass_marks' => 'required|integer|min:1',
-            'class' => 'required|string|max:255',
+            'code' => 'nullable|string|unique:subjects,code',
+            'description' => 'nullable|string',
+            'max_marks' => 'nullable|integer|min:1',
+            'pass_marks' => 'nullable|integer|min:1',
+            'grade_id' => 'required|exists:grades,id',
+            'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
-        Subject::create($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        Subject::create($data);
 
         return redirect()->route('subjects.index')
                         ->with('success','Subject created successfully.');
@@ -48,6 +65,7 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
+        $subject->load(['grade', 'teacher', 'school']);
         return view('subjects.show', compact('subject'));
     }
 
@@ -56,7 +74,9 @@ class SubjectController extends Controller
      */
     public function edit(Subject $subject)
     {
-        return view('subjects.edit', compact('subject'));
+        $grades = \App\Models\Grade::all();
+        $teachers = \App\Models\Teacher::all();
+        return view('subjects.edit', compact('subject', 'grades', 'teachers'));
     }
 
     /**
@@ -66,13 +86,21 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:subjects,code,' . $subject->id,
-            'max_marks' => 'required|integer|min:1',
-            'pass_marks' => 'required|integer|min:1',
-            'class' => 'required|string|max:255',
+            'code' => 'nullable|string|unique:subjects,code,' . $subject->id,
+            'description' => 'nullable|string',
+            'max_marks' => 'nullable|integer|min:1',
+            'pass_marks' => 'nullable|integer|min:1',
+            'grade_id' => 'required|exists:grades,id',
+            'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
-        $subject->update($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        $subject->update($data);
 
         return redirect()->route('subjects.index')
                         ->with('success','Subject updated successfully.');
