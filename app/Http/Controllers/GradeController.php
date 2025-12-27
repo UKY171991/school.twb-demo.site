@@ -10,9 +10,16 @@ class GradeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $grades = Grade::withCount('students')->get();
+        $query = Grade::withCount('students');
+        
+        // Filter by current school if available
+        if ($request->has('current_school_id')) {
+            $query->where('school_id', $request->get('current_school_id'));
+        }
+        
+        $grades = $query->get();
         return view('grades.index', compact('grades'));
     }
 
@@ -30,10 +37,17 @@ class GradeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
+            'section' => 'nullable|string|max:255',
         ]);
 
-        Grade::create($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        Grade::create($data);
 
         return redirect()->route('grades.index')
                         ->with('success','Grade created successfully.');
@@ -62,11 +76,19 @@ class GradeController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
+            'section' => 'nullable|string|max:255',
         ]);
 
         $grade = Grade::findOrFail($id);
-        $grade->update($request->all());
+        
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+        
+        $grade->update($data);
 
         return redirect()->route('grades.index')
                         ->with('success','Grade updated successfully.');

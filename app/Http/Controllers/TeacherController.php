@@ -11,9 +11,16 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = Teacher::all();
+        $query = Teacher::query();
+        
+        // Filter by current school if available
+        if ($request->has('current_school_id')) {
+            $query->where('school_id', $request->get('current_school_id'));
+        }
+        
+        $teachers = $query->latest()->paginate(10);
         return view('teachers.index', compact('teachers'));
     }
 
@@ -31,12 +38,22 @@ class TeacherController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers',
-            'gender' => 'required',
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'required|in:male,female,other',
+            'date_of_birth' => 'nullable|date',
+            'date_of_joining' => 'nullable|date',
+            'address' => 'nullable|string',
         ]);
 
-        Teacher::create($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        Teacher::create($data);
 
         return redirect()->route('teachers.index')
                         ->with('success','Teacher created successfully.');
@@ -65,13 +82,24 @@ class TeacherController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers,email,'.$id,
-            'gender' => 'required',
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'required|in:male,female,other',
+            'date_of_birth' => 'nullable|date',
+            'date_of_joining' => 'nullable|date',
+            'address' => 'nullable|string',
         ]);
 
         $teacher = Teacher::findOrFail($id);
-        $teacher->update($request->all());
+        
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+        
+        $teacher->update($data);
 
         return redirect()->route('teachers.index')
                         ->with('success','Teacher updated successfully.');

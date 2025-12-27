@@ -44,10 +44,12 @@
                         <div class="form-group">
                             <label for="exam_type">Exam Type <span class="text-danger">*</span></label>
                             <select name="exam_type" id="exam_type" class="form-control @error('exam_type') is-invalid @enderror" required>
-                                <option value="Midterm" {{ old('exam_type', $mark->exam_type) == 'Midterm' ? 'selected' : '' }}>Midterm</option>
-                                <option value="Final" {{ old('exam_type', $mark->exam_type) == 'Final' ? 'selected' : '' }}>Final</option>
-                                <option value="Quiz" {{ old('exam_type', $mark->exam_type) == 'Quiz' ? 'selected' : '' }}>Quiz</option>
-                                <option value="Assignment" {{ old('exam_type', $mark->exam_type) == 'Assignment' ? 'selected' : '' }}>Assignment</option>
+                                <option value="">Select Type</option>
+                                @foreach($examTypes as $examType)
+                                    <option value="{{ $examType->name }}" {{ old('exam_type', $mark->exam_type) == $examType->name ? 'selected' : '' }}>
+                                        {{ $examType->name }} ({{ $examType->code }})
+                                    </option>
+                                @endforeach
                             </select>
                             @error('exam_type')
                                 <span class="invalid-feedback">{{ $message }}</span>

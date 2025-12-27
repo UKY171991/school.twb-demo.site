@@ -17,6 +17,11 @@ class Teacher extends Model
         'address'
     ];
 
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'date_of_joining' => 'date',
+    ];
+
     public function school()
     {
         return $this->belongsTo(School::class);

@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/', [App\Http\Controllers\SystemSettingController::class, 'index'])->name('index');
         Route::post('/update', [App\Http\Controllers\SystemSettingController::class, 'update'])->name('update');
+        Route::post('/reset', [App\Http\Controllers\SystemSettingController::class, 'resetSetting'])->name('reset');
         
         Route::get('/grading', [App\Http\Controllers\SystemSettingController::class, 'gradingSettings'])->name('grading');
         Route::post('/grading', [App\Http\Controllers\SystemSettingController::class, 'updateGradingSettings'])->name('grading.update');

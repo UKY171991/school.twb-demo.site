@@ -11,18 +11,33 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::with('grade')->latest()->paginate(10);
+        $query = Student::with('grade');
+        
+        // Filter by current school if available
+        if ($request->has('current_school_id')) {
+            $query->where('school_id', $request->get('current_school_id'));
+        }
+        
+        $students = $query->latest()->paginate(10);
         return view('students.index', compact('students'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $grades = Grade::all();
+        $query = function() use ($request) {
+            $q = \App\Models\Grade::query();
+            if ($request->has('current_school_id')) {
+                $q->where('school_id', $request->get('current_school_id'));
+            }
+            return $q;
+        };
+        
+        $grades = $query()->get();
         return view('students.create', compact('grades'));
     }
 
@@ -41,7 +56,13 @@ class StudentController extends Controller
             'grade_id' => 'required|exists:grades,id',
         ]);
 
-        Student::create($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        Student::create($data);
 
         return redirect()->route('students.index')
                         ->with('success','Student created successfully.');
@@ -59,9 +80,17 @@ class StudentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Student $student)
+    public function edit(Student $student, Request $request)
     {
-        $grades = Grade::all();
+        $query = function() use ($request) {
+            $q = \App\Models\Grade::query();
+            if ($request->has('current_school_id')) {
+                $q->where('school_id', $request->get('current_school_id'));
+            }
+            return $q;
+        };
+        
+        $grades = $query()->get();
         return view('students.edit', compact('student', 'grades'));
     }
 
@@ -80,7 +109,13 @@ class StudentController extends Controller
             'grade_id' => 'required|exists:grades,id',
         ]);
 
-        $student->update($request->all());
+        // Add current school context
+        $data = $request->all();
+        if ($request->has('current_school_id')) {
+            $data['school_id'] = $request->get('current_school_id');
+        }
+
+        $student->update($data);
 
         return redirect()->route('students.index')
                         ->with('success','Student updated successfully.');

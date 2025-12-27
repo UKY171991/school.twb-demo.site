@@ -70,7 +70,7 @@
                         <div class="form-group">
                             <label for="date_of_birth">Date of Birth</label>
                             <input type="date" name="date_of_birth" class="form-control @error('date_of_birth') is-invalid @enderror" 
-                                   id="date_of_birth" value="{{ old('date_of_birth', $teacher->date_of_birth) }}">
+                                   id="date_of_birth" value="{{ old('date_of_birth', $teacher->date_of_birth ? $teacher->date_of_birth->format('Y-m-d') : '') }}">
                             @error('date_of_birth')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -80,7 +80,7 @@
                         <div class="form-group">
                             <label for="date_of_joining">Date of Joining</label>
                             <input type="date" name="date_of_joining" class="form-control @error('date_of_joining') is-invalid @enderror" 
-                                   id="date_of_joining" value="{{ old('date_of_joining', $teacher->date_of_joining) }}">
+                                   id="date_of_joining" value="{{ old('date_of_joining', $teacher->date_of_joining ? $teacher->date_of_joining->format('Y-m-d') : '') }}">
                             @error('date_of_joining')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror

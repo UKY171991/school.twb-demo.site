@@ -86,7 +86,7 @@
                         <div class="form-group">
                             <label for="date_of_birth">Date of Birth</label>
                             <input type="date" name="date_of_birth" class="form-control @error('date_of_birth') is-invalid @enderror" 
-                                   id="date_of_birth" value="{{ old('date_of_birth', $student->date_of_birth) }}">
+                                   id="date_of_birth" value="{{ old('date_of_birth', $student->date_of_birth ? $student->date_of_birth->format('Y-m-d') : '') }}">
                             @error('date_of_birth')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror

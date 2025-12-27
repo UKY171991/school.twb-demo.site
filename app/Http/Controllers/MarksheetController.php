@@ -11,16 +11,31 @@ use Illuminate\Support\Facades\DB;
 
 class MarksheetController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $marksheets = Marksheet::with('student')->latest()->paginate(10);
+        $query = Marksheet::with('student');
+        
+        // Filter by current school if available
+        if ($request->has('current_school_id')) {
+            $query->where('school_id', $request->get('current_school_id'));
+        }
+        
+        $marksheets = $query->latest()->paginate(10);
         return view('marksheets.index', compact('marksheets'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $students = Student::all();
-        $subjects = Subject::all();
+        $query = function($model) use ($request) {
+            $q = $model::query();
+            if ($request->has('current_school_id')) {
+                $q->where('school_id', $request->get('current_school_id'));
+            }
+            return $q;
+        };
+        
+        $students = $query(Student::class)->get();
+        $subjects = $query(Subject::class)->get();
         return view('marksheets.create', compact('students', 'subjects'));
     }
 
@@ -39,7 +54,7 @@ class MarksheetController extends Controller
         DB::transaction(function () use ($request) {
             $student = Student::find($request->student_id);
             
-            $marksheet = Marksheet::create([
+            $data = [
                 'student_id' => $request->student_id,
                 'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
@@ -47,7 +62,14 @@ class MarksheetController extends Controller
                 'class' => $student->class,
                 'section' => $student->section,
                 'academic_year' => $request->academic_year,
-            ]);
+            ];
+            
+            // Add current school context
+            if ($request->has('current_school_id')) {
+                $data['school_id'] = $request->get('current_school_id');
+            }
+            
+            $marksheet = Marksheet::create($data);
 
             foreach ($request->marks as $subjectId => $obtainedMarks) {
                 MarksheetMark::create([
@@ -79,11 +101,20 @@ class MarksheetController extends Controller
         return view('marksheets.print', compact('marksheet'));
     }
 
-    public function edit(Marksheet $marksheet)
+    public function edit(Marksheet $marksheet, Request $request)
     {
         $marksheet->load(['student', 'marks.subject']);
-        $students = Student::all();
-        $subjects = Subject::all();
+        
+        $query = function($model) use ($request) {
+            $q = $model::query();
+            if ($request->has('current_school_id')) {
+                $q->where('school_id', $request->get('current_school_id'));
+            }
+            return $q;
+        };
+        
+        $students = $query(Student::class)->get();
+        $subjects = $query(Subject::class)->get();
         return view('marksheets.edit', compact('marksheet', 'students', 'subjects'));
     }
 
@@ -102,7 +133,7 @@ class MarksheetController extends Controller
         DB::transaction(function () use ($request, $marksheet) {
             $student = Student::find($request->student_id);
             
-            $marksheet->update([
+            $data = [
                 'student_id' => $request->student_id,
                 'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
@@ -110,7 +141,14 @@ class MarksheetController extends Controller
                 'class' => $student->class,
                 'section' => $student->section,
                 'academic_year' => $request->academic_year,
-            ]);
+            ];
+            
+            // Add current school context
+            if ($request->has('current_school_id')) {
+                $data['school_id'] = $request->get('current_school_id');
+            }
+            
+            $marksheet->update($data);
 
             // Delete existing marks
             $marksheet->marks()->delete();

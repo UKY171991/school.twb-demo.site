@@ -37,7 +37,7 @@
                         <label for="exam_type_id">Exam Type</label>
                         <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>
                             <option value="">Select Exam Type</option>
-                            @foreach(\App\Models\ExamType::getActiveTypes() as $examType)
+                            @foreach(\App\Models\ExamType::getActiveTypes(request()->get('current_school_id')) as $examType)
                                 <option value="{{ $examType->id }}" 
                                         data-exam-name="{{ $examType->name }}"
                                         {{ $marksheet->exam_type_id == $examType->id ? 'selected' : '' }}>

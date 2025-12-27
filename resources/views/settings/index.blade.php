@@ -10,7 +10,26 @@
 <div class="row">
     <div class="col-md-12">
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ session('success') }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                {{ session('error') }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
         @endif
     </div>
 </div>
@@ -120,7 +139,7 @@
 <div class="modal fade" id="schoolSettingsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('settings.update') }}" method="POST">
+            <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
                     <h4 class="modal-title">School Settings</h4>
@@ -143,6 +162,54 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>School Logo</label>
+                                <input type="file" name="settings[school_logo]" class="form-control-file" accept="image/*">
+                                <small class="form-text text-muted">Upload school logo (JPG, PNG, SVG - Max: 2MB)</small>
+                                @if(\App\Models\SystemSetting::get('school_logo'))
+                                    <div class="mt-2">
+                                        <img src="{{ asset(\App\Models\SystemSetting::get('school_logo')) }}" 
+                                             alt="Current Logo" class="img-thumbnail" style="max-height: 100px;">
+                                        <p class="small text-muted">Current Logo</p>
+                                        <form action="{{ route('settings.reset') }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <input type="hidden" name="key" value="school_logo">
+                                            <button type="submit" class="btn btn-sm btn-danger" 
+                                                    onclick="return confirm('Are you sure you want to remove the logo?')">
+                                                <i class="fas fa-trash"></i> Remove Logo
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Favicon</label>
+                                <input type="file" name="settings[school_favicon]" class="form-control-file" accept="image/*">
+                                <small class="form-text text-muted">Upload favicon (ICO, PNG - Max: 1MB)</small>
+                                @if(\App\Models\SystemSetting::get('school_favicon'))
+                                    <div class="mt-2">
+                                        <img src="{{ asset(\App\Models\SystemSetting::get('school_favicon')) }}" 
+                                             alt="Current Favicon" class="img-thumbnail" style="max-height: 50px;">
+                                        <p class="small text-muted">Current Favicon</p>
+                                        <form action="{{ route('settings.reset') }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <input type="hidden" name="key" value="school_favicon">
+                                            <button type="submit" class="btn btn-sm btn-danger" 
+                                                    onclick="return confirm('Are you sure you want to remove the favicon?')">
+                                                <i class="fas fa-trash"></i> Remove Favicon
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
@@ -164,6 +231,23 @@
                                 <label>Email Address</label>
                                 <input type="email" name="settings[school_email]" class="form-control" 
                                        value="{{ \App\Models\SystemSetting::get('school_email', 'info@abcschool.edu') }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Website URL</label>
+                                <input type="url" name="settings[school_website]" class="form-control" 
+                                       value="{{ \App\Models\SystemSetting::get('school_website', 'https://www.abcschool.edu') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Principal Name</label>
+                                <input type="text" name="settings[school_principal]" class="form-control" 
+                                       value="{{ \App\Models\SystemSetting::get('school_principal', 'Dr. John Smith') }}">
                             </div>
                         </div>
                     </div>
