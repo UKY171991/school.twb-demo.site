@@ -11,6 +11,7 @@ class Marksheet extends Model
 
     protected $fillable = [
         'student_id',
+        'exam_type_id',
         'exam_name',
         'exam_date',
         'class',
@@ -20,7 +21,9 @@ class Marksheet extends Model
         'obtained_marks',
         'percentage',
         'grade',
-        'result'
+        'result',
+        'class_position',
+        'total_students'
     ];
 
     protected $casts = [
@@ -30,6 +33,11 @@ class Marksheet extends Model
     public function student()
     {
         return $this->belongsTo(Student::class);
+    }
+
+    public function examType()
+    {
+        return $this->belongsTo(ExamType::class);
     }
 
     public function marks()
@@ -59,6 +67,36 @@ class Marksheet extends Model
             'percentage' => round($percentage, 2),
             'grade' => $this->calculateGrade($percentage),
             'result' => $allPassed ? 'PASS' : 'FAIL'
+        ]);
+
+        // Calculate class position
+        $this->calculateClassPosition();
+    }
+
+    public function calculateClassPosition()
+    {
+        // Get all marksheets for the same class, section, exam type, and academic year
+        $classMarksheets = self::where('class', $this->class)
+                              ->where('section', $this->section)
+                              ->where('exam_type_id', $this->exam_type_id)
+                              ->where('academic_year', $this->academic_year)
+                              ->where('result', 'PASS') // Only consider passed students for ranking
+                              ->orderBy('percentage', 'desc')
+                              ->get();
+
+        $totalStudents = $classMarksheets->count();
+        $position = $classMarksheets->search(function($marksheet) {
+            return $marksheet->id === $this->id;
+        }) + 1;
+
+        // If student failed, position is null
+        if ($this->result === 'FAIL') {
+            $position = null;
+        }
+
+        $this->update([
+            'class_position' => $position,
+            'total_students' => $totalStudents
         ]);
     }
 

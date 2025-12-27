@@ -33,10 +33,53 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label for="exam_type_id">Exam Type</label>
+                        <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>
+                            <option value="">Select Exam Type</option>
+                            @foreach(\App\Models\ExamType::getActiveTypes() as $examType)
+                                <option value="{{ $examType->id }}" {{ old('exam_type_id') == $examType->id ? 'selected' : '' }}>
+                                    {{ $examType->name }} ({{ $examType->code }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('exam_type_id')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label for="exam_name">Exam Name</label>
                         <input type="text" name="exam_name" id="exam_name" class="form-control @error('exam_name') is-invalid @enderror" 
                                value="{{ old('exam_name') }}" placeholder="e.g., Mid Term, Final Term" required>
                         @error('exam_name')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="academic_year">Academic Year</label>
+                        <select name="academic_year" id="academic_year" class="form-control @error('academic_year') is-invalid @enderror" required>
+                            <option value="">Select Academic Year</option>
+                            @php
+                                $currentYear = date('Y');
+                                $academicYears = [
+                                    ($currentYear-1) . '-' . $currentYear,
+                                    $currentYear . '-' . ($currentYear+1),
+                                    ($currentYear+1) . '-' . ($currentYear+2)
+                                ];
+                            @endphp
+                            @foreach($academicYears as $year)
+                                <option value="{{ $year }}" {{ old('academic_year', $currentYear . '-' . ($currentYear+1)) == $year ? 'selected' : '' }}>
+                                    {{ $year }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('academic_year')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>
@@ -56,12 +99,13 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="academic_year">Academic Year</label>
-                        <input type="text" name="academic_year" id="academic_year" class="form-control @error('academic_year') is-invalid @enderror" 
-                               value="{{ old('academic_year', date('Y') . '-' . (date('Y') + 1)) }}" placeholder="e.g., 2024-2025" required>
-                        @error('academic_year')
-                            <span class="invalid-feedback">{{ $message }}</span>
-                        @enderror
+                        <label>&nbsp;</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="calculate_position" name="calculate_position" value="1" checked>
+                            <label class="form-check-label" for="calculate_position">
+                                Calculate class position automatically
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

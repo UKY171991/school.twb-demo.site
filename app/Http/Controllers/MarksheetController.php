@@ -28,6 +28,7 @@ class MarksheetController extends Controller
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
+            'exam_type_id' => 'required|exists:exam_types,id',
             'exam_name' => 'required|string|max:255',
             'exam_date' => 'required|date',
             'academic_year' => 'required|string|max:255',
@@ -40,6 +41,7 @@ class MarksheetController extends Controller
             
             $marksheet = Marksheet::create([
                 'student_id' => $request->student_id,
+                'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
                 'exam_date' => $request->exam_date,
                 'class' => $student->class,
@@ -64,13 +66,13 @@ class MarksheetController extends Controller
 
     public function show(Marksheet $marksheet)
     {
-        $marksheet->load(['student', 'marks.subject']);
+        $marksheet->load(['student', 'examType', 'marks.subject']);
         return view('marksheets.show', compact('marksheet'));
     }
 
     public function print(Marksheet $marksheet)
     {
-        $marksheet->load(['student', 'marks.subject']);
+        $marksheet->load(['student', 'examType', 'marks.subject']);
         return view('marksheets.print', compact('marksheet'));
     }
 

@@ -12,6 +12,7 @@ class Mark extends Model
     protected $fillable = [
         'student_id',
         'subject_id',
+        'exam_type_id',
         'mark_obtained',
         'total_marks',
         'exam_type',
@@ -30,6 +31,11 @@ class Mark extends Model
     public function subject()
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    public function examType()
+    {
+        return $this->belongsTo(ExamType::class);
     }
 
     public function getPercentageAttribute()
