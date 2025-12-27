@@ -36,9 +36,11 @@
                         <th>Student Name</th>
                         <th>Roll Number</th>
                         <th>Exam Name</th>
+                        <th>Exam Type</th>
                         <th>Class</th>
                         <th>Percentage</th>
                         <th>Grade</th>
+                        <th>Position</th>
                         <th>Result</th>
                         <th>Actions</th>
                     </tr>
