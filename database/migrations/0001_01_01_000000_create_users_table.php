@@ -17,13 +17,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('user_type', ['super_admin', 'admin', 'teacher', 'student', 'parent'])->default('student');
-            $table->foreignId('school_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('profile_photo')->nullable();
-            $table->string('phone')->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('last_login_at')->nullable();
-            $table->json('preferences')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
