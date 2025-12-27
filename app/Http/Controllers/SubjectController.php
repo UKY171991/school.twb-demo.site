@@ -7,17 +7,18 @@ use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Subject::with(['grade', 'teacher', 'school']);
-        
-        // Filter by current school if available
-        if ($request->has('current_school_id')) {
-            $query->where('school_id', $request->get('current_school_id'));
-        }
+        $schoolId = session('current_school_id');
+        $query = Subject::with(['grade', 'teacher', 'school'])->where('school_id', $schoolId);
         
         $subjects = $query->latest()->paginate(10);
         return view('subjects.index', compact('subjects'));
@@ -131,5 +132,18 @@ class SubjectController extends Controller
 
         return redirect()->route('subjects.index')
                         ->with('success','Subject deleted successfully.');
+    }
+
+    /**
+     * Get subjects by grade (API endpoint)
+     */
+    public function getByGrade($gradeId)
+    {
+        $subjects = Subject::where('grade_id', $gradeId)
+            ->select('id', 'name', 'code')
+            ->orderBy('name')
+            ->get();
+            
+        return response()->json($subjects);
     }
 }

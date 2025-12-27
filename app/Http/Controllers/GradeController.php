@@ -7,17 +7,18 @@ use Illuminate\Http\Request;
 
 class GradeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Grade::withCount('students');
-        
-        // Filter by current school if available
-        if ($request->has('current_school_id')) {
-            $query->where('school_id', $request->get('current_school_id'));
-        }
+        $schoolId = session('current_school_id');
+        $query = Grade::withCount('students')->where('school_id', $schoolId);
         
         $grades = $query->get();
         return view('grades.index', compact('grades'));
@@ -104,5 +105,18 @@ class GradeController extends Controller
 
         return redirect()->route('grades.index')
                         ->with('success','Grade deleted successfully.');
+    }
+
+    /**
+     * Get grades by school (API endpoint)
+     */
+    public function getBySchool($schoolId)
+    {
+        $grades = Grade::where('school_id', $schoolId)
+            ->select('id', 'name', 'section')
+            ->orderBy('name')
+            ->get();
+            
+        return response()->json($grades);
     }
 }

@@ -10,12 +10,22 @@ use Illuminate\Http\Request;
 
 class MarkController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Mark::with(['student.grade', 'subject']);
+        $schoolId = session('current_school_id');
+        
+        $query = Mark::with(['student.grade', 'subject'])
+            ->whereHas('student', function($q) use ($schoolId) {
+                $q->where('school_id', $schoolId);
+            });
         
         // Filter by grade if provided
         if ($request->has('grade_id') && $request->grade_id) {
@@ -30,9 +40,10 @@ class MarkController extends Controller
         }
         
         $marks = $query->orderBy('exam_date', 'desc')->get();
-        $grades = Grade::all();
+        $grades = Grade::where('school_id', $schoolId)->get();
+        $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
         
-        return view('marks.index', compact('marks', 'grades'));
+        return view('marks.index', compact('marks', 'grades', 'examTypes'));
     }
 
     /**
@@ -40,22 +51,18 @@ class MarkController extends Controller
      */
     public function create(Request $request)
     {
-        $query = function($model) use ($request) {
-            $q = $model::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
-            return $q;
-        };
+        $schoolId = session('current_school_id');
         
-        $grades = $query(Grade::class)->get();
-        $examTypes = \App\Models\ExamType::getActiveTypes($request->get('current_school_id'));
+        $grades = Grade::where('school_id', $schoolId)->get();
+        $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
         $students = [];
         $subjects = [];
         
         if ($request->has('grade_id') && $request->grade_id) {
-            $students = $query(Student::class)->where('grade_id', $request->grade_id)->get();
-            $subjects = $query(Subject::class)->where('grade_id', $request->grade_id)->get();
+            $students = Student::where('grade_id', $request->grade_id)
+                ->where('school_id', $schoolId)->get();
+            $subjects = Subject::where('grade_id', $request->grade_id)
+                ->where('school_id', $schoolId)->get();
         }
         
         return view('marks.create', compact('grades', 'students', 'subjects', 'examTypes'));
@@ -92,11 +99,14 @@ class MarkController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, Request $request)
     {
+        $schoolId = session('current_school_id');
         $mark = Mark::with(['student', 'subject'])->findOrFail($id);
-        $subjects = Subject::where('grade_id', $mark->student->grade_id)->get();
-        $examTypes = \App\Models\ExamType::getActiveTypes();
+        
+        $subjects = Subject::where('grade_id', $mark->student->grade_id)
+            ->where('school_id', $schoolId)->get();
+        $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
         
         return view('marks.edit', compact('mark', 'subjects', 'examTypes'));
     }

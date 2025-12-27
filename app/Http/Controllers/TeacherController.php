@@ -8,17 +8,18 @@ use App\Models\Teacher;
 
 class TeacherController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Teacher::query();
-        
-        // Filter by current school if available
-        if ($request->has('current_school_id')) {
-            $query->where('school_id', $request->get('current_school_id'));
-        }
+        $schoolId = session('current_school_id');
+        $query = Teacher::where('school_id', $schoolId);
         
         $teachers = $query->latest()->paginate(10);
         return view('teachers.index', compact('teachers'));
@@ -45,15 +46,10 @@ class TeacherController extends Controller
             'date_of_birth' => 'nullable|date',
             'date_of_joining' => 'nullable|date',
             'address' => 'nullable|string',
+            'school_id' => 'required|exists:schools,id',
         ]);
 
-        // Add current school context
-        $data = $request->all();
-        if ($request->has('current_school_id')) {
-            $data['school_id'] = $request->get('current_school_id');
-        }
-
-        Teacher::create($data);
+        Teacher::create($request->all());
 
         return redirect()->route('teachers.index')
                         ->with('success','Teacher created successfully.');

@@ -119,6 +119,17 @@ class SchoolController extends Controller
     {
         session(['current_school_id' => $school->id]);
         
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Switched to ' . $school->name,
+                'school' => [
+                    'id' => $school->id,
+                    'name' => $school->name
+                ]
+            ]);
+        }
+        
         return redirect()->back()
                         ->with('success', 'Switched to ' . $school->name);
     }

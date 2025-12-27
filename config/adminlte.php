@@ -306,6 +306,11 @@ return [
             'topnav_right' => true,
         ],
         [
+            'type' => 'custom',
+            'text' => '<x-school-selector />',
+            'topnav_right' => true,
+        ],
+        [
             'type' => 'fullscreen-widget',
             'topnav_right' => true,
         ],

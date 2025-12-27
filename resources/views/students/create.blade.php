@@ -14,6 +14,17 @@
         <form action="{{ route('students.store') }}" method="POST">
             @csrf
             <div class="card-body">
+                <!-- School Selection -->
+                <div class="row">
+                    <div class="col-md-12">
+                        @include('partials.school-selection', [
+                            'fieldName' => 'school_id',
+                            'selectedSchoolId' => old('school_id'),
+                            'required' => true
+                        ])
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -120,4 +131,5 @@
 @stop
 
 @section('js')
+<script src="{{ asset('js/school-cascade.js') }}"></script>
 @stop

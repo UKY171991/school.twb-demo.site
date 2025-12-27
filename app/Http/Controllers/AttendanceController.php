@@ -10,12 +10,22 @@ use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Attendance::with('student.grade');
+        $schoolId = session('current_school_id');
+        
+        $query = Attendance::with('student.grade')
+            ->whereHas('student', function($q) use ($schoolId) {
+                $q->where('school_id', $schoolId);
+            });
         
         // Filter by date if provided
         if ($request->has('date') && $request->date) {
@@ -26,7 +36,7 @@ class AttendanceController extends Controller
         }
         
         $attendances = $query->orderBy('attendance_date', 'desc')->get();
-        $grades = Grade::all();
+        $grades = Grade::where('school_id', $schoolId)->get();
         
         return view('attendances.index', compact('attendances', 'grades'));
     }
@@ -36,11 +46,14 @@ class AttendanceController extends Controller
      */
     public function create(Request $request)
     {
-        $grades = Grade::all();
+        $schoolId = session('current_school_id');
+        
+        $grades = Grade::where('school_id', $schoolId)->get();
         $students = [];
         
         if ($request->has('grade_id') && $request->grade_id) {
-            $students = Student::where('grade_id', $request->grade_id)->get();
+            $students = Student::where('grade_id', $request->grade_id)
+                ->where('school_id', $schoolId)->get();
         }
         
         return view('attendances.create', compact('grades', 'students'));

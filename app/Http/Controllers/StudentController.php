@@ -8,17 +8,18 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Student::with('grade');
-        
-        // Filter by current school if available
-        if ($request->has('current_school_id')) {
-            $query->where('school_id', $request->get('current_school_id'));
-        }
+        $schoolId = session('current_school_id');
+        $query = Student::with('grade')->where('school_id', $schoolId);
         
         $students = $query->latest()->paginate(10);
         return view('students.index', compact('students'));
@@ -29,15 +30,15 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
-        $query = function() use ($request) {
-            $q = \App\Models\Grade::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
-            return $q;
-        };
+        // Get all schools for selection, but filter grades by current school if one is selected
+        $currentSchoolId = session('current_school_id');
         
-        $grades = $query()->get();
+        if ($currentSchoolId) {
+            $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
+        } else {
+            $grades = \App\Models\Grade::all();
+        }
+        
         return view('students.create', compact('grades'));
     }
 
@@ -54,15 +55,10 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female,other',
             'address' => 'nullable|string',
             'grade_id' => 'required|exists:grades,id',
+            'school_id' => 'required|exists:schools,id',
         ]);
 
-        // Add current school context
-        $data = $request->all();
-        if ($request->has('current_school_id')) {
-            $data['school_id'] = $request->get('current_school_id');
-        }
-
-        Student::create($data);
+        Student::create($request->all());
 
         return redirect()->route('students.index')
                         ->with('success','Student created successfully.');

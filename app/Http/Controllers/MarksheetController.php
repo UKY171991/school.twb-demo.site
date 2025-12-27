@@ -11,14 +11,15 @@ use Illuminate\Support\Facades\DB;
 
 class MarksheetController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     public function index(Request $request)
     {
-        $query = Marksheet::with('student');
-        
-        // Filter by current school if available
-        if ($request->has('current_school_id')) {
-            $query->where('school_id', $request->get('current_school_id'));
-        }
+        $schoolId = session('current_school_id');
+        $query = Marksheet::with('student')->where('school_id', $schoolId);
         
         $marksheets = $query->latest()->paginate(10);
         return view('marksheets.index', compact('marksheets'));

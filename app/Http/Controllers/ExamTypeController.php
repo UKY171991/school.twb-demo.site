@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 
 class ExamTypeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
+
     public function index()
     {
-        $examTypes = ExamType::orderBy('sort_order')->orderBy('name')->get();
+        $schoolId = session('current_school_id');
+        $examTypes = ExamType::where('school_id', $schoolId)
+            ->orderBy('sort_order')->orderBy('name')->get();
         return view('exam-types.index', compact('examTypes'));
     }
 

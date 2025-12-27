@@ -45,10 +45,11 @@
                             <label for="exam_type">Filter by Exam Type</label>
                             <select name="exam_type" id="exam_type" class="form-control">
                                 <option value="">All Types</option>
-                                <option value="Midterm" {{ request('exam_type') == 'Midterm' ? 'selected' : '' }}>Midterm</option>
-                                <option value="Final" {{ request('exam_type') == 'Final' ? 'selected' : '' }}>Final</option>
-                                <option value="Quiz" {{ request('exam_type') == 'Quiz' ? 'selected' : '' }}>Quiz</option>
-                                <option value="Assignment" {{ request('exam_type') == 'Assignment' ? 'selected' : '' }}>Assignment</option>
+                                @foreach($examTypes as $examType)
+                                    <option value="{{ $examType->name }}" {{ request('exam_type') == $examType->name ? 'selected' : '' }}>
+                                        {{ $examType->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
