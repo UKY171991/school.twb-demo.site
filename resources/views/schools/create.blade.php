@@ -116,14 +116,19 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="logo">School Logo</label>
-                            <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
-                                   id="logo" accept="image/*">
-                            @error('logo')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="form-text text-muted">Upload school logo (JPG, PNG, GIF - Max 2MB)</small>
+                        <div class="image-upload-section">
+                            <label for="logo" class="form-label">School Logo</label>
+                            <div class="image-upload-input">
+                                <i class="fas fa-image fa-2x text-muted mb-2"></i>
+                                <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
+                                       id="logo" accept="image/*">
+                                @error('logo')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <div class="image-upload-help">
+                                    Upload school logo (JPG, PNG, GIF - Max 2MB)
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
