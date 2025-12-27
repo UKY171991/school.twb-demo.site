@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Session;
 
 class AdmitCardController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+    }
     public function index()
     {
         $currentSchoolId = Session::get('current_school_id');

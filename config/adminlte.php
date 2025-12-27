@@ -370,6 +370,12 @@ return [
             'route'  => 'marksheets.search',
             'icon' => 'fas fa-fw fa-search',
         ],
+        [
+            'text' => 'Admit Cards',
+            'route'  => 'admit-cards.index',
+            'icon' => 'fas fa-fw fa-id-card',
+            'active' => ['admit-cards*'],
+        ],
         ['header' => 'SYSTEM SETTINGS'],
         [
             'text' => 'Settings',

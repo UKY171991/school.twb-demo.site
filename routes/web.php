@@ -55,4 +55,12 @@ Route::middleware('auth')->group(function () {
     // Exam Type routes
     Route::resource('exam-types', App\Http\Controllers\ExamTypeController::class);
     Route::get('exam-types/{examType}/toggle-status', [App\Http\Controllers\ExamTypeController::class, 'toggleStatus'])->name('exam-types.toggle-status');
+    
+    // Admit Card routes
+    Route::prefix('admit-cards')->name('admit-cards.')->group(function () {
+        Route::get('/', [App\Http\Controllers\AdmitCardController::class, 'index'])->name('index');
+        Route::get('/search', [App\Http\Controllers\AdmitCardController::class, 'search'])->name('search');
+        Route::post('/generate', [App\Http\Controllers\AdmitCardController::class, 'generate'])->name('generate');
+        Route::post('/bulk-generate', [App\Http\Controllers\AdmitCardController::class, 'bulkGenerate'])->name('bulk-generate');
+    });
 });
