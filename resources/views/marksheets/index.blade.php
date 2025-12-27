@@ -134,9 +134,19 @@
                                     <a href="{{ route('marksheets.show', $marksheet) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('marksheets.print', $marksheet) }}" class="btn btn-sm btn-secondary" target="_blank">
-                                        <i class="fas fa-print"></i>
-                                    </a>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-print"></i>
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ route('marksheets.print', $marksheet) }}" target="_blank">
+                                                <i class="fas fa-file-alt"></i> All Exams
+                                            </a>
+                                            <a class="dropdown-item" href="{{ route('marksheets.print-single', $marksheet) }}" target="_blank">
+                                                <i class="fas fa-file"></i> Single Exam
+                                            </a>
+                                        </div>
+                                    </div>
                                     <a href="{{ route('marksheets.edit', $marksheet) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>

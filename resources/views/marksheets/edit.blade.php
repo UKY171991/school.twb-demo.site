@@ -118,6 +118,15 @@
                 </div>
             </div>
 
+            <!-- Student Exam History (shown after student selection) -->
+            <div id="student-exam-history">
+                <hr>
+                <h4><i class="fas fa-history"></i> Student Exam History</h4>
+                <div id="exam-history-content">
+                    <!-- Content will be loaded via AJAX -->
+                </div>
+            </div>
+
             <hr>
             <h4>Subject Marks</h4>
             <div class="table-responsive">
@@ -125,7 +134,6 @@
                     <thead>
                         <tr>
                             <th>Subject</th>
-                            <th>Subject Code</th>
                             <th>Max Marks</th>
                             <th>Pass Marks</th>
                             <th>Obtained Marks</th>
@@ -138,7 +146,6 @@
                             @endphp
                             <tr>
                                 <td>{{ $subject->name }}</td>
-                                <td>{{ $subject->code }}</td>
                                 <td>{{ $subject->max_marks }}</td>
                                 <td>{{ $subject->pass_marks }}</td>
                                 <td>
@@ -168,13 +175,193 @@
 </div>
 @stop
 
+@section('css')
+<style>
+.exam-history-table th {
+    vertical-align: middle !important;
+    text-align: center;
+}
+
+.exam-history-table .align-middle {
+    vertical-align: middle !important;
+}
+
+#student-exam-history {
+    border-top: 2px solid #007bff;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.grand-total-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.badge-lg {
+    font-size: 0.9em;
+    padding: 6px 12px;
+}
+</style>
+@stop
+
 @section('js')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const examTypeSelect = document.getElementById('exam_type_id');
     const examNameInput = document.getElementById('exam_name');
     const toggleEditLink = document.getElementById('toggle-exam-name-edit');
+    const studentSelect = document.getElementById('student_id');
+    const examHistoryDiv = document.getElementById('student-exam-history');
+    const examHistoryContent = document.getElementById('exam-history-content');
     let manualEdit = false;
+
+    // Handle student selection change
+    studentSelect.addEventListener('change', function() {
+        if (this.value) {
+            loadStudentExamHistory(this.value);
+        } else {
+            examHistoryDiv.style.display = 'none';
+        }
+    });
+
+    // Load student exam history
+    function loadStudentExamHistory(studentId) {
+        examHistoryContent.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading exam history...</div>';
+        examHistoryDiv.style.display = 'block';
+
+        fetch(`/api/students/${studentId}/exam-data`)
+            .then(response => response.json())
+            .then(data => {
+                displayExamHistory(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                examHistoryContent.innerHTML = '<div class="alert alert-danger">Error loading exam history</div>';
+            });
+    }
+
+    // Display exam history
+    function displayExamHistory(data) {
+        let html = '';
+        
+        if (data.marksheets.length === 0) {
+            html = '<div class="alert alert-info">No previous exam records found for this student.</div>';
+        } else {
+            // Create exam history table
+            html = `
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th rowspan="2" class="align-middle">Subject</th>
+                                <th rowspan="2" class="align-middle">Max Marks</th>
+            `;
+            
+            // Add exam type headers
+            data.examTypes.forEach(examType => {
+                const hasData = data.marksheetsByExamType[examType.id];
+                if (hasData) {
+                    html += `<th colspan="2" class="text-center">${examType.name}</th>`;
+                }
+            });
+            
+            html += `
+                                <th rowspan="2" class="align-middle">Average</th>
+                            </tr>
+                            <tr>
+            `;
+            
+            // Add sub-headers
+            data.examTypes.forEach(examType => {
+                const hasData = data.marksheetsByExamType[examType.id];
+                if (hasData) {
+                    html += `
+                        <th class="text-center">Marks</th>
+                        <th class="text-center">Grade</th>
+                    `;
+                }
+            });
+            
+            html += `</tr></thead><tbody>`;
+            
+            // Add subject rows
+            data.subjects.forEach(subject => {
+                html += `
+                    <tr>
+                        <td><strong>${subject.name}</strong></td>
+                        <td>${subject.max_marks}</td>
+                `;
+                
+                let subjectTotal = 0;
+                let subjectCount = 0;
+                
+                data.examTypes.forEach(examType => {
+                    const hasData = data.marksheetsByExamType[examType.id];
+                    if (hasData) {
+                        const marksheet = hasData[0];
+                        const mark = marksheet.marks.find(m => m.subject_id === subject.id);
+                        
+                        if (mark) {
+                            subjectTotal += mark.obtained_marks;
+                            subjectCount++;
+                            html += `
+                                <td class="text-center">${mark.obtained_marks}/${subject.max_marks}</td>
+                                <td class="text-center">
+                                    <span class="badge badge-${mark.grade === 'F' ? 'danger' : 'success'}">${mark.grade}</span>
+                                </td>
+                            `;
+                        } else {
+                            html += `
+                                <td class="text-center text-muted">-/${subject.max_marks}</td>
+                                <td class="text-center text-muted">-</td>
+                            `;
+                        }
+                    }
+                });
+                
+                // Average
+                const average = subjectCount > 0 ? (subjectTotal / subjectCount).toFixed(1) : '-';
+                html += `<td class="text-center">${average}${subjectCount > 0 ? '/' + subject.max_marks : ''}</td></tr>`;
+            });
+            
+            html += `</tbody></table></div>`;
+            
+            // Add grand total section
+            if (data.grandTotal.exams_count > 0) {
+                html += `
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="alert alert-primary">
+                                <h5><i class="fas fa-chart-line"></i> Grand Total Summary</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Total Marks:</strong><br>
+                                        ${data.grandTotal.obtained_marks} / ${data.grandTotal.total_marks}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Overall Percentage:</strong><br>
+                                        ${data.grandTotal.percentage}%
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Exams Taken:</strong><br>
+                                        ${data.grandTotal.exams_count}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Pass Rate:</strong><br>
+                                        ${data.grandTotal.exams_count > 0 ? Math.round((data.grandTotal.passed_exams / data.grandTotal.exams_count) * 100) : 0}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        examHistoryContent.innerHTML = html;
+    }
 
     // Handle exam type change
     examTypeSelect.addEventListener('change', function() {
@@ -214,6 +401,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Initialize on page load - load exam history for current student
+    if (studentSelect.value) {
+        loadStudentExamHistory(studentSelect.value);
+    }
 
     // Initialize on page load if exam type is already selected
     if (examTypeSelect.value) {

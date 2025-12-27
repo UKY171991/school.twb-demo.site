@@ -14,6 +14,7 @@ Route::middleware('auth')->group(function () {
     // API routes for dynamic loading
     Route::get('/api/schools/{school}/grades', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
     Route::get('/api/grades/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
+    Route::get('/api/students/{student}/exam-data', [App\Http\Controllers\MarksheetController::class, 'getStudentExamData'])->name('api.students.exam-data');
     
     // School routes
     Route::resource('schools', App\Http\Controllers\SchoolController::class);
@@ -29,6 +30,7 @@ Route::middleware('auth')->group(function () {
     // Marksheet routes
     Route::resource('marksheets', App\Http\Controllers\MarksheetController::class);
     Route::get('marksheets/{marksheet}/print', [App\Http\Controllers\MarksheetController::class, 'print'])->name('marksheets.print');
+    Route::get('marksheets/{marksheet}/print-single', [App\Http\Controllers\MarksheetController::class, 'printSingle'])->name('marksheets.print-single');
     Route::get('search-result', [App\Http\Controllers\MarksheetController::class, 'searchByRoll'])->name('marksheets.search');
     Route::post('search-result', [App\Http\Controllers\MarksheetController::class, 'searchByRoll']);
     Route::get('marksheets-recalculate-positions', [App\Http\Controllers\MarksheetController::class, 'recalculatePositions'])->name('marksheets.recalculate-positions');

@@ -182,7 +182,6 @@
                 <tr>
                     <th>S.No</th>
                     <th>Subject</th>
-                    <th>Subject Code</th>
                     <th>Max Marks</th>
                     <th>Obtained Marks</th>
                     <th>Grade</th>
@@ -194,17 +193,16 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $mark->subject->name }}</td>
-                        <td>{{ $mark->subject->code }}</td>
                         <td>{{ $mark->subject->max_marks }}</td>
-                        <td>{{ $mark->obtained_marks }}</td>
+                        <td>{{ $mark->obtained_marks }}/{{ $mark->subject->max_marks }}</td>
                         <td>{{ $mark->grade }}</td>
                         <td>{{ $mark->isPassed() ? 'PASS' : 'FAIL' }}</td>
                     </tr>
                 @endforeach
                 <tr class="total-row">
-                    <td colspan="3">TOTAL</td>
+                    <td colspan="2">TOTAL</td>
                     <td>{{ $marksheet->total_marks }}</td>
-                    <td>{{ $marksheet->obtained_marks }}</td>
+                    <td>{{ $marksheet->obtained_marks }}/{{ $marksheet->total_marks }}</td>
                     <td>{{ $marksheet->grade }}</td>
                     <td>{{ $marksheet->result }}</td>
                 </tr>

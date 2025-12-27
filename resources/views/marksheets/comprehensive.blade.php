@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Marksheet Details - All Exam Types')
+@section('title', 'Comprehensive Marksheet')
 
 @section('content_header')
-    <h1>Marksheet Details - All Exam Types</h1>
+    <h1>Comprehensive Marksheet - All Exam Types</h1>
 @stop
 
 @section('content')
@@ -14,21 +14,8 @@
                 <h3 class="card-title">{{ $marksheet->student->name }} - All Exam Results</h3>
             </div>
             <div class="col-md-6 text-right">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-print"></i> Print Options
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="{{ route('marksheets.print', $marksheet) }}" target="_blank">
-                            <i class="fas fa-file-alt"></i> Comprehensive Report (All Exams)
-                        </a>
-                        <a class="dropdown-item" href="{{ route('marksheets.print-single', $marksheet) }}" target="_blank">
-                            <i class="fas fa-file"></i> Single Exam Report
-                        </a>
-                    </div>
-                </div>
-                <a href="{{ route('marksheets.edit', $marksheet) }}" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Edit
+                <a href="{{ route('marksheets.print', $marksheet) }}" class="btn btn-secondary" target="_blank">
+                    <i class="fas fa-print"></i> Print
                 </a>
                 <a href="{{ route('marksheets.index') }}" class="btn btn-primary">
                     <i class="fas fa-arrow-left"></i> Back
@@ -137,7 +124,7 @@
                                         $subjectTotal += $mark->obtained_marks;
                                         $subjectCount++;
                                     @endphp
-                                    <td class="text-center">{{ $mark->obtained_marks }}/{{ $subject->max_marks }}</td>
+                                    <td class="text-center">{{ $mark->obtained_marks }}</td>
                                     <td class="text-center">{{ number_format($percentage, 1) }}%</td>
                                     <td class="text-center">
                                         <span class="badge badge-{{ $mark->grade == 'F' ? 'danger' : 'success' }}">
@@ -145,7 +132,7 @@
                                         </span>
                                     </td>
                                 @else
-                                    <td class="text-center text-muted">-/{{ $subject->max_marks }}</td>
+                                    <td class="text-center text-muted">-</td>
                                     <td class="text-center text-muted">-</td>
                                     <td class="text-center text-muted">-</td>
                                 @endif
@@ -158,7 +145,7 @@
                                         $average = $subjectTotal / $subjectCount;
                                         $avgPercentage = ($average / $subject->max_marks) * 100;
                                     @endphp
-                                    {{ number_format($average, 1) }}/{{ $subject->max_marks }} ({{ number_format($avgPercentage, 1) }}%)
+                                    {{ number_format($average, 1) }} ({{ number_format($avgPercentage, 1) }}%)
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif

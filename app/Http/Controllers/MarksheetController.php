@@ -27,17 +27,13 @@ class MarksheetController extends Controller
 
     public function create(Request $request)
     {
-        $query = function($model) use ($request) {
-            $q = $model::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
-            return $q;
-        };
+        $schoolId = session('current_school_id');
         
-        $students = $query(Student::class)->get();
-        $subjects = $query(Subject::class)->get();
-        return view('marksheets.create', compact('students', 'subjects'));
+        $students = Student::where('school_id', $schoolId)->with('grade')->get();
+        $subjects = Subject::where('school_id', $schoolId)->get();
+        $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
+        
+        return view('marksheets.create', compact('students', 'subjects', 'examTypes'));
     }
 
     public function store(Request $request)
@@ -92,11 +88,67 @@ class MarksheetController extends Controller
 
     public function show(Marksheet $marksheet)
     {
-        $marksheet->load(['student', 'examType', 'marks.subject']);
-        return view('marksheets.show', compact('marksheet'));
+        $marksheet->load(['student.grade', 'student.school', 'examType', 'marks.subject']);
+        
+        // Get all marksheets for this student to show all exam types
+        $allMarksheets = Marksheet::where('student_id', $marksheet->student_id)
+            ->where('academic_year', $marksheet->academic_year)
+            ->where('class', $marksheet->class)
+            ->where('section', $marksheet->section)
+            ->with(['examType', 'marks.subject'])
+            ->orderBy('exam_date')
+            ->get();
+            
+        // Group marksheets by exam type
+        $marksheetsByExamType = $allMarksheets->groupBy('exam_type_id');
+        
+        // Get all subjects for this student's grade/class to show complete subject list
+        $allSubjects = \App\Models\Subject::where('school_id', $marksheet->school_id)
+            ->where(function($query) use ($marksheet) {
+                $query->where('grade_id', $marksheet->student->grade_id)
+                      ->orWhereNull('grade_id'); // Include subjects not tied to specific grade
+            })
+            ->orderBy('name')
+            ->get();
+            
+        return view('marksheets.show', compact('marksheet', 'allMarksheets', 'marksheetsByExamType', 'allSubjects'));
     }
 
     public function print(Marksheet $marksheet)
+    {
+        $marksheet->load(['student.grade', 'student.school', 'examType', 'marks.subject']);
+        
+        // Get all marksheets for this student to show all exam types
+        $allMarksheets = Marksheet::where('student_id', $marksheet->student_id)
+            ->where('academic_year', $marksheet->academic_year)
+            ->where('class', $marksheet->class)
+            ->where('section', $marksheet->section)
+            ->with(['examType', 'marks.subject'])
+            ->orderBy('exam_date')
+            ->get();
+            
+        // Group marksheets by exam type
+        $marksheetsByExamType = $allMarksheets->groupBy('exam_type_id');
+        
+        // Get all subjects for this student's grade/class to show complete subject list
+        $allSubjects = \App\Models\Subject::where('school_id', $marksheet->school_id)
+            ->where(function($query) use ($marksheet) {
+                $query->where('grade_id', $marksheet->student->grade_id)
+                      ->orWhereNull('grade_id'); // Include subjects not tied to specific grade
+            })
+            ->orderBy('name')
+            ->get();
+            
+        // Get current school
+        $currentSchool = $marksheet->student->school;
+            
+        return view('marksheets.comprehensive-print', compact('marksheet', 'allMarksheets', 'marksheetsByExamType', 'allSubjects', 'currentSchool'));
+    }
+
+    /**
+     * Print single exam marksheet (original format)
+     */
+    public function printSingle(Marksheet $marksheet)
     {
         $marksheet->load(['student', 'examType', 'marks.subject']);
         return view('marksheets.print', compact('marksheet'));
@@ -106,17 +158,13 @@ class MarksheetController extends Controller
     {
         $marksheet->load(['student', 'marks.subject']);
         
-        $query = function($model) use ($request) {
-            $q = $model::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
-            return $q;
-        };
+        $schoolId = session('current_school_id');
         
-        $students = $query(Student::class)->get();
-        $subjects = $query(Subject::class)->get();
-        return view('marksheets.edit', compact('marksheet', 'students', 'subjects'));
+        $students = Student::where('school_id', $schoolId)->with('grade')->get();
+        $subjects = Subject::where('school_id', $schoolId)->get();
+        $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
+        
+        return view('marksheets.edit', compact('marksheet', 'students', 'subjects', 'examTypes'));
     }
 
     public function update(Request $request, Marksheet $marksheet)
@@ -348,5 +396,51 @@ class MarksheetController extends Controller
             ]);
             $position++;
         }
+    }
+
+    /**
+     * Get student exam data for AJAX (API endpoint)
+     */
+    public function getStudentExamData($studentId)
+    {
+        $student = Student::with(['grade', 'school'])->findOrFail($studentId);
+        
+        // Get all marksheets for this student
+        $marksheets = Marksheet::where('student_id', $studentId)
+            ->with(['examType', 'marks.subject'])
+            ->orderBy('exam_date', 'desc')
+            ->get();
+            
+        // Get all exam types for the school
+        $examTypes = \App\Models\ExamType::where('school_id', $student->school_id)
+            ->orderBy('sort_order')
+            ->get();
+            
+        // Get subjects for the student's grade
+        $subjects = Subject::where('grade_id', $student->grade_id)
+            ->orderBy('name')
+            ->get();
+            
+        // Group marksheets by exam type
+        $marksheetsByExamType = $marksheets->groupBy('exam_type_id');
+        
+        // Calculate totals
+        $grandTotal = [
+            'total_marks' => $marksheets->sum('total_marks'),
+            'obtained_marks' => $marksheets->sum('obtained_marks'),
+            'percentage' => $marksheets->count() > 0 ? 
+                round(($marksheets->sum('obtained_marks') / $marksheets->sum('total_marks')) * 100, 2) : 0,
+            'exams_count' => $marksheets->count(),
+            'passed_exams' => $marksheets->where('result', 'PASS')->count()
+        ];
+        
+        return response()->json([
+            'student' => $student,
+            'marksheets' => $marksheets,
+            'examTypes' => $examTypes,
+            'subjects' => $subjects,
+            'marksheetsByExamType' => $marksheetsByExamType,
+            'grandTotal' => $grandTotal
+        ]);
     }
 }
