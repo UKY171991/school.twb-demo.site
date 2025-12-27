@@ -153,11 +153,6 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="exam_date">Exam Date</label>
-                        <input type="date" name="exam_date" id="exam_date" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
                         <label for="academic_year">Academic Year</label>
                         <select name="academic_year" id="academic_year" class="form-control" required>
                             @php
@@ -179,11 +174,6 @@
                     <div class="form-group">
                         <label for="exam_center">Exam Center</label>
                         <input type="text" name="exam_center" id="exam_center" class="form-control" placeholder="Will use school name if empty">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="exam_time">Exam Time</label>
-                        <input type="text" name="exam_time" id="exam_time" class="form-control" placeholder="e.g., 10:00 AM - 1:00 PM" value="10:00 AM - 1:00 PM">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -229,11 +219,6 @@
                     <input type="hidden" name="section" value="{{ request('section') }}">
                     
                     <div class="form-group">
-                        <label for="bulk_exam_date">Exam Date</label>
-                        <input type="date" name="exam_date" id="bulk_exam_date" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
                         <label for="bulk_academic_year">Academic Year</label>
                         <select name="academic_year" id="bulk_academic_year" class="form-control" required>
                             @foreach($academicYears as $year)
@@ -247,11 +232,6 @@
                     <div class="form-group">
                         <label for="bulk_exam_center">Exam Center</label>
                         <input type="text" name="exam_center" id="bulk_exam_center" class="form-control" placeholder="Will use school name if empty">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="bulk_exam_time">Exam Time</label>
-                        <input type="text" name="exam_time" id="bulk_exam_time" class="form-control" placeholder="e.g., 10:00 AM - 1:00 PM" value="10:00 AM - 1:00 PM">
                     </div>
                 </div>
                 <div class="modal-footer">

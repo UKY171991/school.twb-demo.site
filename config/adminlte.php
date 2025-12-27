@@ -376,6 +376,12 @@ return [
             'icon' => 'fas fa-fw fa-id-card',
             'active' => ['admit-cards*'],
         ],
+        [
+            'text' => 'Exam Timetables',
+            'route'  => 'exam-timetables.index',
+            'icon' => 'fas fa-fw fa-calendar-alt',
+            'active' => ['exam-timetables*'],
+        ],
         ['header' => 'SYSTEM SETTINGS'],
         [
             'text' => 'Settings',

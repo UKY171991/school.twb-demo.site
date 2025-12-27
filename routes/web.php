@@ -63,4 +63,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/generate', [App\Http\Controllers\AdmitCardController::class, 'generate'])->name('generate');
         Route::post('/bulk-generate', [App\Http\Controllers\AdmitCardController::class, 'bulkGenerate'])->name('bulk-generate');
     });
+    
+    // Exam Timetable routes
+    Route::resource('exam-timetables', App\Http\Controllers\ExamTimetableController::class);
+    Route::get('exam-timetables-bulk-create', [App\Http\Controllers\ExamTimetableController::class, 'bulkCreate'])->name('exam-timetables.bulk-create');
+    Route::post('exam-timetables-bulk-store', [App\Http\Controllers\ExamTimetableController::class, 'bulkStore'])->name('exam-timetables.bulk-store');
+    Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
 });
