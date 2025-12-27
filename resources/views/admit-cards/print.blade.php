@@ -200,9 +200,10 @@
         <div class="exam-info">
             <h3>{{ $examType->name }} Examination - {{ $academic_year }}</h3>
             <div class="exam-details">
-                <div class="exam-detail-item"><strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($exam_date)->format('d M Y') }}</div>
-                <div class="exam-detail-item"><strong>Exam Time:</strong> {{ $exam_time }}</div>
                 <div class="exam-detail-item"><strong>Exam Center:</strong> {{ $exam_center }}</div>
+                @if($timetable->isNotEmpty())
+                    <div class="exam-detail-item"><strong>Exam Period:</strong> {{ $timetable->first()->exam_date->format('d M Y') }} to {{ $timetable->last()->exam_date->format('d M Y') }}</div>
+                @endif
             </div>
         </div>
 
@@ -244,34 +245,73 @@
         </div>
 
         <div class="subjects-section">
-            <h4 style="margin-bottom: 10px; color: #2c3e50;">Subjects for Examination:</h4>
-            <table class="subjects-table">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">S.No</th>
-                        <th style="width: 60%;">Subject Name</th>
-                        <th style="width: 15%;">Max Marks</th>
-                        <th style="width: 15%;">Pass Marks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($subjects as $index => $subject)
+            <h4 style="margin-bottom: 10px; color: #2c3e50;">Examination Timetable:</h4>
+            @if($timetable->isNotEmpty())
+                <table class="subjects-table">
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td style="text-align: left; padding-left: 15px;">{{ $subject->name }}</td>
-                            <td>{{ $subject->max_marks }}</td>
-                            <td>{{ $subject->pass_marks }}</td>
+                            <th style="width: 8%;">S.No</th>
+                            <th style="width: 40%;">Subject Name</th>
+                            <th style="width: 17%;">Date</th>
+                            <th style="width: 17%;">Time</th>
+                            <th style="width: 10%;">Max Marks</th>
+                            <th style="width: 8%;">Pass Marks</th>
                         </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr style="background-color: #ecf0f1; font-weight: bold;">
-                        <td colspan="2">TOTAL</td>
-                        <td>{{ $subjects->sum('max_marks') }}</td>
-                        <td>{{ $subjects->sum('pass_marks') }}</td>
-                    </tr>
-                </tfoot>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach($timetable as $index => $schedule)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td style="text-align: left; padding-left: 15px;">{{ $schedule->subject->name }}</td>
+                                <td>{{ $schedule->exam_date->format('d M Y') }}</td>
+                                <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
+                                <td>{{ $schedule->subject->max_marks }}</td>
+                                <td>{{ $schedule->subject->pass_marks }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ecf0f1; font-weight: bold;">
+                            <td colspan="4">TOTAL</td>
+                            <td>{{ $timetable->sum(function($t) { return $t->subject->max_marks; }) }}</td>
+                            <td>{{ $timetable->sum(function($t) { return $t->subject->pass_marks; }) }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            @else
+                <div class="alert alert-warning" style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px;">
+                    <strong>Notice:</strong> Exam timetable has not been published yet. Please check with the school office for exam schedule.
+                </div>
+                
+                <!-- Fallback: Show subjects without schedule -->
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">S.No</th>
+                            <th style="width: 60%;">Subject Name</th>
+                            <th style="width: 15%;">Max Marks</th>
+                            <th style="width: 15%;">Pass Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($subjects as $index => $subject)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td style="text-align: left; padding-left: 15px;">{{ $subject->name }}</td>
+                                <td>{{ $subject->max_marks }}</td>
+                                <td>{{ $subject->pass_marks }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color: #ecf0f1; font-weight: bold;">
+                            <td colspan="2">TOTAL</td>
+                            <td>{{ $subjects->sum('max_marks') }}</td>
+                            <td>{{ $subjects->sum('pass_marks') }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            @endif
         </div>
 
         <div class="instructions">

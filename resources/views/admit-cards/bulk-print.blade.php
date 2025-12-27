@@ -198,9 +198,10 @@
             <div class="exam-info">
                 <h3>{{ $examType->name }} Examination - {{ $academic_year }}</h3>
                 <div class="exam-details">
-                    <div class="exam-detail-item"><strong>Date:</strong> {{ \Carbon\Carbon::parse($exam_date)->format('d M Y') }}</div>
-                    <div class="exam-detail-item"><strong>Time:</strong> {{ $exam_time }}</div>
                     <div class="exam-detail-item"><strong>Center:</strong> {{ $exam_center }}</div>
+                    @if($timetable->isNotEmpty())
+                        <div class="exam-detail-item"><strong>Period:</strong> {{ $timetable->first()->exam_date->format('d M Y') }} to {{ $timetable->last()->exam_date->format('d M Y') }}</div>
+                    @endif
                 </div>
             </div>
 
@@ -238,34 +239,72 @@
             </div>
 
             <div class="subjects-section">
-                <h4 style="margin-bottom: 8px; color: #2c3e50; font-size: 12px;">Subjects for Examination:</h4>
-                <table class="subjects-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 8%;">S.No</th>
-                            <th style="width: 62%;">Subject Name</th>
-                            <th style="width: 15%;">Max Marks</th>
-                            <th style="width: 15%;">Pass Marks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($subjects as $index => $subject)
+                <h4 style="margin-bottom: 8px; color: #2c3e50; font-size: 12px;">Examination Timetable:</h4>
+                @if($timetable->isNotEmpty())
+                    <table class="subjects-table">
+                        <thead>
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td style="text-align: left; padding-left: 8px;">{{ $subject->name }}</td>
-                                <td>{{ $subject->max_marks }}</td>
-                                <td>{{ $subject->pass_marks }}</td>
+                                <th style="width: 6%;">S.No</th>
+                                <th style="width: 40%;">Subject</th>
+                                <th style="width: 18%;">Date</th>
+                                <th style="width: 18%;">Time</th>
+                                <th style="width: 9%;">Max</th>
+                                <th style="width: 9%;">Pass</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr style="background-color: #ecf0f1; font-weight: bold;">
-                            <td colspan="2">TOTAL</td>
-                            <td>{{ $subjects->sum('max_marks') }}</td>
-                            <td>{{ $subjects->sum('pass_marks') }}</td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($timetable as $index => $schedule)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td style="text-align: left; padding-left: 8px;">{{ $schedule->subject->name }}</td>
+                                    <td>{{ $schedule->exam_date->format('d M') }}</td>
+                                    <td>{{ $schedule->start_time->format('H:i') }}-{{ $schedule->end_time->format('H:i') }}</td>
+                                    <td>{{ $schedule->subject->max_marks }}</td>
+                                    <td>{{ $schedule->subject->pass_marks }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #ecf0f1; font-weight: bold;">
+                                <td colspan="4">TOTAL</td>
+                                <td>{{ $timetable->sum(function($t) { return $t->subject->max_marks; }) }}</td>
+                                <td>{{ $timetable->sum(function($t) { return $t->subject->pass_marks; }) }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                @else
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 6px; border-radius: 3px; font-size: 9px; margin-bottom: 10px;">
+                        <strong>Notice:</strong> Timetable not published. Check with school office.
+                    </div>
+                    
+                    <table class="subjects-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 8%;">S.No</th>
+                                <th style="width: 62%;">Subject Name</th>
+                                <th style="width: 15%;">Max Marks</th>
+                                <th style="width: 15%;">Pass Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($subjects as $index => $subject)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td style="text-align: left; padding-left: 8px;">{{ $subject->name }}</td>
+                                    <td>{{ $subject->max_marks }}</td>
+                                    <td>{{ $subject->pass_marks }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: #ecf0f1; font-weight: bold;">
+                                <td colspan="2">TOTAL</td>
+                                <td>{{ $subjects->sum('max_marks') }}</td>
+                                <td>{{ $subjects->sum('pass_marks') }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                @endif
             </div>
 
             <div class="instructions">

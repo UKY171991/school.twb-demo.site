@@ -80,7 +80,6 @@ class AdmitCardController extends Controller
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'exam_type_id' => 'required|exists:exam_types,id',
-            'exam_date' => 'required|date',
             'academic_year' => 'required|string',
         ]);
 
@@ -96,14 +95,25 @@ class AdmitCardController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Get exam timetable for this class and exam type
+        $timetable = \App\Models\ExamTimetable::where('school_id', $student->school_id)
+            ->where('class', $student->class)
+            ->where('section', $student->section)
+            ->where('exam_type_id', $request->exam_type_id)
+            ->where('academic_year', $request->academic_year)
+            ->where('is_active', true)
+            ->with(['subject'])
+            ->orderBy('exam_date')
+            ->orderBy('start_time')
+            ->get();
+
         $admitCardData = [
             'student' => $student,
             'examType' => $examType,
             'subjects' => $subjects,
-            'exam_date' => $request->exam_date,
+            'timetable' => $timetable,
             'academic_year' => $request->academic_year,
             'exam_center' => $request->exam_center ?? $student->school->name,
-            'exam_time' => $request->exam_time ?? '10:00 AM - 1:00 PM',
         ];
 
         return view('admit-cards.print', $admitCardData);
@@ -113,7 +123,6 @@ class AdmitCardController extends Controller
     {
         $request->validate([
             'exam_type_id' => 'required|exists:exam_types,id',
-            'exam_date' => 'required|date',
             'academic_year' => 'required|string',
             'class' => 'required|string',
             'section' => 'nullable|string',
@@ -146,14 +155,25 @@ class AdmitCardController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Get exam timetable for this class and exam type
+        $timetable = \App\Models\ExamTimetable::where('school_id', $currentSchoolId)
+            ->where('class', $request->class)
+            ->where('section', $request->section)
+            ->where('exam_type_id', $request->exam_type_id)
+            ->where('academic_year', $request->academic_year)
+            ->where('is_active', true)
+            ->with(['subject'])
+            ->orderBy('exam_date')
+            ->orderBy('start_time')
+            ->get();
+
         $bulkData = [
             'students' => $students,
             'examType' => $examType,
             'subjects' => $subjects,
-            'exam_date' => $request->exam_date,
+            'timetable' => $timetable,
             'academic_year' => $request->academic_year,
             'exam_center' => $request->exam_center ?? $firstStudent->school->name,
-            'exam_time' => $request->exam_time ?? '10:00 AM - 1:00 PM',
         ];
 
         return view('admit-cards.bulk-print', $bulkData);
