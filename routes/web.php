@@ -11,6 +11,10 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::middleware('auth')->group(function () {
+    // School routes
+    Route::resource('schools', App\Http\Controllers\SchoolController::class);
+    Route::post('schools/{school}/switch', [App\Http\Controllers\SchoolController::class, 'switchSchool'])->name('schools.switch');
+    
     Route::resource('grades', App\Http\Controllers\GradeController::class);
     Route::resource('teachers', App\Http\Controllers\TeacherController::class);
     Route::resource('students', App\Http\Controllers\StudentController::class);
@@ -23,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('marksheets/{marksheet}/print', [App\Http\Controllers\MarksheetController::class, 'print'])->name('marksheets.print');
     Route::get('search-result', [App\Http\Controllers\MarksheetController::class, 'searchByRoll'])->name('marksheets.search');
     Route::post('search-result', [App\Http\Controllers\MarksheetController::class, 'searchByRoll']);
+    Route::get('marksheets-recalculate-positions', [App\Http\Controllers\MarksheetController::class, 'recalculatePositions'])->name('marksheets.recalculate-positions');
     
     // Settings routes
     Route::prefix('settings')->name('settings.')->group(function () {
@@ -39,4 +44,8 @@ Route::middleware('auth')->group(function () {
     // Grading System routes
     Route::resource('grading-systems', App\Http\Controllers\GradingSystemController::class);
     Route::get('grading-systems/{gradingSystem}/toggle-status', [App\Http\Controllers\GradingSystemController::class, 'toggleStatus'])->name('grading-systems.toggle-status');
+    
+    // Exam Type routes
+    Route::resource('exam-types', App\Http\Controllers\ExamTypeController::class);
+    Route::get('exam-types/{examType}/toggle-status', [App\Http\Controllers\ExamTypeController::class, 'toggleStatus'])->name('exam-types.toggle-status');
 });

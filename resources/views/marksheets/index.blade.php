@@ -14,12 +14,25 @@
                 <h3 class="card-title">All Marksheets</h3>
             </div>
             <div class="col-md-6 text-right">
-                <a href="{{ route('marksheets.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Create New Marksheet
-                </a>
-                <a href="{{ route('marksheets.search') }}" class="btn btn-info">
-                    <i class="fas fa-search"></i> Search by Roll Number
-                </a>
+                <div class="btn-group">
+                    <a href="{{ route('marksheets.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create New Marksheet
+                    </a>
+                    <a href="{{ route('marksheets.search') }}" class="btn btn-info">
+                        <i class="fas fa-search"></i> Advanced Search
+                    </a>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown">
+                            <i class="fas fa-cogs"></i> Actions
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{{ route('marksheets.recalculate-positions') }}" 
+                               onclick="return confirm('This will recalculate class positions for all marksheets. Continue?')">
+                                <i class="fas fa-calculator"></i> Recalculate Positions
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -27,6 +40,37 @@
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
+
+        <!-- Quick Search Form -->
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <form method="GET" action="{{ route('marksheets.search') }}" class="form-inline">
+                    <div class="input-group input-group-sm" style="width: 200px;">
+                        <input type="text" name="roll_number" class="form-control" placeholder="Quick search by roll number">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-default">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ml-2">
+                        <select name="exam_type_id" class="form-control form-control-sm" style="width: 150px;">
+                            <option value="">All Exam Types</option>
+                            @foreach(\App\Models\ExamType::getActiveTypes() as $examType)
+                                <option value="{{ $examType->id }}">{{ $examType->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="ml-2">
+                        <select name="result" class="form-control form-control-sm" style="width: 100px;">
+                            <option value="">All Results</option>
+                            <option value="PASS">Pass</option>
+                            <option value="FAIL">Fail</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -68,10 +112,14 @@
                             </td>
                             <td>
                                 @if($marksheet->class_position)
-                                    <strong>{{ $marksheet->class_position }}</strong>
-                                    @if($marksheet->total_students)
-                                        / {{ $marksheet->total_students }}
-                                    @endif
+                                    <div class="text-center">
+                                        <span class="badge badge-lg badge-{{ $marksheet->class_position <= 3 ? 'warning' : 'info' }}">
+                                            #{{ $marksheet->class_position }}
+                                        </span>
+                                        @if($marksheet->total_students)
+                                            <br><small class="text-muted">of {{ $marksheet->total_students }}</small>
+                                        @endif
+                                    </div>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
@@ -104,7 +152,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center">No marksheets found.</td>
+                            <td colspan="11" class="text-center">No marksheets found.</td>
                         </tr>
                     @endforelse
                 </tbody>

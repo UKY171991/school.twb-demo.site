@@ -10,6 +10,7 @@ class ExamType extends Model
     use HasFactory;
 
     protected $fillable = [
+        'school_id',
         'name',
         'code',
         'description',
@@ -24,6 +25,11 @@ class ExamType extends Model
         'is_active' => 'boolean'
     ];
 
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
     public function marksheets()
     {
         return $this->hasMany(Marksheet::class);
@@ -34,16 +40,21 @@ class ExamType extends Model
         return $this->hasMany(Mark::class);
     }
 
-    public static function getActiveTypes()
+    public static function getActiveTypes($schoolId = null)
     {
-        return self::where('is_active', true)
-                   ->orderBy('sort_order')
-                   ->orderBy('name')
-                   ->get();
+        $query = self::where('is_active', true);
+        
+        if ($schoolId) {
+            $query->where('school_id', $schoolId);
+        }
+        
+        return $query->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get();
     }
 
-    public static function getTypeOptions()
+    public static function getTypeOptions($schoolId = null)
     {
-        return self::getActiveTypes()->pluck('name', 'id');
+        return self::getActiveTypes($schoolId)->pluck('name', 'id');
     }
 }

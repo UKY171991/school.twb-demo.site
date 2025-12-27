@@ -13,7 +13,7 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $students = Student::latest()->paginate(10);
+        $students = Student::with('grade')->latest()->paginate(10);
         return view('students.index', compact('students'));
     }
 
@@ -22,7 +22,8 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return view('students.create');
+        $grades = Grade::all();
+        return view('students.create', compact('grades'));
     }
 
     /**
@@ -32,14 +33,12 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'roll_number' => 'required|string|unique:students,roll_number',
-            'class' => 'required|string|max:255',
-            'section' => 'required|string|max:255',
-            'father_name' => 'required|string|max:255',
-            'mother_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'address' => 'required|string',
+            'email' => 'nullable|email|unique:students,email',
             'phone' => 'nullable|string|max:20',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'required|in:male,female,other',
+            'address' => 'nullable|string',
+            'grade_id' => 'required|exists:grades,id',
         ]);
 
         Student::create($request->all());
@@ -53,7 +52,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load('marksheets');
+        $student->load(['grade', 'marksheets']);
         return view('students.show', compact('student'));
     }
 
@@ -62,7 +61,8 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return view('students.edit', compact('student'));
+        $grades = Grade::all();
+        return view('students.edit', compact('student', 'grades'));
     }
 
     /**
@@ -72,14 +72,12 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'roll_number' => 'required|string|unique:students,roll_number,' . $student->id,
-            'class' => 'required|string|max:255',
-            'section' => 'required|string|max:255',
-            'father_name' => 'required|string|max:255',
-            'mother_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'address' => 'required|string',
+            'email' => 'nullable|email|unique:students,email,' . $student->id,
             'phone' => 'nullable|string|max:20',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'required|in:male,female,other',
+            'address' => 'nullable|string',
+            'grade_id' => 'required|exists:grades,id',
         ]);
 
         $student->update($request->all());

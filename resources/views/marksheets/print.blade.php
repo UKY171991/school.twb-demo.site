@@ -93,6 +93,11 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .top-position {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
         .signature-section {
             margin-top: 40px;
             display: flex;
@@ -151,6 +156,12 @@
                     <span class="info-label">Exam Name:</span>
                     <span>{{ $marksheet->exam_name }}</span>
                 </div>
+                @if($marksheet->examType)
+                <div class="info-row">
+                    <span class="info-label">Exam Type:</span>
+                    <span>{{ $marksheet->examType->name }}</span>
+                </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">Exam Date:</span>
                     <span>{{ $marksheet->exam_date->format('d M Y') }}</span>
@@ -209,6 +220,20 @@
                 <strong>Percentage</strong><br>
                 {{ $marksheet->percentage }}%
             </div>
+            @if($marksheet->class_position)
+            <div class="result-box {{ $marksheet->class_position <= 3 ? 'top-position' : '' }}">
+                <strong>Class Position</strong><br>
+                <span style="font-size: 1.2em; font-weight: bold;">
+                    #{{ $marksheet->class_position }}
+                </span>
+                @if($marksheet->total_students)
+                    <br><small>out of {{ $marksheet->total_students }} students</small>
+                @endif
+                @if($marksheet->class_position <= 3)
+                    <br><small style="font-weight: bold;">🏆 Top Performer</small>
+                @endif
+            </div>
+            @endif
             <div class="result-box {{ strtolower($marksheet->result) }}">
                 <strong>Result</strong><br>
                 {{ $marksheet->result }}

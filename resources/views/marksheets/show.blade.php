@@ -57,6 +57,16 @@
                         <td>{{ $marksheet->exam_name }}</td>
                     </tr>
                     <tr>
+                        <td><strong>Exam Type:</strong></td>
+                        <td>
+                            @if($marksheet->examType)
+                                {{ $marksheet->examType->name }} ({{ $marksheet->examType->code }})
+                            @else
+                                <span class="text-muted">Not specified</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
                         <td><strong>Exam Date:</strong></td>
                         <td>{{ $marksheet->exam_date->format('d M Y') }}</td>
                     </tr>
@@ -130,6 +140,13 @@
                     <p><strong>Total Marks:</strong> {{ $marksheet->obtained_marks }} / {{ $marksheet->total_marks }}</p>
                     <p><strong>Percentage:</strong> {{ $marksheet->percentage }}%</p>
                     <p><strong>Overall Grade:</strong> {{ $marksheet->grade }}</p>
+                    @if($marksheet->class_position)
+                        <p><strong>Class Position:</strong> {{ $marksheet->class_position }}
+                            @if($marksheet->total_students)
+                                out of {{ $marksheet->total_students }} students
+                            @endif
+                        </p>
+                    @endif
                     <p><strong>Result:</strong> 
                         <span class="badge badge-{{ $marksheet->result == 'PASS' ? 'success' : 'danger' }}">
                             {{ $marksheet->result }}

@@ -7,9 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Grade extends Model
 {
     protected $fillable = [
+        'school_id',
         'name',
         'section'
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function students()
     {

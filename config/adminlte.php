@@ -322,6 +322,11 @@ return [
         ],
         ['header' => 'ACADEMIC'],
         [
+            'text' => 'Schools',
+            'url'  => 'schools',
+            'icon' => 'fas fa-fw fa-school',
+        ],
+        [
             'text' => 'Teachers',
             'url'  => 'teachers',
             'icon' => 'fas fa-fw fa-chalkboard-teacher',
@@ -373,6 +378,11 @@ return [
             'text' => 'Grading System',
             'url'  => 'grading-systems',
             'icon' => 'fas fa-fw fa-graduation-cap',
+        ],
+        [
+            'text' => 'Exam Types',
+            'url'  => 'exam-types',
+            'icon' => 'fas fa-fw fa-clipboard-list',
         ],
         ['header' => 'ACCOUNT SETTINGS'],
         [

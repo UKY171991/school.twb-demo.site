@@ -10,6 +10,7 @@ class Student extends Model
     use HasFactory;
 
     protected $fillable = [
+        'school_id',
         'name',
         'roll_number',
         'class',
@@ -27,6 +28,11 @@ class Student extends Model
     protected $casts = [
         'date_of_birth' => 'date',
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function grade()
     {

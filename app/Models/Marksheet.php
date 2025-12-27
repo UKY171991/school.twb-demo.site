@@ -10,6 +10,7 @@ class Marksheet extends Model
     use HasFactory;
 
     protected $fillable = [
+        'school_id',
         'student_id',
         'exam_type_id',
         'exam_name',
@@ -29,6 +30,11 @@ class Marksheet extends Model
     protected $casts = [
         'exam_date' => 'date',
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
 
     public function student()
     {
@@ -76,28 +82,67 @@ class Marksheet extends Model
     public function calculateClassPosition()
     {
         // Get all marksheets for the same class, section, exam type, and academic year
-        $classMarksheets = self::where('class', $this->class)
-                              ->where('section', $this->section)
-                              ->where('exam_type_id', $this->exam_type_id)
-                              ->where('academic_year', $this->academic_year)
-                              ->where('result', 'PASS') // Only consider passed students for ranking
-                              ->orderBy('percentage', 'desc')
-                              ->get();
+        $query = self::where('class', $this->class)
+                    ->where('section', $this->section)
+                    ->where('academic_year', $this->academic_year);
 
-        $totalStudents = $classMarksheets->count();
-        $position = $classMarksheets->search(function($marksheet) {
-            return $marksheet->id === $this->id;
-        }) + 1;
-
-        // If student failed, position is null
-        if ($this->result === 'FAIL') {
-            $position = null;
+        // Only filter by exam_type_id if it's set
+        if ($this->exam_type_id) {
+            $query->where('exam_type_id', $this->exam_type_id);
         }
 
+        $classMarksheets = $query->orderBy('percentage', 'desc')
+                                ->orderBy('obtained_marks', 'desc')
+                                ->get();
+
+        $totalStudents = $classMarksheets->count();
+        
+        // Find position by comparing percentages
+        $position = 1;
+        $currentPercentage = $this->percentage;
+        
+        foreach ($classMarksheets as $index => $marksheet) {
+            if ($marksheet->id === $this->id) {
+                $position = $index + 1;
+                break;
+            }
+        }
+
+        // If student failed, still show position but mark it differently
         $this->update([
             'class_position' => $position,
             'total_students' => $totalStudents
         ]);
+
+        // Recalculate positions for all students in the same class/section/exam
+        $this->recalculateAllPositions();
+    }
+
+    public function recalculateAllPositions()
+    {
+        // Get all marksheets for the same class, section, exam type, and academic year
+        $query = self::where('class', $this->class)
+                    ->where('section', $this->section)
+                    ->where('academic_year', $this->academic_year);
+
+        // Only filter by exam_type_id if it's set
+        if ($this->exam_type_id) {
+            $query->where('exam_type_id', $this->exam_type_id);
+        }
+
+        $classMarksheets = $query->orderBy('percentage', 'desc')
+                                ->orderBy('obtained_marks', 'desc')
+                                ->get();
+
+        $totalStudents = $classMarksheets->count();
+
+        // Update positions for all students
+        foreach ($classMarksheets as $index => $marksheet) {
+            $marksheet->update([
+                'class_position' => $index + 1,
+                'total_students' => $totalStudents
+            ]);
+        }
     }
 
     private function calculateGrade($percentage)

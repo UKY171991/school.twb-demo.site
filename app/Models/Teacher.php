@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $fillable = [
+        'school_id',
         'name',
         'email',
         'phone',
@@ -15,4 +16,14 @@ class Teacher extends Model
         'date_of_joining',
         'address'
     ];
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
 }

@@ -3,7 +3,14 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Dashboard</h1>
+        @if(isset($currentSchool))
+            <div class="badge badge-info badge-lg">
+                <i class="fas fa-school"></i> {{ $currentSchool->name }}
+            </div>
+        @endif
+    </div>
 @stop
 
 @section('content')
@@ -87,13 +94,13 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-teal">
                 <div class="inner">
-                    <h3>{{ $stats['marks'] }}</h3>
-                    <p>Total Exam Records</p>
+                    <h3>{{ $stats['marksheets'] }}</h3>
+                    <p>Total Marksheets</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-poll"></i>
+                    <i class="fas fa-file-alt"></i>
                 </div>
-                <a href="{{ route('marks.index') }}" class="small-box-footer">
+                <a href="{{ route('marksheets.index') }}" class="small-box-footer">
                     More info <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -125,8 +132,13 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('subjects.create') }}" class="btn btn-danger btn-block">
-                                <i class="fas fa-plus"></i> Add Subject
+                            <a href="{{ route('marksheets.create') }}" class="btn btn-info btn-block">
+                                <i class="fas fa-plus"></i> Add Marksheet
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('schools.index') }}" class="btn btn-secondary btn-block">
+                                <i class="fas fa-school"></i> Manage Schools
                             </a>
                         </div>
                     </div>

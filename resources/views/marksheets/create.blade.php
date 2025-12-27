@@ -37,7 +37,9 @@
                         <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>
                             <option value="">Select Exam Type</option>
                             @foreach(\App\Models\ExamType::getActiveTypes() as $examType)
-                                <option value="{{ $examType->id }}" {{ old('exam_type_id') == $examType->id ? 'selected' : '' }}>
+                                <option value="{{ $examType->id }}" 
+                                        data-exam-name="{{ $examType->name }}"
+                                        {{ old('exam_type_id') == $examType->id ? 'selected' : '' }}>
                                     {{ $examType->name }} ({{ $examType->code }})
                                 </option>
                             @endforeach
@@ -54,10 +56,14 @@
                     <div class="form-group">
                         <label for="exam_name">Exam Name</label>
                         <input type="text" name="exam_name" id="exam_name" class="form-control @error('exam_name') is-invalid @enderror" 
-                               value="{{ old('exam_name') }}" placeholder="e.g., Mid Term, Final Term" required>
+                               value="{{ old('exam_name') }}" placeholder="Will be auto-filled when exam type is selected" required readonly>
                         @error('exam_name')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle"></i> Exam name will be automatically set based on selected exam type. 
+                            <a href="#" id="toggle-exam-name-edit">Click to edit manually</a>
+                        </small>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -155,4 +161,63 @@
         </div>
     </form>
 </div>
+@stop
+
+@section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const examTypeSelect = document.getElementById('exam_type_id');
+    const examNameInput = document.getElementById('exam_name');
+    const toggleEditLink = document.getElementById('toggle-exam-name-edit');
+    let manualEdit = false;
+
+    // Handle exam type change
+    examTypeSelect.addEventListener('change', function() {
+        if (!manualEdit && this.value) {
+            const selectedOption = this.options[this.selectedIndex];
+            const examName = selectedOption.getAttribute('data-exam-name');
+            if (examName) {
+                examNameInput.value = examName;
+            }
+        } else if (!this.value) {
+            examNameInput.value = '';
+        }
+    });
+
+    // Handle manual edit toggle
+    toggleEditLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        manualEdit = !manualEdit;
+        
+        if (manualEdit) {
+            examNameInput.removeAttribute('readonly');
+            examNameInput.focus();
+            this.textContent = 'Use auto-fill';
+            examNameInput.placeholder = 'Enter custom exam name';
+        } else {
+            examNameInput.setAttribute('readonly', 'readonly');
+            this.textContent = 'Click to edit manually';
+            examNameInput.placeholder = 'Will be auto-filled when exam type is selected';
+            
+            // Re-populate from selected exam type
+            if (examTypeSelect.value) {
+                const selectedOption = examTypeSelect.options[examTypeSelect.selectedIndex];
+                const examName = selectedOption.getAttribute('data-exam-name');
+                if (examName) {
+                    examNameInput.value = examName;
+                }
+            }
+        }
+    });
+
+    // Initialize on page load if exam type is already selected
+    if (examTypeSelect.value) {
+        const selectedOption = examTypeSelect.options[examTypeSelect.selectedIndex];
+        const examName = selectedOption.getAttribute('data-exam-name');
+        if (examName && !examNameInput.value) {
+            examNameInput.value = examName;
+        }
+    }
+});
+</script>
 @stop
