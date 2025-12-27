@@ -52,12 +52,29 @@
                             <td>{{ $marksheet->student->name }}</td>
                             <td>{{ $marksheet->student->roll_number }}</td>
                             <td>{{ $marksheet->exam_name }}</td>
+                            <td>
+                                @if($marksheet->examType)
+                                    <span class="badge badge-primary">{{ $marksheet->examType->name }}</span>
+                                @else
+                                    <span class="text-muted">Not set</span>
+                                @endif
+                            </td>
                             <td>{{ $marksheet->class }}-{{ $marksheet->section }}</td>
                             <td>{{ $marksheet->percentage }}%</td>
                             <td>
                                 <span class="badge badge-{{ $marksheet->grade == 'F' ? 'danger' : 'success' }}">
                                     {{ $marksheet->grade }}
                                 </span>
+                            </td>
+                            <td>
+                                @if($marksheet->class_position)
+                                    <strong>{{ $marksheet->class_position }}</strong>
+                                    @if($marksheet->total_students)
+                                        / {{ $marksheet->total_students }}
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
                             </td>
                             <td>
                                 <span class="badge badge-{{ $marksheet->result == 'PASS' ? 'success' : 'danger' }}">
