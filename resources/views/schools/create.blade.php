@@ -6,6 +6,10 @@
     <h1>Add New School</h1>
 @stop
 
+@section('css')
+    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
+@stop
+
 @section('content')
     <div class="card">
         <div class="card-header">
