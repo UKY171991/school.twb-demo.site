@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\ImageUploadTrait;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageUploadTrait;
 
     protected $fillable = [
         'school_id',
@@ -22,7 +23,8 @@ class Student extends Model
         'date_of_birth',
         'gender',
         'address',
-        'grade_id'
+        'grade_id',
+        'image'
     ];
 
     protected $casts = [
@@ -52,5 +54,21 @@ class Student extends Model
     public function marks()
     {
         return $this->hasMany(Mark::class);
+    }
+
+    /**
+     * Get the student's image URL
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl($this->image);
+    }
+
+    /**
+     * Get default avatar if no image
+     */
+    public function getAvatarAttribute()
+    {
+        return $this->image ? $this->getImageUrl($this->image) : asset('images/default-student.png');
     }
 }

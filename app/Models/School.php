@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\ImageUploadTrait;
 
 class School extends Model
 {
-    use HasFactory;
+    use HasFactory, ImageUploadTrait;
 
     protected $fillable = [
         'name',
@@ -78,5 +79,21 @@ class School extends Model
     public function getGradesCount()
     {
         return $this->grades()->count();
+    }
+
+    /**
+     * Get the school's logo URL
+     */
+    public function getLogoUrlAttribute()
+    {
+        return $this->getImageUrl($this->logo);
+    }
+
+    /**
+     * Get default logo if no logo
+     */
+    public function getLogoAttribute($value)
+    {
+        return $value ? $this->getImageUrl($value) : asset('images/default-school-logo.png');
     }
 }

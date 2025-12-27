@@ -20,6 +20,10 @@ class ExamTimetableController extends Controller
     {
         $currentSchoolId = Session::get('current_school_id');
         
+        if (!$currentSchoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+        
         $timetables = ExamTimetable::where('school_id', $currentSchoolId)
             ->with(['examType', 'subject'])
             ->orderBy('exam_date')
@@ -35,6 +39,10 @@ class ExamTimetableController extends Controller
     public function create()
     {
         $currentSchoolId = Session::get('current_school_id');
+        
+        if (!$currentSchoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
         
         $examTypes = ExamType::getActiveTypes($currentSchoolId);
         $subjects = Subject::where('school_id', $currentSchoolId)->orderBy('name')->get();
@@ -114,6 +122,10 @@ class ExamTimetableController extends Controller
     public function bulkCreate()
     {
         $currentSchoolId = Session::get('current_school_id');
+        
+        if (!$currentSchoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
         
         $examTypes = ExamType::getActiveTypes($currentSchoolId);
         $subjects = Subject::where('school_id', $currentSchoolId)->orderBy('name')->get();

@@ -56,9 +56,18 @@ class StudentController extends Controller
             'address' => 'nullable|string',
             'grade_id' => 'required|exists:grades,id',
             'school_id' => 'required|exists:schools,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Student::create($request->all());
+        $data = $request->all();
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $student = new Student();
+            $data['image'] = $student->uploadImage($request->file('image'), 'students');
+        }
+
+        Student::create($data);
 
         return redirect()->route('students.index')
                         ->with('success','Student created successfully.');
@@ -103,12 +112,18 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female,other',
             'address' => 'nullable|string',
             'grade_id' => 'required|exists:grades,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Add current school context
         $data = $request->all();
         if ($request->has('current_school_id')) {
             $data['school_id'] = $request->get('current_school_id');
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $data['image'] = $student->uploadImage($request->file('image'), 'students', $student->image);
         }
 
         $student->update($data);
@@ -122,9 +137,27 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        // Delete student image if exists
+        if ($student->image) {
+            $student->deleteImage($student->image);
+        }
+
         $student->delete();
 
         return redirect()->route('students.index')
                         ->with('success','Student deleted successfully.');
+    }
+
+    /**
+     * Remove student image
+     */
+    public function removeImage(Student $student)
+    {
+        if ($student->image) {
+            $student->deleteImage($student->image);
+            $student->update(['image' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Student image removed successfully.');
     }
 }

@@ -11,7 +11,7 @@
         <div class="card-header">
             <h3 class="card-title">School Information</h3>
         </div>
-        <form action="{{ route('schools.store') }}" method="POST">
+        <form action="{{ route('schools.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row">
@@ -110,6 +110,20 @@
                             @error('address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="logo">School Logo</label>
+                            <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
+                                   id="logo" accept="image/*">
+                            @error('logo')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">Upload school logo (JPG, PNG, GIF - Max 2MB)</small>
                         </div>
                     </div>
                 </div>

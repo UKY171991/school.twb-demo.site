@@ -11,7 +11,7 @@
         <div class="card-header">
             <h3 class="card-title">Student Information</h3>
         </div>
-        <form action="{{ route('students.update', $student->id) }}" method="POST">
+        <form action="{{ route('students.update', $student->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="card-body">
@@ -104,6 +104,36 @@
                             @error('address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+                    </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="image">Student Photo</label>
+                            
+                            @if($student->image)
+                                <div class="mb-2">
+                                    <img src="{{ $student->getImageUrl($student->image) }}" alt="Current Photo" 
+                                         class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                    <div class="mt-2">
+                                        <a href="{{ route('students.remove-image', $student->id) }}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to remove this image?')">
+                                            <i class="fas fa-trash"></i> Remove Image
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
+                                   id="image" accept="image/*">
+                            @error('image')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">
+                                Upload new student photo (JPG, PNG, GIF - Max 2MB)
+                                @if($student->image) - This will replace the current image @endif
+                            </small>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@
         <div class="card-header">
             <h3 class="card-title">Teacher Information</h3>
         </div>
-        <form action="{{ route('teachers.store') }}" method="POST">
+        <form action="{{ route('teachers.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <!-- School Selection -->
@@ -108,6 +108,18 @@
                             @error('address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+                    </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="image">Teacher Photo</label>
+                            <input type="file" name="image" class="form-control-file @error('image') is-invalid @enderror" 
+                                   id="image" accept="image/*">
+                            @error('image')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">Upload teacher photo (JPG, PNG, GIF - Max 2MB)</small>
                         </div>
                     </div>
                 </div>

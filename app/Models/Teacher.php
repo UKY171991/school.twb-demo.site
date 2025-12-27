@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\ImageUploadTrait;
 
 class Teacher extends Model
 {
+    use ImageUploadTrait;
     protected $fillable = [
         'school_id',
         'name',
@@ -14,7 +16,8 @@ class Teacher extends Model
         'gender',
         'date_of_birth',
         'date_of_joining',
-        'address'
+        'address',
+        'image'
     ];
 
     protected $casts = [
@@ -30,5 +33,21 @@ class Teacher extends Model
     public function subjects()
     {
         return $this->hasMany(Subject::class);
+    }
+
+    /**
+     * Get the teacher's image URL
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->getImageUrl($this->image);
+    }
+
+    /**
+     * Get default avatar if no image
+     */
+    public function getAvatarAttribute()
+    {
+        return $this->image ? $this->getImageUrl($this->image) : asset('images/default-teacher.png');
     }
 }

@@ -47,9 +47,18 @@ class TeacherController extends Controller
             'date_of_joining' => 'nullable|date',
             'address' => 'nullable|string',
             'school_id' => 'required|exists:schools,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Teacher::create($request->all());
+        $data = $request->all();
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $teacher = new Teacher();
+            $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers');
+        }
+
+        Teacher::create($data);
 
         return redirect()->route('teachers.index')
                         ->with('success','Teacher created successfully.');
@@ -85,6 +94,7 @@ class TeacherController extends Controller
             'date_of_birth' => 'nullable|date',
             'date_of_joining' => 'nullable|date',
             'address' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $teacher = Teacher::findOrFail($id);
@@ -93,6 +103,11 @@ class TeacherController extends Controller
         $data = $request->all();
         if ($request->has('current_school_id')) {
             $data['school_id'] = $request->get('current_school_id');
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers', $teacher->image);
         }
         
         $teacher->update($data);
@@ -107,9 +122,30 @@ class TeacherController extends Controller
     public function destroy(string $id)
     {
         $teacher = Teacher::findOrFail($id);
+        
+        // Delete teacher image if exists
+        if ($teacher->image) {
+            $teacher->deleteImage($teacher->image);
+        }
+        
         $teacher->delete();
 
         return redirect()->route('teachers.index')
                         ->with('success','Teacher deleted successfully.');
+    }
+
+    /**
+     * Remove teacher image
+     */
+    public function removeImage(string $id)
+    {
+        $teacher = Teacher::findOrFail($id);
+        
+        if ($teacher->image) {
+            $teacher->deleteImage($teacher->image);
+            $teacher->update(['image' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Teacher image removed successfully.');
     }
 }

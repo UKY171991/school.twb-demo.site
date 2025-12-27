@@ -38,10 +38,19 @@ class SchoolController extends Controller
             'website' => 'nullable|url',
             'principal_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive'
+            'status' => 'required|in:active,inactive',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        School::create($request->all());
+        $data = $request->all();
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $school = new School();
+            $data['logo'] = $school->uploadImage($request->file('logo'), 'schools/logos');
+        }
+
+        School::create($data);
 
         return redirect()->route('schools.index')
                         ->with('success', 'School created successfully!');
@@ -86,10 +95,18 @@ class SchoolController extends Controller
             'website' => 'nullable|url',
             'principal_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive'
+            'status' => 'required|in:active,inactive',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $school->update($request->all());
+        $data = $request->all();
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $school->uploadImage($request->file('logo'), 'schools/logos', $school->logo);
+        }
+
+        $school->update($data);
 
         return redirect()->route('schools.index')
                         ->with('success', 'School updated successfully!');
@@ -104,6 +121,11 @@ class SchoolController extends Controller
         if ($school->students()->count() > 0 || $school->teachers()->count() > 0) {
             return redirect()->route('schools.index')
                            ->with('error', 'Cannot delete school with existing students or teachers. Please transfer them first.');
+        }
+
+        // Delete school logo if exists
+        if ($school->logo) {
+            $school->deleteImage($school->logo);
         }
 
         $school->delete();
@@ -132,5 +154,18 @@ class SchoolController extends Controller
         
         return redirect()->back()
                         ->with('success', 'Switched to ' . $school->name);
+    }
+
+    /**
+     * Remove school logo
+     */
+    public function removeLogo(School $school)
+    {
+        if ($school->logo) {
+            $school->deleteImage($school->logo);
+            $school->update(['logo' => null]);
+        }
+
+        return redirect()->back()->with('success', 'School logo removed successfully.');
     }
 }

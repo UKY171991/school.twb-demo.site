@@ -11,7 +11,7 @@
         <div class="card-header">
             <h3 class="card-title">School Information</h3>
         </div>
-        <form action="{{ route('schools.update', $school) }}" method="POST">
+        <form action="{{ route('schools.update', $school) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="card-body">
@@ -111,6 +111,38 @@
                             @error('address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="logo">School Logo</label>
+                            
+                            @if($school->logo)
+                                <div class="mb-2">
+                                    <img src="{{ $school->getImageUrl($school->logo) }}" alt="Current Logo" 
+                                         class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                                    <div class="mt-2">
+                                        <a href="{{ route('schools.remove-logo', $school->id) }}" 
+                                           class="btn btn-sm btn-danger"
+                                           onclick="return confirm('Are you sure you want to remove this logo?')">
+                                            <i class="fas fa-trash"></i> Remove Logo
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
+                            
+                            <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
+                                   id="logo" accept="image/*">
+                            @error('logo')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                            <small class="form-text text-muted">
+                                Upload new school logo (JPG, PNG, GIF - Max 2MB)
+                                @if($school->logo) - This will replace the current logo @endif
+                            </small>
                         </div>
                     </div>
                 </div>
