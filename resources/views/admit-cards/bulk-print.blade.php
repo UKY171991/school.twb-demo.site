@@ -315,9 +315,9 @@
                         <thead>
                             <tr>
                                 <th style="width: 8%;">S.No</th>
-                                <th style="width: 62%;">Subject Name</th>
-                                <th style="width: 15%;">Max Marks</th>
-                                <th style="width: 15%;">Pass Marks</th>
+                                <th style="width: 52%;">Subject Name</th>
+                                <th style="width: 20%;">Exam Date</th>
+                                <th style="width: 20%;">Exam Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -325,18 +325,11 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td style="text-align: left; padding-left: 8px;">{{ $subject->name }}</td>
-                                    <td>{{ $subject->max_marks }}</td>
-                                    <td>{{ $subject->pass_marks }}</td>
+                                    <td>TBD</td>
+                                    <td>TBD</td>
                                 </tr>
                             @endforeach
                         </tbody>
-                        <tfoot>
-                            <tr style="background-color: #ecf0f1; font-weight: bold;">
-                                <td colspan="2">TOTAL</td>
-                                <td>{{ $subjects->sum('max_marks') }}</td>
-                                <td>{{ $subjects->sum('pass_marks') }}</td>
-                            </tr>
-                        </tfoot>
                     </table>
                 @endif
             </div>
