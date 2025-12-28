@@ -89,7 +89,7 @@
             height: 100%;
             object-fit: cover;
         }
-        .photo-placeholder::after {
+        .photo-placeholder.no-image::after {
             content: "STUDENT\APHOTO";
             position: absolute;
             top: 50%;
@@ -245,18 +245,16 @@
                 </table>
             </div>
             <div class="student-photo">
-                <div class="photo-placeholder">
+                <div class="photo-placeholder {{ $student->image ? '' : 'no-image' }}">
                     @if($student->image)
                         <img src="{{ $student->image_url }}" alt="{{ $student->name }}">
                     @endif
                 </div>
-                <div style="margin-top: 10px; font-size: 12px; font-weight: bold;">
-                    @if($student->image)
-                        Student Photo
-                    @else
+                @if(!$student->image)
+                    <div style="margin-top: 10px; font-size: 12px; font-weight: bold;">
                         Paste Recent<br>Photograph Here
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -284,6 +282,7 @@
                     </tbody>
                 </table>
             @else
+                <!-- Fallback: Show subjects with TBD when no timetable is available -->
                 <table class="subjects-table">
                     <thead>
                         <tr>
@@ -298,12 +297,18 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td style="text-align: left; padding-left: 15px;">{{ $subject->name }}</td>
-                                <td>TBD</td>
-                                <td>TBD</td>
+                                <td style="color: #e74c3c; font-weight: bold;">TBD</td>
+                                <td style="color: #e74c3c; font-weight: bold;">TBD</td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 10px; margin-top: 10px;">
+                    <small style="color: #856404;">
+                        <strong>Note:</strong> Exam dates and times are yet to be determined (TBD). 
+                        Please check with the examination office for the updated schedule.
+                    </small>
+                </div>
             @endif
         </div>
 

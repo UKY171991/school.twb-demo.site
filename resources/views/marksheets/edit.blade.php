@@ -252,17 +252,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // Create exam history table
             html = `
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
+                    <table class="table table-bordered table-striped exam-history-table">
                         <thead class="thead-dark">
                             <tr>
                                 <th rowspan="2" class="align-middle">Subject</th>
                                 <th rowspan="2" class="align-middle">Max Marks</th>
             `;
             
-            // Add exam type headers
+            // Count exam types with data
+            let examTypesWithData = [];
             data.examTypes.forEach(examType => {
                 const hasData = data.marksheetsByExamType[examType.id];
                 if (hasData) {
+                    examTypesWithData.push(examType);
                     html += `<th colspan="2" class="text-center">${examType.name}</th>`;
                 }
             });
@@ -273,15 +275,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <tr>
             `;
             
-            // Add sub-headers
-            data.examTypes.forEach(examType => {
-                const hasData = data.marksheetsByExamType[examType.id];
-                if (hasData) {
-                    html += `
-                        <th class="text-center">Marks</th>
-                        <th class="text-center">Grade</th>
-                    `;
-                }
+            // Add sub-headers for each exam type with data
+            examTypesWithData.forEach(examType => {
+                html += `
+                    <th class="text-center">Marks</th>
+                    <th class="text-center">Grade</th>
+                `;
             });
             
             html += `</tr></thead><tbody>`;
@@ -291,33 +290,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 html += `
                     <tr>
                         <td><strong>${subject.name}</strong></td>
-                        <td>${subject.max_marks}</td>
+                        <td class="text-center">${subject.max_marks}</td>
                 `;
                 
                 let subjectTotal = 0;
                 let subjectCount = 0;
                 
-                data.examTypes.forEach(examType => {
-                    const hasData = data.marksheetsByExamType[examType.id];
-                    if (hasData) {
-                        const marksheet = hasData[0];
-                        const mark = marksheet.marks.find(m => m.subject_id === subject.id);
-                        
-                        if (mark) {
-                            subjectTotal += mark.obtained_marks;
-                            subjectCount++;
-                            html += `
-                                <td class="text-center">${mark.obtained_marks}/${subject.max_marks}</td>
-                                <td class="text-center">
-                                    <span class="badge badge-${mark.grade === 'F' ? 'danger' : 'success'}">${mark.grade}</span>
-                                </td>
-                            `;
-                        } else {
-                            html += `
-                                <td class="text-center text-muted">-/${subject.max_marks}</td>
-                                <td class="text-center text-muted">-</td>
-                            `;
-                        }
+                examTypesWithData.forEach(examType => {
+                    const marksheet = data.marksheetsByExamType[examType.id][0];
+                    const mark = marksheet.marks.find(m => m.subject_id === subject.id);
+                    
+                    if (mark) {
+                        subjectTotal += mark.obtained_marks;
+                        subjectCount++;
+                        html += `
+                            <td class="text-center">${mark.obtained_marks}/${subject.max_marks}</td>
+                            <td class="text-center">
+                                <span class="badge badge-${mark.grade === 'F' ? 'danger' : 'success'}">${mark.grade}</span>
+                            </td>
+                        `;
+                    } else {
+                        html += `
+                            <td class="text-center text-muted">-/${subject.max_marks}</td>
+                            <td class="text-center text-muted">-</td>
+                        `;
                     }
                 });
                 

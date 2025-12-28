@@ -1,59 +1,223 @@
 @extends('adminlte::page')
 
-@section('title', 'Grades/Classes')
+@section('title', 'Grades/Classes Management')
+
+@section('adminlte_css_pre')
+    <link rel="stylesheet" href="{{ asset('css/grades.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+@stop
 
 @section('content_header')
-    <h1>Grades/Classes Management</h1>
+    <div class="grades-header">
+        <h1><i class="fas fa-graduation-cap"></i> Grades/Classes Management</h1>
+        <p class="subtitle">Manage academic grades, sections, and student assignments</p>
+    </div>
 @stop
 
 @section('content')
     @if ($message = Session::get('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ $message }}
+            <i class="fas fa-check-circle"></i> {{ $message }}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
     @endif
 
-    <div class="card">
+    <!-- Statistics Cards -->
+    <div class="stats-container">
+        <div class="stat-card total">
+            <div class="stat-icon">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="stat-value" id="totalGrades">{{ $grades->count() }}</div>
+            <div class="stat-label">Total Grades</div>
+        </div>
+        <div class="stat-card students">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value" id="totalStudents">{{ $grades->sum('students_count') }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card sections">
+            <div class="stat-icon">
+                <i class="fas fa-th-large"></i>
+            </div>
+            <div class="stat-value" id="totalSections">{{ $grades->whereNotNull('section')->count() }}</div>
+            <div class="stat-label">Active Sections</div>
+        </div>
+        <div class="stat-card average">
+            <div class="stat-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="stat-value" id="avgStudents">{{ $grades->count() > 0 ? round($grades->sum('students_count') / $grades->count()) : 0 }}</div>
+            <div class="stat-label">Avg Students/Grade</div>
+        </div>
+    </div>
+
+    <!-- Filters and Actions -->
+    <div class="card grade-card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="gradeSearch" placeholder="Search grades...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="gradeFilter">
+                        <option value="">All Grades</option>
+                        @for($i = 1; $i <= 12; $i++)
+                            <option value="{{ $i }}">Grade {{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="sectionFilter">
+                        <option value="">All Sections</option>
+                        <option value="A">Section A</option>
+                        <option value="B">Section B</option>
+                        <option value="C">Section C</option>
+                    </select>
+                </div>
+                <div class="col-md-4 text-right">
+                    <div class="btn-group">
+                        <button class="btn btn-info btn-sm" id="exportBtn" title="Export">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <button class="btn btn-warning btn-sm" id="bulkActions" style="display: none;">
+                            <i class="fas fa-tasks"></i> Bulk Actions
+                        </button>
+                        <a href="{{ route('grades.create') }}" class="btn btn-add-grade btn-sm">
+                            <i class="fas fa-plus"></i> Add New Grade
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grades Table -->
+    <div class="card grade-card">
         <div class="card-header">
-            <h3 class="card-title">List of Grades/Classes</h3>
+            <h3 class="card-title"><i class="fas fa-list"></i> List of Grades/Classes</h3>
             <div class="card-tools">
-                <a href="{{ route('grades.create') }}" class="btn btn-primary btn-sm">Add New Grade</a>
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
             </div>
         </div>
         <div class="card-body">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Section</th>
-                        <th>Students Count</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($grades as $grade)
-                    <tr>
-                        <td>{{ $grade->id }}</td>
-                        <td>{{ $grade->name }}</td>
-                        <td>{{ $grade->section ?? 'N/A' }}</td>
-                        <td>{{ $grade->students_count }}</td>
-                        <td>
-                            <a href="{{ route('grades.edit', $grade->id) }}" class="btn btn-info btn-sm">Edit</a>
-                            <form action="{{ route('grades.destroy', $grade->id) }}" method="POST" style="display:inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover grades-table" id="gradesTable">
+                    <thead>
+                        <tr>
+                            <th width="5%">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="selectAll">
+                                    <label class="custom-control-label" for="selectAll"></label>
+                                </div>
+                            </th>
+                            <th width="15%">Grade</th>
+                            <th width="15%">Section</th>
+                            <th width="20%">Students Count</th>
+                            <th width="15%">Class Teacher</th>
+                            <th width="15%">Status</th>
+                            <th width="15%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($grades as $grade)
+                        <tr>
+                            <td>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input grade-checkbox" id="grade{{ $grade->id }}">
+                                    <label class="custom-control-label" for="grade{{ $grade->id }}"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="grade-badge grade-{{ $grade->id <= 12 ? $grade->id : '1' }}">
+                                    {{ $grade->name }}
+                                </div>
+                            </td>
+                            <td>
+                                @if($grade->section)
+                                    <div class="section-badge">{{ $grade->section }}</div>
+                                @else
+                                    <div class="section-badge no-section">N/A</div>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="student-count {{ $grade->students_count == 0 ? 'zero' : '' }}">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span class="count">{{ $grade->students_count }}</span>
+                                    <span>students</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if($grade->class_teacher)
+                                    <span class="text-muted">
+                                        <i class="fas fa-chalkboard-teacher"></i> {{ $grade->class_teacher }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">Not assigned</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge badge-success">
+                                    <i class="fas fa-check-circle"></i> Active
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-view btn-sm" data-grade-id="{{ $grade->id }}" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ route('grades.edit', $grade->id) }}" class="btn btn-edit btn-sm" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-delete btn-sm" data-grade-name="{{ $grade->name }}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <form action="{{ route('grades.destroy', $grade->id) }}" method="POST" style="display:none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="empty-state">
+                                    <div class="icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <h3>No Grades Found</h3>
+                                    <p>Start by adding your first grade to begin organizing your classes.</p>
+                                    <a href="{{ route('grades.create') }}" class="btn btn-add-grade">
+                                        <i class="fas fa-plus"></i> Add First Grade
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
+        @if($grades->hasPages())
+        <div class="card-footer">
+            {{ $grades->links() }}
+        </div>
+        @endif
     </div>
 @stop
 
@@ -61,4 +225,5 @@
 @stop
 
 @section('js')
+    <script src="{{ asset('js/grades.js') }}"></script>
 @stop

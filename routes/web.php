@@ -8,9 +8,16 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Route::middleware('auth')->group(function () {
+// Admin routes with prefix
+Route::prefix('admin')->middleware('auth')->group(function () {
+    // Dashboard route
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    
+    // Profile routes
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    
     // Test route for debugging images
     Route::get('/test-images', function() {
         return view('test-images');
@@ -72,10 +79,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/bulk-generate', [App\Http\Controllers\AdmitCardController::class, 'bulkGenerate'])->name('bulk-generate');
     });
     
-    // Exam Timetable routes
-    Route::resource('exam-timetables', App\Http\Controllers\ExamTimetableController::class);
+    // Exam Timetable routes - Individual operations
+    Route::get('exam-timetables', [App\Http\Controllers\ExamTimetableController::class, 'index'])->name('exam-timetables.index');
+    Route::get('exam-timetables/create', [App\Http\Controllers\ExamTimetableController::class, 'create'])->name('exam-timetables.create');
+    Route::post('exam-timetables', [App\Http\Controllers\ExamTimetableController::class, 'store'])->name('exam-timetables.store');
+    Route::get('exam-timetables/{examTimetable}', [App\Http\Controllers\ExamTimetableController::class, 'show'])->name('exam-timetables.show');
+    Route::get('exam-timetables/{examTimetable}/edit', [App\Http\Controllers\ExamTimetableController::class, 'edit'])->name('exam-timetables.edit');
+    Route::put('exam-timetables/{examTimetable}', [App\Http\Controllers\ExamTimetableController::class, 'update'])->name('exam-timetables.update');
+    Route::delete('exam-timetables/{examTimetable}', [App\Http\Controllers\ExamTimetableController::class, 'destroy'])->name('exam-timetables.destroy');
+    
+    // Exam Timetable routes - Bulk operations
     Route::get('exam-timetables-bulk-create', [App\Http\Controllers\ExamTimetableController::class, 'bulkCreate'])->name('exam-timetables.bulk-create');
     Route::post('exam-timetables-bulk-store', [App\Http\Controllers\ExamTimetableController::class, 'bulkStore'])->name('exam-timetables.bulk-store');
+    Route::post('exam-timetables-bulk-edit', [App\Http\Controllers\ExamTimetableController::class, 'bulkEdit'])->name('exam-timetables.bulk-edit');
+    Route::put('exam-timetables-bulk-update', [App\Http\Controllers\ExamTimetableController::class, 'bulkUpdate'])->name('exam-timetables.bulk-update');
+    Route::delete('exam-timetables-bulk-delete', [App\Http\Controllers\ExamTimetableController::class, 'bulkDelete'])->name('exam-timetables.bulk-delete');
     Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
     Route::get('exam-timetables-print', [App\Http\Controllers\ExamTimetableController::class, 'printTimetable'])->name('exam-timetables.print');
     Route::get('exam-timetables-print-all', [App\Http\Controllers\ExamTimetableController::class, 'printAllTimetables'])->name('exam-timetables.print-all');

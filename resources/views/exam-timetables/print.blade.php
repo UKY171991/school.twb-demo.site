@@ -150,6 +150,28 @@
                 box-shadow: none;
                 margin-bottom: 0;
             }
+            /* Hide Day column when printing */
+            .timetable-table th:nth-child(4),
+            .timetable-table td:nth-child(4) {
+                display: none !important;
+            }
+            /* Adjust column widths after hiding Day column */
+            .timetable-table th:nth-child(3),
+            .timetable-table td:nth-child(3) {
+                width: 20% !important;
+            }
+            .timetable-table th:nth-child(5),
+            .timetable-table td:nth-child(5) {
+                width: 18% !important;
+            }
+            .timetable-table th:nth-child(6),
+            .timetable-table td:nth-child(6) {
+                width: 12% !important;
+            }
+            .timetable-table th:nth-child(7),
+            .timetable-table td:nth-child(7) {
+                width: 12% !important;
+            }
         }
     </style>
 </head>
@@ -166,7 +188,7 @@
         <div class="exam-info">
             <h3>{{ $examType->name ?? 'Examination' }} - {{ $academic_year }}</h3>
             <div class="exam-details">
-                <div class="exam-detail-item"><strong>Class:</strong> {{ $class }}-{{ $section }}</div>
+                <div class="exam-detail-item"><strong>Class:</strong> {{ $class }}{{ $section ? '-' . $section : '' }}</div>
                 @if($timetables->isNotEmpty())
                     <div class="exam-detail-item"><strong>Exam Period:</strong> {{ $timetables->first()->exam_date->format('d M Y') }} to {{ $timetables->last()->exam_date->format('d M Y') }}</div>
                     <div class="exam-detail-item"><strong>Total Subjects:</strong> {{ $timetables->count() }}</div>
@@ -184,7 +206,6 @@
                         <th style="width: 12%;">Day</th>
                         <th style="width: 15%;">Time</th>
                         <th style="width: 10%;">Duration</th>
-                        <th style="width: 10%;">Max Marks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -202,16 +223,9 @@
                                 @endphp
                                 {{ $duration }}h {{ $minutes > 0 ? $minutes . 'm' : '' }}
                             </td>
-                            <td>{{ $schedule->subject->max_marks ?? 'N/A' }}</td>
                         </tr>
                     @endforeach
                 </tbody>
-                <tfoot>
-                    <tr style="background-color: #d5f4e6; font-weight: bold;">
-                        <td colspan="6">TOTAL MARKS</td>
-                        <td>{{ $timetables->sum(function($t) { return $t->subject->max_marks ?? 0; }) }}</td>
-                    </tr>
-                </tfoot>
             </table>
 
             <div class="summary-section">

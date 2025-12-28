@@ -144,7 +144,7 @@
                     @if (Route::has('login'))
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url('/home') }}">Dashboard</a>
+                                <a class="nav-link" href="{{ route('home') }}">Dashboard</a>
                             </li>
                         @else
                             <li class="nav-item">
@@ -171,7 +171,7 @@
                     <p class="hero-subtitle">Streamline your school operations with our comprehensive management system. Manage students, teachers, grades, and more - all in one place.</p>
                     <div class="mt-4">
                         @auth
-                            <a href="{{ url('/home') }}" class="btn btn-light btn-custom">Go to Dashboard</a>
+                            <a href="{{ route('home') }}" class="btn btn-light btn-custom">Go to Dashboard</a>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-light btn-custom">Get Started</a>
                             <a href="#features" class="btn btn-outline-light btn-custom">Learn More</a>

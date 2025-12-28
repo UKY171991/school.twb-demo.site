@@ -37,7 +37,7 @@
                         <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>
                             <option value="">Select Exam Type</option>
                             @foreach($examTypes as $examType)
-                                <option value="{{ $examType->id }}" {{ old('exam_type_id') == $examType->id ? 'selected' : '' }}>
+                                <option value="{{ $examType->id }}" {{ (old('exam_type_id') ?? $prefilledData['exam_type_id']) == $examType->id ? 'selected' : '' }}>
                                     {{ $examType->name }}
                                 </option>
                             @endforeach
@@ -60,7 +60,7 @@
                                 ];
                             @endphp
                             @foreach($academicYears as $year)
-                                <option value="{{ $year }}" {{ old('academic_year', $currentYear . '-' . ($currentYear+1)) == $year ? 'selected' : '' }}>
+                                <option value="{{ $year }}" {{ (old('academic_year') ?? $prefilledData['academic_year'] ?? $currentYear . '-' . ($currentYear+1)) == $year ? 'selected' : '' }}>
                                     {{ $year }}
                                 </option>
                             @endforeach
@@ -79,7 +79,7 @@
                         <select name="class" id="class" class="form-control @error('class') is-invalid @enderror" required>
                             <option value="">Select Class</option>
                             @foreach($grades as $grade)
-                                <option value="{{ $grade->name }}" {{ old('class') == $grade->name ? 'selected' : '' }}>
+                                <option value="{{ $grade->name }}" {{ (old('class') ?? $prefilledData['class']) == $grade->name ? 'selected' : '' }}>
                                     {{ $grade->name }}
                                 </option>
                             @endforeach
@@ -93,7 +93,7 @@
                     <div class="form-group">
                         <label for="section">Section</label>
                         <input type="text" name="section" id="section" class="form-control @error('section') is-invalid @enderror" 
-                               value="{{ old('section') }}" placeholder="e.g., A, B, C (optional)">
+                               value="{{ old('section') ?? $prefilledData['section'] }}" placeholder="e.g., A, B, C (optional)">
                         @error('section')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror

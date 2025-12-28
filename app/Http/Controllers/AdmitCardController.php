@@ -98,7 +98,10 @@ class AdmitCardController extends Controller
         // Get exam timetable for this class and exam type
         $timetable = \App\Models\ExamTimetable::where('school_id', $student->school_id)
             ->where('class', $student->class)
-            ->where('section', $student->section)
+            ->where(function($query) use ($student) {
+                $query->where('section', $student->section)
+                      ->orWhereNull('section');
+            })
             ->where('exam_type_id', $request->exam_type_id)
             ->where('academic_year', $request->academic_year)
             ->where('is_active', true)
@@ -158,7 +161,10 @@ class AdmitCardController extends Controller
         // Get exam timetable for this class and exam type
         $timetable = \App\Models\ExamTimetable::where('school_id', $currentSchoolId)
             ->where('class', $request->class)
-            ->where('section', $request->section)
+            ->where(function($query) use ($request) {
+                $query->where('section', $request->section)
+                      ->orWhereNull('section');
+            })
             ->where('exam_type_id', $request->exam_type_id)
             ->where('academic_year', $request->academic_year)
             ->where('is_active', true)

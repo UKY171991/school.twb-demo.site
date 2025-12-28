@@ -15,7 +15,7 @@
         @csrf
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="student_id">Student</label>
                         <select name="student_id" id="student_id" class="form-control @error('student_id') is-invalid @enderror" required>
@@ -31,7 +31,23 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="class">Class</label>
+                        <select name="class" id="class" class="form-control @error('class') is-invalid @enderror" required>
+                            <option value="">Select Class</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->name }}" {{ old('class') == $grade->name ? 'selected' : '' }}>
+                                    {{ $grade->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('class')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="exam_type_id">Exam Type</label>
                         <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>

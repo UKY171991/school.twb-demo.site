@@ -32,14 +32,16 @@ class MarksheetController extends Controller
         $students = Student::where('school_id', $schoolId)->with('grade')->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
         $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
+        $grades = \App\Models\Grade::where('school_id', $schoolId)->orderBy('name')->get();
         
-        return view('marksheets.create', compact('students', 'subjects', 'examTypes'));
+        return view('marksheets.create', compact('students', 'subjects', 'examTypes', 'grades'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
+            'class' => 'required|string|max:255',
             'exam_type_id' => 'required|exists:exam_types,id',
             'exam_name' => 'required|string|max:255',
             'exam_date' => 'required|date',
@@ -56,7 +58,7 @@ class MarksheetController extends Controller
                 'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
                 'exam_date' => $request->exam_date,
-                'class' => $student->class,
+                'class' => $request->class,
                 'section' => $student->section,
                 'academic_year' => $request->academic_year,
             ];
