@@ -380,12 +380,6 @@ return [
             'icon' => 'fas fa-fw fa-calendar-check',
             'active' => ['admin/attendances*'],
         ],
-        [
-            'text' => 'Marks/Exams',
-            'route'  => 'marks.index',
-            'icon' => 'fas fa-fw fa-poll',
-            'active' => ['admin/marks*'],
-        ],
         ['header' => 'MARKSHEETS & RESULTS'],
         [
             'text' => 'Marksheets',

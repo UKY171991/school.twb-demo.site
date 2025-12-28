@@ -202,7 +202,6 @@
             <thead>
                 <tr>
                     <th rowspan="2" style="width: 25%;">Subject</th>
-                    <th rowspan="2" style="width: 10%;">Max Marks</th>
                     @foreach($marksheetsByExamType as $examTypeId => $examMarksheets)
                         @php
                             $examType = $examMarksheets->first()->examType;
@@ -211,7 +210,7 @@
                             {{ $examType ? $examType->name : 'Unknown' }}
                         </th>
                     @endforeach
-                    <th rowspan="2" style="width: 10%;">Average</th>
+                    <th rowspan="2" style="width: 10%;">Grand Total</th>
                     <th rowspan="2" style="width: 5%;">Grade</th>
                 </tr>
                 <tr>
@@ -230,7 +229,6 @@
                 @foreach($allSubjects as $subject)
                     <tr>
                         <td class="subject-name">{{ $subject->name }}</td>
-                        <td>{{ $subject->max_marks }}</td>
                         
                         @php
                             $subjectTotal = 0;
@@ -265,10 +263,10 @@
                             @endif
                         @endforeach
                         
-                        <!-- Average Column -->
+                        <!-- Grand total Column -->
                         <td>
                             @if($subjectCount > 0)
-                                {{ number_format($subjectTotal / $subjectCount, 1) }}/{{ $subject->max_marks }}
+                                {{ number_format($subjectTotal ) }}/{{ $subject->max_marks }}
                             @else
                                 -/{{ $subject->max_marks }}
                             @endif
@@ -301,7 +299,6 @@
                 <!-- Exam Totals Row -->
                 <tr class="total-row">
                     <td><strong>TOTAL</strong></td>
-                    <td><strong>{{ $allSubjects->sum('max_marks') }}</strong></td>
                     @foreach($examTotals as $examTypeId => $totals)
                         <td><strong>{{ $totals['obtained'] }}/{{ $totals['max'] }}</strong></td>
                     @endforeach
