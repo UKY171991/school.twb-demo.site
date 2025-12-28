@@ -16,6 +16,8 @@ class MarksheetMark extends Model
         'obtained_marks'
     ];
 
+    protected $appends = ['grade'];
+
     public function student()
     {
         return $this->belongsTo(Student::class);
@@ -33,7 +35,9 @@ class MarksheetMark extends Model
 
     public function getGradeAttribute()
     {
-        $percentage = ($this->obtained_marks / $this->subject->max_marks) * 100;
+        $max = $this->subject && $this->subject->max_marks ? (float) $this->subject->max_marks : 0.0;
+        $obt = (float) $this->obtained_marks;
+        $percentage = $max > 0 ? ($obt / $max) * 100 : 0;
         
         // Use configurable grading system
         $gradingSystem = \App\Models\GradingSystem::getGradeForPercentage($percentage);

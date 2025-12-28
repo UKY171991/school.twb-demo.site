@@ -8,6 +8,14 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::middleware('auth')->group(function () {
+    // API routes for dynamic loading
+    Route::get('/api/schools/{school}/grades', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
+    Route::get('/api/grades/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
+    Route::get('/api/students/{student}/exam-data', [App\Http\Controllers\MarksheetController::class, 'getStudentExamData'])->name('api.students.exam-data');
+    Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
+});
+
 // Admin routes with prefix
 Route::prefix('admin')->middleware('auth')->group(function () {
     // Dashboard route
@@ -22,11 +30,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/test-images', function() {
         return view('test-images');
     });
-    
-    // API routes for dynamic loading
-    Route::get('/api/schools/{school}/grades', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
-    Route::get('/api/grades/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
-    Route::get('/api/students/{student}/exam-data', [App\Http\Controllers\MarksheetController::class, 'getStudentExamData'])->name('api.students.exam-data');
     
     // School routes
     Route::resource('schools', App\Http\Controllers\SchoolController::class);
@@ -77,6 +80,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
         Route::get('/search', [App\Http\Controllers\AdmitCardController::class, 'search'])->name('search');
         Route::post('/generate', [App\Http\Controllers\AdmitCardController::class, 'generate'])->name('generate');
         Route::post('/bulk-generate', [App\Http\Controllers\AdmitCardController::class, 'bulkGenerate'])->name('bulk-generate');
+        Route::post('/generate-roll-numbers', [App\Http\Controllers\AdmitCardController::class, 'generateRollNumbers'])->name('generate-roll-numbers');
     });
     
     // Exam Timetable routes - Individual operations
@@ -98,7 +102,6 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::post('exam-timetables-bulk-edit', [App\Http\Controllers\ExamTimetableController::class, 'bulkEdit'])->name('exam-timetables.bulk-edit');
     Route::put('exam-timetables-bulk-update', [App\Http\Controllers\ExamTimetableController::class, 'bulkUpdate'])->name('exam-timetables.bulk-update');
     Route::delete('exam-timetables-bulk-delete', [App\Http\Controllers\ExamTimetableController::class, 'bulkDelete'])->name('exam-timetables.bulk-delete');
-    Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
     Route::get('exam-timetables-print', [App\Http\Controllers\ExamTimetableController::class, 'printTimetable'])->name('exam-timetables.print');
     Route::get('exam-timetables-print-all', [App\Http\Controllers\ExamTimetableController::class, 'printAllTimetables'])->name('exam-timetables.print-all');
 });

@@ -25,33 +25,33 @@ class ComprehensiveDummyDataSeeder extends Seeder
         $schools = [
             [
                 'name' => 'Greenwood High School',
+                'code' => 'GHS',
                 'address' => '123 Education Street, Downtown',
                 'phone' => '+1-555-0101',
                 'email' => 'info@greenwood.edu',
                 'website' => 'www.greenwood.edu',
                 'principal_name' => 'Dr. Margaret Thompson',
-                'established_year' => 1985,
-                'is_active' => true
+                'status' => 'active'
             ],
             [
                 'name' => 'Riverside Academy',
+                'code' => 'RA',
                 'address' => '456 River Road, Riverside',
                 'phone' => '+1-555-0202',
                 'email' => 'admin@riverside.edu',
                 'website' => 'www.riverside.edu',
                 'principal_name' => 'Mr. James Wilson',
-                'established_year' => 1992,
-                'is_active' => true
+                'status' => 'active'
             ],
             [
                 'name' => 'Oakwood International School',
+                'code' => 'OIS',
                 'address' => '789 Oak Avenue, Oakwood',
                 'phone' => '+1-555-0303',
                 'email' => 'contact@oakwood.edu',
                 'website' => 'www.oakwood.edu',
                 'principal_name' => 'Ms. Sarah Johnson',
-                'established_year' => 2001,
-                'is_active' => true
+                'status' => 'active'
             ]
         ];
 
@@ -236,6 +236,29 @@ class ComprehensiveDummyDataSeeder extends Seeder
         foreach ($schoolIds as $schoolId) {
             foreach ($gradingSystems as $system) {
                 GradingSystem::create(array_merge($system, ['school_id' => $schoolId]));
+            }
+        }
+
+        // Create Grading System Grades
+        $gradingGrades = [
+            ['grade' => 'A+', 'min_percentage' => 90, 'max_percentage' => 100, 'grade_points' => 4.0, 'is_passing' => true, 'sort_order' => 1],
+            ['grade' => 'A', 'min_percentage' => 80, 'max_percentage' => 89, 'grade_points' => 3.7, 'is_passing' => true, 'sort_order' => 2],
+            ['grade' => 'B+', 'min_percentage' => 70, 'max_percentage' => 79, 'grade_points' => 3.3, 'is_passing' => true, 'sort_order' => 3],
+            ['grade' => 'B', 'min_percentage' => 60, 'max_percentage' => 69, 'grade_points' => 3.0, 'is_passing' => true, 'sort_order' => 4],
+            ['grade' => 'C+', 'min_percentage' => 50, 'max_percentage' => 59, 'grade_points' => 2.7, 'is_passing' => true, 'sort_order' => 5],
+            ['grade' => 'C', 'min_percentage' => 40, 'max_percentage' => 49, 'grade_points' => 2.0, 'is_passing' => true, 'sort_order' => 6],
+            ['grade' => 'D', 'min_percentage' => 33, 'max_percentage' => 39, 'grade_points' => 1.0, 'is_passing' => true, 'sort_order' => 7],
+            ['grade' => 'F', 'min_percentage' => 0, 'max_percentage' => 32, 'grade_points' => 0.0, 'is_passing' => false, 'sort_order' => 8],
+        ];
+
+        foreach ($schoolIds as $schoolId) {
+            foreach ($gradingGrades as $grade) {
+                GradingSystem::create(array_merge($grade, [
+                    'name' => 'Grade ' . $grade['grade'],
+                    'description' => 'Grade ' . $grade['grade'] . ' for ' . $grade['min_percentage'] . '-' . $grade['max_percentage'] . '%',
+                    'is_active' => true,
+                    'school_id' => $schoolId
+                ]));
             }
         }
 

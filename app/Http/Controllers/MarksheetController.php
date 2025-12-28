@@ -160,19 +160,21 @@ class MarksheetController extends Controller
     {
         $marksheet->load(['student', 'marks.subject']);
         
-        $schoolId = session('current_school_id');
+        $schoolId = $marksheet->school_id ?: session('current_school_id');
         
         $students = Student::where('school_id', $schoolId)->with('grade')->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
         $examTypes = \App\Models\ExamType::getActiveTypes($schoolId);
+        $grades = \App\Models\Grade::where('school_id', $schoolId)->orderBy('name')->get();
         
-        return view('marksheets.edit', compact('marksheet', 'students', 'subjects', 'examTypes'));
+        return view('marksheets.edit', compact('marksheet', 'students', 'subjects', 'examTypes', 'grades'));
     }
 
     public function update(Request $request, Marksheet $marksheet)
     {
         $request->validate([
             'student_id' => 'required|exists:students,id',
+            'class' => 'required|string|max:255',
             'exam_type_id' => 'required|exists:exam_types,id',
             'exam_name' => 'required|string|max:255',
             'exam_date' => 'required|date',
@@ -189,7 +191,7 @@ class MarksheetController extends Controller
                 'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
                 'exam_date' => $request->exam_date,
-                'class' => $student->class,
+                'class' => $request->class,
                 'section' => $student->section,
                 'academic_year' => $request->academic_year,
             ];
@@ -406,6 +408,7 @@ class MarksheetController extends Controller
     public function getStudentExamData($studentId)
     {
         $student = Student::with(['grade', 'school'])->findOrFail($studentId);
+        $schoolId = session('current_school_id') ?: $student->school_id;
         
         // Get all marksheets for this student
         $marksheets = Marksheet::where('student_id', $studentId)
@@ -414,12 +417,12 @@ class MarksheetController extends Controller
             ->get();
             
         // Get all exam types for the school
-        $examTypes = \App\Models\ExamType::where('school_id', $student->school_id)
+        $examTypes = \App\Models\ExamType::where('school_id', $schoolId)
             ->orderBy('sort_order')
             ->get();
             
-        // Get subjects for the student's grade
-        $subjects = Subject::where('grade_id', $student->grade_id)
+        // Get all subjects for the student's school (match edit/create view behavior)
+        $subjects = Subject::where('school_id', $schoolId)
             ->orderBy('name')
             ->get();
             

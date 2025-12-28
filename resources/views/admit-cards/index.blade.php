@@ -20,6 +20,9 @@
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#bulkGenerateModal">
                     <i class="fas fa-users"></i> Bulk Generate
                 </button>
+                <button type="button" class="btn btn-warning ml-2" data-toggle="modal" data-target="#generateRollNumbersModal">
+                    <i class="fas fa-list-ol"></i> Fix Roll Numbers
+                </button>
             </div>
         </div>
     </div>
@@ -78,8 +81,8 @@
                         <tr>
                             <td>{{ $student->roll_number }}</td>
                             <td>{{ $student->name }}</td>
-                            <td>{{ $student->class }}</td>
-                            <td>{{ $student->section }}</td>
+                            <td>{{ $student->class ?: ($student->grade ? $student->grade->name : '-') }}</td>
+                            <td>{{ $student->section ?: ($student->grade ? $student->grade->section : '-') }}</td>
                             <td>{{ $student->father_name }}</td>
                             <td>
                                 <div class="btn-group" role="group" aria-label="Actions">
@@ -247,6 +250,49 @@
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-print"></i> Generate All & Print
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Roll Numbers Modal -->
+<div class="modal fade" id="generateRollNumbersModal" tabindex="-1" role="dialog" aria-labelledby="generateRollNumbersModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="generateRollNumbersModalLabel">Generate Roll Numbers</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('admit-cards.generate-roll-numbers') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> This tool helps fix missing roll numbers. It will:
+                        <ul class="mb-0 pl-3">
+                            <li>Find students in the selected grade without a roll number</li>
+                            <li>Assign sequential roll numbers continuing from the highest existing one</li>
+                            <li>Update class/section names to match the Grade definition</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="generate_roll_grade_id">Select Grade to Process</label>
+                        <select name="grade_id" id="generate_roll_grade_id" class="form-control" required>
+                            <option value="">Select Grade</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->id }}">{{ $grade->name }} @if($grade->section) - {{ $grade->section }} @endif</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-magic"></i> Generate Roll Numbers
                     </button>
                 </div>
             </form>

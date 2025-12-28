@@ -260,52 +260,46 @@
 
         <div class="subjects-section">
             <h4 style="margin-bottom: 10px; color: #2c3e50;">Subjects for Examination:</h4>
-            @if($timetable->isNotEmpty())
-                <table class="subjects-table">
-                    <thead>
+            
+            @php
+                $scheduledSubjectIds = $timetable->pluck('subject_id')->toArray();
+                $unscheduledSubjects = $subjects->whereNotIn('id', $scheduledSubjectIds);
+            @endphp
+            
+            <table class="subjects-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">S.No</th>
+                        <th style="width: 52%;">Subject Name</th>
+                        <th style="width: 20%;">Exam Date</th>
+                        <th style="width: 20%;">Exam Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($timetable as $index => $schedule)
                         <tr>
-                            <th style="width: 8%;">S.No</th>
-                            <th style="width: 52%;">Subject Name</th>
-                            <th style="width: 20%;">Exam Date</th>
-                            <th style="width: 20%;">Exam Time</th>
+                            <td>{{ $index + 1 }}</td>
+                            <td style="text-align: left; padding-left: 15px;">{{ $schedule->subject->name }}</td>
+                            <td>{{ $schedule->exam_date->format('d M Y') }}</td>
+                            <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($timetable as $index => $schedule)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td style="text-align: left; padding-left: 15px;">{{ $schedule->subject->name }}</td>
-                                <td>{{ $schedule->exam_date->format('d M Y') }}</td>
-                                <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <!-- Fallback: Show subjects with TBD when no timetable is available -->
-                <table class="subjects-table">
-                    <thead>
+                    @endforeach
+                    
+                    @foreach($unscheduledSubjects as $index => $subject)
                         <tr>
-                            <th style="width: 8%;">S.No</th>
-                            <th style="width: 52%;">Subject Name</th>
-                            <th style="width: 20%;">Exam Date</th>
-                            <th style="width: 20%;">Exam Time</th>
+                            <td>{{ count($timetable) + $loop->iteration }}</td>
+                            <td style="text-align: left; padding-left: 15px;">{{ $subject->name }}</td>
+                            <td style="color: #e74c3c; font-weight: bold;">TBD</td>
+                            <td style="color: #e74c3c; font-weight: bold;">TBD</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($subjects as $index => $subject)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td style="text-align: left; padding-left: 15px;">{{ $subject->name }}</td>
-                                <td style="color: #e74c3c; font-weight: bold;">TBD</td>
-                                <td style="color: #e74c3c; font-weight: bold;">TBD</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                    @endforeach
+                </tbody>
+            </table>
+
+            @if($unscheduledSubjects->isNotEmpty())
                 <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 10px; margin-top: 10px;">
                     <small style="color: #856404;">
-                        <strong>Note:</strong> Exam dates and times are yet to be determined (TBD). 
+                        <strong>Note:</strong> Some exam dates and times are yet to be determined (TBD). 
                         Please check with the examination office for the updated schedule.
                     </small>
                 </div>

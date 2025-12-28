@@ -8,6 +8,7 @@ use App\Models\Subject;
 use App\Models\Grade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class AdmitCardController extends Controller
 {
@@ -85,6 +86,10 @@ class AdmitCardController extends Controller
 
         $student = Student::with(['grade', 'school'])->findOrFail($request->student_id);
         $examType = ExamType::findOrFail($request->exam_type_id);
+
+        // Determine the class name to use for timetable lookup
+        // Prefer the grade name if available (e.g. "Grade 10"), otherwise fallback to student's class string (e.g. "10")
+        $className = $student->grade ? $student->grade->name : $student->class;
         
         // Get subjects for the student's grade
         $subjects = Subject::where('school_id', $student->school_id)
@@ -97,7 +102,7 @@ class AdmitCardController extends Controller
 
         // Get exam timetable for this class and exam type
         $timetable = \App\Models\ExamTimetable::where('school_id', $student->school_id)
-            ->where('class', $student->class)
+            ->where('class', $className)
             ->where(function($query) use ($student) {
                 $query->where('section', $student->section)
                       ->orWhereNull('section')
@@ -134,8 +139,16 @@ class AdmitCardController extends Controller
 
         $currentSchoolId = Session::get('current_school_id');
         
+        // Find grade by name to support matching by grade_id
+        $grade = Grade::where('school_id', $currentSchoolId)->where('name', $request->class)->first();
+
         $query = Student::where('school_id', $currentSchoolId)
-            ->where('class', $request->class)
+            ->where(function($q) use ($request, $grade) {
+                $q->where('class', $request->class);
+                if ($grade) {
+                    $q->orWhere('grade_id', $grade->id);
+                }
+            })
             ->with(['grade', 'school']);
 
         if ($request->filled('section')) {
@@ -185,5 +198,54 @@ class AdmitCardController extends Controller
         ];
 
         return view('admit-cards.bulk-print', $bulkData);
+    }
+
+    public function generateRollNumbers(Request $request)
+    {
+        $currentSchoolId = Session::get('current_school_id');
+        
+        $request->validate([
+            'grade_id' => 'required|exists:grades,id',
+        ]);
+        
+        $grade = Grade::findOrFail($request->grade_id);
+        
+        $students = Student::where('school_id', $currentSchoolId)
+            ->where('grade_id', $grade->id)
+            ->orderBy('name')
+            ->get();
+            
+        $count = 0;
+        
+        // Find existing max roll number
+        $maxRoll = Student::where('school_id', $currentSchoolId)
+            ->where('grade_id', $grade->id)
+            ->max(DB::raw('CAST(roll_number AS UNSIGNED)'));
+            
+        $nextRoll = $maxRoll ? $maxRoll + 1 : 1;
+        
+        foreach ($students as $student) {
+            $updates = [];
+            
+            // Update class and section if missing or mismatch
+            if ($student->class !== $grade->name) {
+                $updates['class'] = $grade->name;
+            }
+            if ($student->section !== $grade->section) {
+                $updates['section'] = $grade->section;
+            }
+            
+            // Assign roll number if missing
+            if (empty($student->roll_number)) {
+                $updates['roll_number'] = $nextRoll++;
+                $count++;
+            }
+            
+            if (!empty($updates)) {
+                $student->update($updates);
+            }
+        }
+        
+        return back()->with('success', "Generated roll numbers for {$count} students in {$grade->name}.");
     }
 }

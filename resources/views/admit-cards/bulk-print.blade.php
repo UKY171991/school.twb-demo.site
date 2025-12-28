@@ -289,49 +289,41 @@
 
             <div class="subjects-section">
                 <h4 style="margin-bottom: 8px; color: #2c3e50; font-size: 11px;">Subjects for Examination:</h4>
-                @if($timetable->isNotEmpty())
-                    <table class="subjects-table">
-                        <thead>
+                
+                @php
+                    $scheduledSubjectIds = $timetable->pluck('subject_id')->toArray();
+                    $unscheduledSubjects = $subjects->whereNotIn('id', $scheduledSubjectIds);
+                @endphp
+                
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 8%;">S.No</th>
+                            <th style="width: 52%;">Subject</th>
+                            <th style="width: 20%;">Exam Date</th>
+                            <th style="width: 20%;">Exam Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($timetable as $index => $schedule)
                             <tr>
-                                <th style="width: 8%;">S.No</th>
-                                <th style="width: 52%;">Subject</th>
-                                <th style="width: 20%;">Exam Date</th>
-                                <th style="width: 20%;">Exam Time</th>
+                                <td>{{ $index + 1 }}</td>
+                                <td style="text-align: left; padding-left: 8px;">{{ $schedule->subject->name }}</td>
+                                <td>{{ $schedule->exam_date->format('d M Y') }}</td>
+                                <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($timetable as $index => $schedule)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td style="text-align: left; padding-left: 8px;">{{ $schedule->subject->name }}</td>
-                                    <td>{{ $schedule->exam_date->format('d M Y') }}</td>
-                                    <td>{{ $schedule->start_time->format('H:i') }} - {{ $schedule->end_time->format('H:i') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @else
-                    <table class="subjects-table">
-                        <thead>
+                        @endforeach
+                        
+                        @foreach($unscheduledSubjects as $index => $subject)
                             <tr>
-                                <th style="width: 8%;">S.No</th>
-                                <th style="width: 52%;">Subject Name</th>
-                                <th style="width: 20%;">Exam Date</th>
-                                <th style="width: 20%;">Exam Time</th>
+                                <td>{{ count($timetable) + $loop->iteration }}</td>
+                                <td style="text-align: left; padding-left: 8px;">{{ $subject->name }}</td>
+                                <td>TBD</td>
+                                <td>TBD</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($subjects as $index => $subject)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td style="text-align: left; padding-left: 8px;">{{ $subject->name }}</td>
-                                    <td>TBD</td>
-                                    <td>TBD</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             <div class="signature-section">

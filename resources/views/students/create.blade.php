@@ -105,6 +105,29 @@
                 </div>
 
                 <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="father_name">Father's Name</label>
+                            <input type="text" name="father_name" class="form-control @error('father_name') is-invalid @enderror" 
+                                   id="father_name" placeholder="Enter father's name" value="{{ old('father_name') }}">
+                            @error('father_name')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="mother_name">Mother's Name</label>
+                            <input type="text" name="mother_name" class="form-control @error('mother_name') is-invalid @enderror" 
+                                   id="mother_name" placeholder="Enter mother's name" value="{{ old('mother_name') }}">
+                            @error('mother_name')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="address">Address</label>

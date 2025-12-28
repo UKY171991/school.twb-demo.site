@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Grade;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
@@ -60,6 +61,20 @@ class StudentController extends Controller
         ]);
 
         $data = $request->all();
+
+        // Populate class and section from Grade
+        $grade = Grade::findOrFail($request->grade_id);
+        $data['class'] = $grade->name;
+        $data['section'] = $grade->section;
+
+        // Auto-generate roll number if not provided
+        if (empty($data['roll_number'])) {
+            $maxRoll = Student::where('school_id', $request->school_id)
+                ->where('grade_id', $request->grade_id)
+                ->max(DB::raw('CAST(roll_number AS UNSIGNED)'));
+            
+            $data['roll_number'] = $maxRoll ? $maxRoll + 1 : 1;
+        }
 
         // Handle image upload
         if ($request->hasFile('image')) {

@@ -7,6 +7,12 @@
 @stop
 
 @section('content')
+@php
+$gradeOptions = $grades->pluck('name')->toArray();
+if ($marksheet->class && !in_array($marksheet->class, $gradeOptions)) {
+    $grades->push((object)['name' => $marksheet->class]);
+}
+@endphp
 <div class="card">
     <div class="card-header">
         <h3 class="card-title">Edit Marksheet Details</h3>
@@ -16,14 +22,14 @@
         @method('PUT')
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="student_id">Student</label>
                         <select name="student_id" id="student_id" class="form-control @error('student_id') is-invalid @enderror" required>
                             <option value="">Select Student</option>
                             @foreach($students as $student)
                                 <option value="{{ $student->id }}" {{ $marksheet->student_id == $student->id ? 'selected' : '' }}>
-                                    {{ $student->name }} ({{ $student->roll_number }}) - {{ $student->class }}-{{ $student->section }}
+                                    {{ $student->name }} ({{ $student->roll_number }}) - {{ $student->grade->name }}-{{ $student->grade->section }}
                                 </option>
                             @endforeach
                         </select>
@@ -32,12 +38,28 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="class">Class</label>
+                        <select name="class" id="class" class="form-control @error('class') is-invalid @enderror" required>
+                            <option value="">Select Class</option>
+                            @foreach($grades as $grade)
+                                <option value="{{ $grade->name }}" {{ $marksheet->class == $grade->name ? 'selected' : '' }}>
+                                    {{ $grade->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('class')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="form-group">
                         <label for="exam_type_id">Exam Type</label>
                         <select name="exam_type_id" id="exam_type_id" class="form-control @error('exam_type_id') is-invalid @enderror" required>
                             <option value="">Select Exam Type</option>
-                            @foreach(\App\Models\ExamType::getActiveTypes(request()->get('current_school_id')) as $examType)
+                            @foreach($examTypes as $examType)
                                 <option value="{{ $examType->id }}" 
                                         data-exam-name="{{ $examType->name }}"
                                         {{ $marksheet->exam_type_id == $examType->id ? 'selected' : '' }}>
