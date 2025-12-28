@@ -100,7 +100,8 @@ class AdmitCardController extends Controller
             ->where('class', $student->class)
             ->where(function($query) use ($student) {
                 $query->where('section', $student->section)
-                      ->orWhereNull('section');
+                      ->orWhereNull('section')
+                      ->orWhere('section', '');
             })
             ->where('exam_type_id', $request->exam_type_id)
             ->where('academic_year', $request->academic_year)
@@ -163,7 +164,8 @@ class AdmitCardController extends Controller
             ->where('class', $request->class)
             ->where(function($query) use ($request) {
                 $query->where('section', $request->section)
-                      ->orWhereNull('section');
+                      ->orWhereNull('section')
+                      ->orWhere('section', '');
             })
             ->where('exam_type_id', $request->exam_type_id)
             ->where('academic_year', $request->academic_year)

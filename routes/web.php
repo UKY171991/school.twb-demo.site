@@ -88,6 +88,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::put('exam-timetables/{examTimetable}', [App\Http\Controllers\ExamTimetableController::class, 'update'])->name('exam-timetables.update');
     Route::delete('exam-timetables/{examTimetable}', [App\Http\Controllers\ExamTimetableController::class, 'destroy'])->name('exam-timetables.destroy');
     
+    // Exam Timetable routes - Group operations
+    Route::get('exam-timetables-edit-group', [App\Http\Controllers\ExamTimetableController::class, 'editGroup'])->name('exam-timetables.edit-group');
+    Route::put('exam-timetables-update-group', [App\Http\Controllers\ExamTimetableController::class, 'updateGroup'])->name('exam-timetables.update-group');
+    
     // Exam Timetable routes - Bulk operations
     Route::get('exam-timetables-bulk-create', [App\Http\Controllers\ExamTimetableController::class, 'bulkCreate'])->name('exam-timetables.bulk-create');
     Route::post('exam-timetables-bulk-store', [App\Http\Controllers\ExamTimetableController::class, 'bulkStore'])->name('exam-timetables.bulk-store');

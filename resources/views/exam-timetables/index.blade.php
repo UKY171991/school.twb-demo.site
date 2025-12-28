@@ -196,47 +196,50 @@
     <!-- Filter Section -->
     <div class="filter-section">
         <h5 class="mb-3"><i class="fas fa-filter mr-2"></i>Filter Timetables</h5>
-        <form method="GET" class="row g-3">
+        <form method="GET" class="row">
             <div class="col-md-3">
-                <label class="form-label">Exam Type</label>
-                <select name="exam_type_id" class="form-select">
-                    <option value="">All Exam Types</option>
-                    @foreach($examTypes as $examType)
-                        <option value="{{ $examType->id }}" {{ request('exam_type_id') == $examType->id ? 'selected' : '' }}>
-                            {{ $examType->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Class</label>
-                <select name="class" class="form-select">
-                    <option value="">All Classes</option>
-                    @foreach($grades as $grade)
-                        <option value="{{ $grade->name }}" {{ request('class') == $grade->name ? 'selected' : '' }}>
-                            {{ $grade->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Section</label>
-                <input type="text" name="section" class="form-control" placeholder="Section" value="{{ request('section') }}">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">&nbsp;</label>
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i> Filter
-                    </button>
+                <div class="form-group">
+                    <label>Exam Type</label>
+                    <select name="exam_type_id" class="form-control">
+                        <option value="">All Exam Types</option>
+                        @foreach($examTypes as $examType)
+                            <option value="{{ $examType->id }}" {{ request('exam_type_id') == $examType->id ? 'selected' : '' }}>
+                                {{ $examType->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
-            <div class="col-md-2">
-                <label class="form-label">&nbsp;</label>
-                <div class="d-grid">
-                    <a href="{{ route('exam-timetables.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times"></i> Clear
-                    </a>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select name="class" class="form-control">
+                        <option value="">All Classes</option>
+                        @foreach($grades as $grade)
+                            <option value="{{ $grade->name }}" {{ request('class') == $grade->name ? 'selected' : '' }}>
+                                {{ $grade->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Section</label>
+                    <input type="text" name="section" class="form-control" placeholder="Section" value="{{ request('section') }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Filter
+                        </button>
+                        <a href="{{ route('exam-timetables.index') }}" class="btn btn-outline-secondary ml-2">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
                 </div>
             </div>
         </form>
@@ -284,7 +287,7 @@
                             </div>
                             <div class="checkbox-wrapper">
                                 <input type="checkbox" name="selected_combinations[]" 
-                                       value="{{ $timetable->exam_type_id }}-{{ $timetable->class }}-{{ $timetable->section ?? '' }}-{{ $timetable->academic_year }}" 
+                                       value="{{ $timetable->exam_type_id }}|{{ $timetable->class }}|{{ $timetable->section ?? '' }}|{{ $timetable->academic_year }}" 
                                        class="form-check-input custom-checkbox row-checkbox">
                             </div>
                         </div>
@@ -320,6 +323,14 @@
                         
                         <div class="action-buttons">
                             @if($timetable->has_subjects)
+                                <button type="button" class="btn btn-warning btn-sm edit-class-btn"
+                                        data-exam-type="{{ $timetable->exam_type_id }}"
+                                        data-class="{{ $timetable->class }}"
+                                        data-section="{{ $timetable->section }}"
+                                        data-academic-year="{{ $timetable->academic_year }}"
+                                        title="Edit Timetable">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
                                 <button type="button" class="btn btn-info btn-sm print-class-btn"
                                         data-exam-type="{{ $timetable->exam_type_id }}"
                                         data-class="{{ $timetable->class }}"
@@ -506,6 +517,18 @@ $(document).ready(function() {
     }
 
     // Individual action buttons
+    $('.edit-class-btn').on('click', function() {
+        const examType = $(this).data('exam-type');
+        const className = $(this).data('class');
+        const section = $(this).data('section') || '';
+        const academicYear = $(this).data('academic-year');
+        
+        // Redirect to edit group page
+        const url = '{{ route("exam-timetables.edit-group") }}' + 
+                   `?exam_type_id=${examType}&class=${className}&section=${section}&academic_year=${academicYear}`;
+        window.location.href = url;
+    });
+
     $('.add-subjects-btn').on('click', function() {
         const examType = $(this).data('exam-type');
         const className = $(this).data('class');
@@ -530,7 +553,7 @@ $(document).ready(function() {
             return;
         }
         
-        const combination = `${examType}-${className}-${section}-${academicYear}`;
+        const combination = `${examType}|${className}|${section}|${academicYear}`;
         
         const form = $('<form>', {
             method: 'POST',

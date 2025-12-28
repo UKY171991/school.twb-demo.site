@@ -150,6 +150,105 @@ class ExamTimetableController extends Controller
         return redirect()->route('exam-timetables.index')->with('success', 'Exam timetable deleted successfully!');
     }
 
+    public function editGroup(Request $request)
+    {
+        $currentSchoolId = Session::get('current_school_id');
+        
+        if (!$currentSchoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
+        $examTypeId = $request->exam_type_id;
+        $class = $request->class;
+        $section = $request->section;
+        $academicYear = $request->academic_year;
+
+        // Retrieve existing timetables for this group
+        $timetables = ExamTimetable::where('school_id', $currentSchoolId)
+            ->where('exam_type_id', $examTypeId)
+            ->where('class', $class)
+            ->where(function($query) use ($section) {
+                if ($section) {
+                    $query->where('section', $section);
+                } else {
+                    $query->whereNull('section')->orWhere('section', '');
+                }
+            })
+            ->where('academic_year', $academicYear)
+            ->get()
+            ->keyBy('subject_id');
+
+        $examTypes = ExamType::getActiveTypes($currentSchoolId);
+        $subjects = Subject::where('school_id', $currentSchoolId)->orderBy('name')->get();
+        $grades = Grade::where('school_id', $currentSchoolId)->orderBy('name')->get();
+        
+        $groupData = [
+            'exam_type_id' => $examTypeId,
+            'class' => $class,
+            'section' => $section,
+            'academic_year' => $academicYear,
+            'exam_center' => $timetables->first()->exam_center ?? null,
+        ];
+
+        return view('exam-timetables.edit-group', compact('examTypes', 'subjects', 'grades', 'timetables', 'groupData'));
+    }
+
+    public function updateGroup(Request $request)
+    {
+        $currentSchoolId = Session::get('current_school_id');
+        
+        $request->validate([
+            'exam_type_id' => 'required|exists:exam_types,id',
+            'class' => 'required|string',
+            'section' => 'nullable|string',
+            'academic_year' => 'required|string',
+            'exam_center' => 'nullable|string',
+            'subjects' => 'required|array',
+            'subjects.*.subject_id' => 'required|exists:subjects,id',
+            'subjects.*.exam_date' => 'nullable|date',
+            'subjects.*.start_time' => 'nullable|date_format:H:i',
+            'subjects.*.end_time' => 'nullable|date_format:H:i',
+        ]);
+
+        $updatedCount = 0;
+        foreach ($request->subjects as $subjectData) {
+            // Check if valid data is present
+            if (!empty($subjectData['exam_date']) && !empty($subjectData['start_time']) && !empty($subjectData['end_time'])) {
+                
+                ExamTimetable::updateOrCreate(
+                    [
+                        'school_id' => $currentSchoolId,
+                        'exam_type_id' => $request->exam_type_id,
+                        'class' => $request->class,
+                        'section' => $request->section,
+                        'academic_year' => $request->academic_year,
+                        'subject_id' => $subjectData['subject_id'],
+                    ],
+                    [
+                        'exam_date' => $subjectData['exam_date'],
+                        'start_time' => $subjectData['start_time'],
+                        'end_time' => $subjectData['end_time'],
+                        'exam_center' => $request->exam_center,
+                        'instructions' => $subjectData['instructions'] ?? null,
+                        'is_active' => true,
+                    ]
+                );
+                $updatedCount++;
+            } else {
+                // If date/time is cleared, delete the entry if it exists
+                 ExamTimetable::where('school_id', $currentSchoolId)
+                    ->where('exam_type_id', $request->exam_type_id)
+                    ->where('class', $request->class)
+                    ->where('section', $request->section)
+                    ->where('academic_year', $request->academic_year)
+                    ->where('subject_id', $subjectData['subject_id'])
+                    ->delete();
+            }
+        }
+
+        return redirect()->route('exam-timetables.index')->with('success', "Exam timetable updated successfully! ({$updatedCount} subjects scheduled)");
+    }
+
     public function bulkEdit(Request $request)
     {
         $currentSchoolId = Session::get('current_school_id');
@@ -166,7 +265,7 @@ class ExamTimetableController extends Controller
         $timetables = collect();
         
         foreach ($request->class_combinations as $combination) {
-            list($examTypeId, $class, $section, $academicYear) = explode('-', $combination);
+            list($examTypeId, $class, $section, $academicYear) = explode('|', $combination);
             
             // Handle null section properly
             $sectionValue = ($section === '' || $section === 'null') ? null : $section;
@@ -249,7 +348,7 @@ class ExamTimetableController extends Controller
 
         $deleted = 0;
         foreach ($request->class_combinations as $combination) {
-            list($examTypeId, $class, $section, $academicYear) = explode('-', $combination);
+            list($examTypeId, $class, $section, $academicYear) = explode('|', $combination);
             
             // Handle null section properly
             $sectionValue = ($section === '' || $section === 'null') ? null : $section;
