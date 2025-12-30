@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'Edit Grade')
 
@@ -16,7 +16,7 @@
             @method('PUT')
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="name">Grade Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
@@ -26,12 +26,28 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="section">Section</label>
                             <input type="text" name="section" class="form-control @error('section') is-invalid @enderror" 
                                    id="section" placeholder="e.g., A, B, C" value="{{ old('section', $grade->section) }}">
                             @error('section')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="teacher_id">Class Teacher</label>
+                            <select name="teacher_id" id="teacher_id" class="form-control @error('teacher_id') is-invalid @enderror">
+                                <option value="">Select Teacher</option>
+                                @foreach($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}" {{ old('teacher_id', $grade->teacher_id) == $teacher->id ? 'selected' : '' }}>
+                                        {{ $teacher->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('teacher_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>

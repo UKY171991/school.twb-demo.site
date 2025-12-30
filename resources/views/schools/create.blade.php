@@ -7,7 +7,7 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
+    <!-- Custom CSS already included in layout -->
 @stop
 
 @section('content')
@@ -165,5 +165,5 @@
 @stop
 
 @section('js')
-<script src="{{ asset('js/image-upload.js') }}"></script>
+    <!-- Custom JS already included in layout -->
 @stop

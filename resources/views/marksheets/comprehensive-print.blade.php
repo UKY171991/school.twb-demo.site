@@ -153,7 +153,10 @@
 </head>
 <body>
     <div class="marksheet">
-        <div class="header">
+        <div class="header" style="position: relative;">
+            @if($currentSchool && $currentSchool->logo)
+                <img src="{{ $currentSchool->logo_url }}" alt="Logo" style="position: absolute; left: 15px; top: 0; height: 60px; width: 60px; object-fit: contain;">
+            @endif
             <div class="school-name">{{ $currentSchool ? $currentSchool->name : 'SchoolMS' }}</div>
             <div class="school-address">{{ $currentSchool ? $currentSchool->address : '123 Education Street, Learning City, LT, 12345' }}</div>
             <div class="marksheet-title">COMPREHENSIVE STUDENT MARKSHEET</div>
@@ -346,12 +349,23 @@
 
         <div class="signature-section">
             <div class="signature-box">
+                @if($marksheet->student->grade && $marksheet->student->grade->teacher && $marksheet->student->grade->teacher->signature)
+                    <img src="{{ $marksheet->student->grade->teacher->signature_url }}" alt="Teacher Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                @else
+                    <div style="height: 30px;"></div>
+                @endif
                 <div class="signature-line">Class Teacher</div>
             </div>
             <div class="signature-box">
+                @if($currentSchool && $currentSchool->principal_signature)
+                    <img src="{{ $currentSchool->principal_signature_url }}" alt="Principal Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                @else
+                    <div style="height: 30px;"></div>
+                @endif
                 <div class="signature-line">Principal</div>
             </div>
             <div class="signature-box">
+                <div style="height: 30px;"></div>
                 <div class="signature-line">Parent's Signature</div>
             </div>
         </div>

@@ -18,6 +18,8 @@ class School extends Model
         'email',
         'website',
         'principal_name',
+        'principal_signature',
+        'exam_controller_signature',
         'logo',
         'description',
         'status',
@@ -87,5 +89,21 @@ class School extends Model
     public function getLogoUrlAttribute()
     {
         return $this->getImageUrl($this->attributes['logo'] ?? null);
+    }
+
+    /**
+     * Get the principal's signature URL
+     */
+    public function getPrincipalSignatureUrlAttribute()
+    {
+        return $this->getImageUrl($this->attributes['principal_signature'] ?? null);
+    }
+
+    /**
+     * Get the exam controller's signature URL
+     */
+    public function getExamControllerSignatureUrlAttribute()
+    {
+        return $this->getImageUrl($this->attributes['exam_controller_signature'] ?? null);
     }
 }

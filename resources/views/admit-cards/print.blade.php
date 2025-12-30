@@ -199,7 +199,10 @@
     <div class="page">
         <div class="watermark">ADMIT CARD</div>
         
-        <div class="header">
+        <div class="header" style="position: relative;">
+            @if($student->school->logo)
+                <img src="{{ $student->school->logo_url }}" alt="Logo" style="position: absolute; left: 0; top: 0; height: 80px; width: 80px; object-fit: contain;">
+            @endif
             <div class="school-name">{{ $student->school->name ?? 'School Name' }}</div>
             <div class="school-address">{{ $student->school->address ?? 'School Address' }}</div>
             <div class="admit-card-title">EXAMINATION ADMIT CARD</div>
@@ -308,12 +311,27 @@
 
         <div class="signature-section">
             <div class="signature-box">
+                @if($student->grade && $student->grade->teacher && $student->grade->teacher->signature)
+                    <img src="{{ $student->grade->teacher->signature_url }}" alt="Teacher Signature" style="height: 50px; display: block; margin: 0 auto -10px;">
+                @else
+                    <div style="height: 40px;"></div>
+                @endif
                 <div class="signature-line">Class Teacher</div>
             </div>
             <div class="signature-box">
+                @if($student->school->exam_controller_signature)
+                    <img src="{{ $student->school->exam_controller_signature_url }}" alt="Controller Signature" style="height: 50px; display: block; margin: 0 auto -10px;">
+                @else
+                    <div style="height: 40px;"></div>
+                @endif
                 <div class="signature-line">Examination Controller</div>
             </div>
             <div class="signature-box">
+                @if($student->school->principal_signature)
+                    <img src="{{ $student->school->principal_signature_url }}" alt="Principal Signature" style="height: 50px; display: block; margin: 0 auto -10px;">
+                @else
+                    <div style="height: 40px;"></div>
+                @endif
                 <div class="signature-line">Principal</div>
             </div>
         </div>

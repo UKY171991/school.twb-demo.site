@@ -1,9 +1,8 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'Add Grade/Class')
 
 @section('adminlte_css_pre')
-    <link rel="stylesheet" href="{{ asset('css/grades.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 @stop
 
@@ -77,15 +76,21 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="room_number" class="form-label">
-                                        <i class="fas fa-door-open"></i> Room Number
+                                    <label for="teacher_id" class="form-label">
+                                        <i class="fas fa-chalkboard-teacher"></i> Class Teacher
                                     </label>
-                                    <input type="text" name="room_number" class="form-control @error('room_number') is-invalid @enderror" 
-                                           id="room_number" placeholder="e.g., 101, A-205" value="{{ old('room_number') }}">
-                                    @error('room_number')
+                                    <select name="teacher_id" id="teacher_id" class="form-control @error('teacher_id') is-invalid @enderror">
+                                        <option value="">Select Teacher</option>
+                                        @foreach($teachers as $teacher)
+                                            <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}>
+                                                {{ $teacher->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('teacher_id')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
-                                    <small class="form-text text-muted">Classroom or room identifier</small>
+                                    <small class="form-text text-muted">Assign a teacher to this class</small>
                                 </div>
                             </div>
                         </div>
@@ -228,5 +233,4 @@
 @stop
 
 @section('js')
-    <script src="{{ asset('js/grades.js') }}"></script>
 @stop

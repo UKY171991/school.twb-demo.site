@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->middleware('auth')->group(function () {
     // Dashboard route
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
     
     // Profile routes
     Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile.index');
@@ -35,10 +36,13 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::resource('schools', App\Http\Controllers\SchoolController::class);
     Route::post('schools/{school}/switch', [App\Http\Controllers\SchoolController::class, 'switchSchool'])->name('schools.switch');
     Route::get('schools/{school}/remove-logo', [App\Http\Controllers\SchoolController::class, 'removeLogo'])->name('schools.remove-logo');
+    Route::get('schools/{school}/remove-principal-signature', [App\Http\Controllers\SchoolController::class, 'removePrincipalSignature'])->name('schools.remove-principal-signature');
+    Route::get('schools/{school}/remove-exam-controller-signature', [App\Http\Controllers\SchoolController::class, 'removeExamControllerSignature'])->name('schools.remove-exam-controller-signature');
     
     Route::resource('grades', App\Http\Controllers\GradeController::class);
     Route::resource('teachers', App\Http\Controllers\TeacherController::class);
     Route::get('teachers/{teacher}/remove-image', [App\Http\Controllers\TeacherController::class, 'removeImage'])->name('teachers.remove-image');
+    Route::get('teachers/{teacher}/remove-signature', [App\Http\Controllers\TeacherController::class, 'removeSignature'])->name('teachers.remove-signature');
     Route::resource('students', App\Http\Controllers\StudentController::class);
     Route::get('students/{student}/remove-image', [App\Http\Controllers\StudentController::class, 'removeImage'])->name('students.remove-image');
     Route::resource('subjects', App\Http\Controllers\SubjectController::class);

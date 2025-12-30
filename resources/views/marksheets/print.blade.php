@@ -126,9 +126,12 @@
 </head>
 <body>
     <div class="marksheet">
-        <div class="header">
-            <div class="school-name">{{ \App\Models\SystemSetting::get('school_name', 'ABC SCHOOL') }}</div>
-            <div class="school-address">{{ \App\Models\SystemSetting::get('school_address', '123 Education Street, Learning City') }}</div>
+        <div class="header" style="position: relative;">
+            @if($marksheet->student->school->logo)
+                <img src="{{ $marksheet->student->school->logo_url }}" alt="Logo" style="position: absolute; left: 20px; top: 0; height: 80px; width: 80px; object-fit: contain;">
+            @endif
+            <div class="school-name">{{ $marksheet->student->school->name ?? 'School Name' }}</div>
+            <div class="school-address">{{ $marksheet->student->school->address ?? 'School Address' }}</div>
             <div class="marksheet-title">STUDENT MARKSHEET</div>
         </div>
 
@@ -240,12 +243,23 @@
 
         <div class="signature-section">
             <div class="signature-box">
+                @if($marksheet->student->grade && $marksheet->student->grade->teacher && $marksheet->student->grade->teacher->signature)
+                    <img src="{{ $marksheet->student->grade->teacher->signature_url }}" alt="Teacher Signature" style="height: 50px; display: block; margin: 0 auto -10px;">
+                @else
+                    <div style="height: 40px;"></div>
+                @endif
                 <div class="signature-line">Class Teacher</div>
             </div>
             <div class="signature-box">
+                @if($marksheet->student->school->principal_signature)
+                    <img src="{{ $marksheet->student->school->principal_signature_url }}" alt="Principal Signature" style="height: 50px; display: block; margin: 0 auto -10px;">
+                @else
+                    <div style="height: 40px;"></div>
+                @endif
                 <div class="signature-line">Principal</div>
             </div>
             <div class="signature-box">
+                <div style="height: 40px;"></div>
                 <div class="signature-line">Parent's Signature</div>
             </div>
         </div>

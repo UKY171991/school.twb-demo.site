@@ -17,7 +17,9 @@ class Teacher extends Model
         'date_of_birth',
         'date_of_joining',
         'address',
-        'image'
+        'designation',
+        'image',
+        'signature'
     ];
 
     protected $casts = [
@@ -41,5 +43,10 @@ class Teacher extends Model
     public function getImageUrlAttribute()
     {
         return $this->getImageUrl($this->attributes['image'] ?? null);
+    }
+    
+    public function getSignatureUrlAttribute()
+    {
+        return $this->getImageUrl($this->attributes['signature'] ?? null);
     }
 }

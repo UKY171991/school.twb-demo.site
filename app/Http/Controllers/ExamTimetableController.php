@@ -482,7 +482,14 @@ class ExamTimetableController extends Controller
         $section = $request->section;
         $academic_year = $request->academic_year;
 
-        return view('exam-timetables.print', compact('school', 'examType', 'timetables', 'class', 'section', 'academic_year'));
+        // Fetch grade to get class teacher
+        $grade = \App\Models\Grade::where('school_id', $currentSchoolId)
+            ->where('name', $class)
+            ->where('section', $section)
+            ->with('teacher')
+            ->first();
+
+        return view('exam-timetables.print', compact('school', 'examType', 'timetables', 'class', 'section', 'academic_year', 'grade'));
     }
 
     /**

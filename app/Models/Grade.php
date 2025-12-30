@@ -8,9 +8,15 @@ class Grade extends Model
 {
     protected $fillable = [
         'school_id',
+        'teacher_id',
         'name',
         'section'
     ];
+
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class);
+    }
 
     public function school()
     {

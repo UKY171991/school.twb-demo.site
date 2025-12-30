@@ -230,7 +230,10 @@
         <div class="page">
             <div class="page-number">Page {{ ($studentIndex * 2) + 1 }} of {{ $students->count() * 2 }}</div>
             
-            <div class="header">
+            <div class="header" style="position: relative;">
+                @if($student->school->logo)
+                    <img src="{{ $student->school->logo_url }}" alt="Logo" style="position: absolute; left: 0; top: 0; height: 60px; width: 60px; object-fit: contain;">
+                @endif
                 <div class="school-name">{{ $student->school->name ?? 'School Name' }}</div>
                 <div class="school-address">{{ $student->school->address ?? 'School Address' }}</div>
                 <div class="admit-card-title">EXAMINATION ADMIT CARD</div>
@@ -328,12 +331,27 @@
 
             <div class="signature-section">
                 <div class="signature-box">
+                    @if($student->grade && $student->grade->teacher && $student->grade->teacher->signature)
+                        <img src="{{ $student->grade->teacher->signature_url }}" alt="Teacher Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                    @else
+                        <div style="height: 30px;"></div>
+                    @endif
                     <div class="signature-line">Class Teacher</div>
                 </div>
                 <div class="signature-box">
+                    @if($student->school->exam_controller_signature)
+                        <img src="{{ $student->school->exam_controller_signature_url }}" alt="Controller Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                    @else
+                        <div style="height: 30px;"></div>
+                    @endif
                     <div class="signature-line">Exam Controller</div>
                 </div>
                 <div class="signature-box">
+                    @if($student->school->principal_signature)
+                        <img src="{{ $student->school->principal_signature_url }}" alt="Principal Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                    @else
+                        <div style="height: 30px;"></div>
+                    @endif
                     <div class="signature-line">Principal</div>
                 </div>
             </div>
@@ -343,7 +361,10 @@
         <div class="page">
             <div class="page-number">Page {{ ($studentIndex * 2) + 2 }} of {{ $students->count() * 2 }}</div>
             
-            <div class="header">
+            <div class="header" style="position: relative;">
+                @if($student->school->logo)
+                    <img src="{{ $student->school->logo_url }}" alt="Logo" style="position: absolute; left: 0; top: 0; height: 60px; width: 60px; object-fit: contain;">
+                @endif
                 <div class="school-name">{{ $student->school->name ?? 'School Name' }}</div>
                 <div class="school-address">{{ $student->school->address ?? 'School Address' }}</div>
                 <div class="timetable-title">DETAILED EXAMINATION TIMETABLE</div>
@@ -431,12 +452,23 @@
 
             <div class="signature-section">
                 <div class="signature-box">
+                    @if($student->school->exam_controller_signature)
+                        <img src="{{ $student->school->exam_controller_signature_url }}" alt="Controller Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                    @else
+                        <div style="height: 30px;"></div>
+                    @endif
                     <div class="signature-line">Exam Controller</div>
                 </div>
                 <div class="signature-box">
+                    <div style="height: 30px;"></div>
                     <div class="signature-line">Academic Coordinator</div>
                 </div>
                 <div class="signature-box">
+                    @if($student->school->principal_signature)
+                        <img src="{{ $student->school->principal_signature_url }}" alt="Principal Signature" style="height: 40px; display: block; margin: 0 auto -5px;">
+                    @else
+                        <div style="height: 30px;"></div>
+                    @endif
                     <div class="signature-line">Principal</div>
                 </div>
             </div>

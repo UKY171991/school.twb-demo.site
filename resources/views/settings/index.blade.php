@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'System Settings')
 
@@ -35,53 +35,59 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+    <div class="col-md-4 d-flex align-items-stretch">
+        <div class="card h-100 w-100 shadow-sm">
+            <div class="card-header bg-gradient-purple text-white">
                 <h3 class="card-title">
                     <i class="fas fa-graduation-cap"></i> Grading System
                 </h3>
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <p>Configure grade boundaries, pass marks, and grading scales.</p>
-                <a href="{{ route('settings.grading') }}" class="btn btn-primary">
-                    <i class="fas fa-cog"></i> Configure Grading
-                </a>
-                <a href="{{ route('grading-systems.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-list"></i> Manage Grades
-                </a>
+                <div class="mt-auto">
+                    <a href="{{ route('settings.grading') }}" class="btn btn-primary btn-block mb-2">
+                        <i class="fas fa-cog"></i> Configure Grading
+                    </a>
+                    <a href="{{ route('grading-systems.index') }}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-list"></i> Manage Grades
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+    <div class="col-md-4 d-flex align-items-stretch">
+        <div class="card h-100 w-100 shadow-sm">
+            <div class="card-header bg-gradient-indigo text-white">
                 <h3 class="card-title">
                     <i class="fas fa-calculator"></i> Marking System
                 </h3>
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <p>Configure marking schemes, calculation methods, and rounding rules.</p>
-                <a href="{{ route('settings.marking') }}" class="btn btn-primary">
-                    <i class="fas fa-cog"></i> Configure Marking
-                </a>
+                <div class="mt-auto">
+                    <a href="{{ route('settings.marking') }}" class="btn btn-primary btn-block">
+                        <i class="fas fa-cog"></i> Configure Marking
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+    <div class="col-md-4 d-flex align-items-stretch">
+        <div class="card h-100 w-100 shadow-sm">
+            <div class="card-header bg-gradient-navy text-white">
                 <h3 class="card-title">
                     <i class="fas fa-school"></i> School Information
                 </h3>
             </div>
-            <div class="card-body">
+            <div class="card-body d-flex flex-column">
                 <p>Update school details, academic year, and general settings.</p>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#schoolSettingsModal">
-                    <i class="fas fa-cog"></i> Configure School
-                </button>
+                <div class="mt-auto">
+                    <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#schoolSettingsModal">
+                        <i class="fas fa-cog"></i> Configure School
+                    </button>
+                </div>
             </div>
         </div>
     </div>

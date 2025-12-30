@@ -84,7 +84,7 @@ class AdmitCardController extends Controller
             'academic_year' => 'required|string',
         ]);
 
-        $student = Student::with(['grade', 'school'])->findOrFail($request->student_id);
+        $student = Student::with(['grade.teacher', 'school'])->findOrFail($request->student_id);
         $examType = ExamType::findOrFail($request->exam_type_id);
 
         // Determine the class name to use for timetable lookup
@@ -149,7 +149,7 @@ class AdmitCardController extends Controller
                     $q->orWhere('grade_id', $grade->id);
                 }
             })
-            ->with(['grade', 'school']);
+            ->with(['grade.teacher', 'school']);
 
         if ($request->filled('section')) {
             $query->where('section', $request->section);

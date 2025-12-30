@@ -7,7 +7,7 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('css/image-upload.css') }}">
+    <!-- Custom CSS already included in layout -->
 @stop
 
 @section('content')
@@ -108,10 +108,10 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="address">Address</label>
+                            <label for="address"><i class="fas fa-map-marker-alt mr-1"></i> Official School Address</label>
                             <textarea name="address" id="address" rows="3" 
                                       class="form-control @error('address') is-invalid @enderror" 
-                                      placeholder="Enter school address">{{ old('address', $school->address) }}</textarea>
+                                      placeholder="Enter school address" style="border-left: 4px solid #4e73df;">{{ old('address', $school->address) }}</textarea>
                             @error('address')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -119,44 +119,99 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="image-upload-section">
+                <div class="row d-flex align-items-stretch mb-4">
+                    <div class="col-md-4">
+                        <div class="image-upload-section h-100">
                             <label for="logo" class="form-label">School Logo</label>
                             
                             @if($school->logo)
                                 <div class="current-image-section">
                                     <span class="current-image-label">Current Logo:</span>
-                                    <p><small>Path: {{ $school->logo }}</small></p>
-                                    <p><small>URL: {{ $school->logo_url }}</small></p>
-                                    <img src="{{ $school->logo_url }}" alt="Current Logo" 
-                                         class="image-preview" 
-                                         onerror="this.style.border='2px solid red'; this.alt='Image failed to load';">
-                                    <div class="mt-2">
+                                    <img src="{{ $school->logo_url }}" alt="Current Logo" class="image-preview">
+                                    <div class="mt-2 text-center">
                                         <a href="{{ route('schools.remove-logo', $school->id) }}" 
-                                           class="btn btn-sm btn-danger remove-image-btn"
+                                           class="btn btn-sm btn-outline-danger"
                                            onclick="return confirm('Are you sure you want to remove this logo?')">
-                                            <i class="fas fa-trash"></i> Remove Logo
+                                            <i class="fas fa-trash"></i> Remove
                                         </a>
                                     </div>
                                 </div>
                             @else
-                                <div class="alert alert-info">
-                                    <small>No logo uploaded yet.</small>
+                                <div class="alert alert-info py-2">
+                                    <small><i class="fas fa-info-circle mr-1"></i> No logo uploaded yet.</small>
                                 </div>
                             @endif
                             
                             <div class="image-upload-input">
-                                <i class="fas fa-image fa-2x text-muted mb-2"></i>
                                 <input type="file" name="logo" class="form-control-file @error('logo') is-invalid @enderror" 
                                        id="logo" accept="image/*">
                                 @error('logo')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
-                                <div class="image-upload-help">
-                                    Upload new school logo (JPG, PNG, GIF - Max 2MB)
-                                    @if($school->logo) - This will replace the current logo @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="image-upload-section h-100">
+                            <label for="principal_signature" class="form-label">Principal Signature</label>
+                            
+                            @if($school->principal_signature)
+                                <div class="current-image-section">
+                                    <span class="current-image-label">Current Signature:</span>
+                                    <img src="{{ $school->principal_signature_url }}" alt="Principal Signature" class="image-preview">
+                                    <div class="mt-2 text-center">
+                                        <a href="{{ route('schools.remove-principal-signature', $school->id) }}" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to remove this signature?')">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </a>
+                                    </div>
                                 </div>
+                            @else
+                                <div class="alert alert-info py-2">
+                                    <small><i class="fas fa-info-circle mr-1"></i> No signature uploaded yet.</small>
+                                </div>
+                            @endif
+                            
+                            <div class="image-upload-input">
+                                <input type="file" name="principal_signature" class="form-control-file @error('principal_signature') is-invalid @enderror" 
+                                       id="principal_signature" accept="image/*">
+                                @error('principal_signature')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="image-upload-section h-100">
+                            <label for="exam_controller_signature" class="form-label">Exam Controller Signature</label>
+                            
+                            @if($school->exam_controller_signature)
+                                <div class="current-image-section">
+                                    <span class="current-image-label">Current Signature:</span>
+                                    <img src="{{ $school->exam_controller_signature_url }}" alt="Exam Controller Signature" class="image-preview">
+                                    <div class="mt-2 text-center">
+                                        <a href="{{ route('schools.remove-exam-controller-signature', $school->id) }}" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           onclick="return confirm('Are you sure you want to remove this signature?')">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </a>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="alert alert-info py-2">
+                                    <small><i class="fas fa-info-circle mr-1"></i> No signature uploaded yet.</small>
+                                </div>
+                            @endif
+                            
+                            <div class="image-upload-input">
+                                <input type="file" name="exam_controller_signature" class="form-control-file @error('exam_controller_signature') is-invalid @enderror" 
+                                       id="exam_controller_signature" accept="image/*">
+                                @error('exam_controller_signature')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -190,5 +245,5 @@
 @stop
 
 @section('js')
-<script src="{{ asset('js/image-upload.js') }}"></script>
+    <!-- Custom JS already included in layout -->
 @stop

@@ -100,16 +100,29 @@
                             @enderror
                         </div>
                     </div>
+                </div>
+
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="designation">Designation</label>
+                            <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror" 
+                                   id="designation" placeholder="e.g. Senior Math Teacher" value="{{ old('designation', $teacher->designation) }}">
+                            @error('designation')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
                         <div class="image-upload-section">
                             <label for="image" class="form-label">Teacher Photo</label>
                             
                             @if($teacher->image)
                                 <div class="current-image-section">
                                     <span class="current-image-label">Current Photo:</span>
-                                    <p><small>Path: {{ $teacher->image }}</small></p>
-                                    <p><small>URL: {{ $teacher->image_url }}</small></p>
+                                    {{-- <p><small>Path: {{ $teacher->image }}</small></p>
+                                    <p><small>URL: {{ $teacher->image_url }}</small></p> --}}
                                     <img src="{{ $teacher->image_url }}" alt="Current Photo" 
                                          class="image-preview"
                                          onerror="this.style.border='2px solid red'; this.alt='Image failed to load';">
@@ -137,6 +150,45 @@
                                 <div class="image-upload-help">
                                     Upload new teacher photo (JPG, PNG, GIF - Max 2MB)
                                     @if($teacher->image) - This will replace the current image @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="image-upload-section">
+                            <label for="signature" class="form-label">Teacher Signature</label>
+                            
+                            @if($teacher->signature)
+                                <div class="current-image-section">
+                                    <span class="current-image-label">Current Signature:</span>
+                                    <img src="{{ $teacher->signature_url }}" alt="Current Signature" 
+                                         class="image-preview"
+                                         style="max-height: 80px; width: auto;"
+                                         onerror="this.style.border='2px solid red'; this.alt='Image failed to load';">
+                                    <div class="mt-2">
+                                        <a href="{{ route('teachers.remove-signature', $teacher->id) }}" 
+                                           class="btn btn-sm btn-danger remove-image-btn"
+                                           onclick="return confirm('Are you sure you want to remove this signature?')">
+                                            <i class="fas fa-trash"></i> Remove Signature
+                                        </a>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="alert alert-info">
+                                    <small>No signature uploaded yet.</small>
+                                </div>
+                            @endif
+                            
+                            <div class="image-upload-input">
+                                <i class="fas fa-file-signature fa-2x text-muted mb-2"></i>
+                                <input type="file" name="signature" class="form-control-file @error('signature') is-invalid @enderror" 
+                                       id="signature" accept="image/*">
+                                @error('signature')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <div class="image-upload-help">
+                                    Upload signature scan (JPG, PNG - Max 2MB)
                                 </div>
                             </div>
                         </div>

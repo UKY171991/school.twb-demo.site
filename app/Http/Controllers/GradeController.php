@@ -18,9 +18,9 @@ class GradeController extends Controller
     public function index(Request $request)
     {
         $schoolId = session('current_school_id');
-        $query = Grade::withCount('students')->where('school_id', $schoolId);
+        $query = Grade::with(['teacher'])->withCount('students')->where('school_id', $schoolId);
         
-        $grades = $query->get();
+        $grades = $query->paginate(10);
         return view('grades.index', compact('grades'));
     }
 
@@ -29,7 +29,9 @@ class GradeController extends Controller
      */
     public function create()
     {
-        return view('grades.create');
+        $schoolId = session('current_school_id');
+        $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+        return view('grades.create', compact('teachers'));
     }
 
     /**
@@ -40,6 +42,7 @@ class GradeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'section' => 'nullable|string|max:255',
+            'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
         // Add current school context
@@ -59,7 +62,21 @@ class GradeController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $grade = Grade::with(['teacher'])->withCount('students')->findOrFail($id);
+        
+        if (request()->wantsJson()) {
+            return response()->json([
+                'id' => $grade->id,
+                'name' => $grade->name,
+                'section' => $grade->section,
+                'students_count' => $grade->students_count,
+                'created_at' => $grade->created_at->format('d/m/Y'),
+                'status' => 'Active', // Assuming active for now as per view
+                'last_activity' => $grade->updated_at->diffForHumans()
+            ]);
+        }
+        
+        return view('grades.show', compact('grade'));
     }
 
     /**
@@ -68,7 +85,9 @@ class GradeController extends Controller
     public function edit(string $id)
     {
         $grade = Grade::findOrFail($id);
-        return view('grades.edit', compact('grade'));
+        $schoolId = session('current_school_id');
+        $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+        return view('grades.edit', compact('grade', 'teachers'));
     }
 
     /**
@@ -79,6 +98,7 @@ class GradeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'section' => 'nullable|string|max:255',
+            'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
         $grade = Grade::findOrFail($id);

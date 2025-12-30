@@ -118,7 +118,7 @@ class MarksheetController extends Controller
 
     public function print(Marksheet $marksheet)
     {
-        $marksheet->load(['student.grade', 'student.school', 'examType', 'marks.subject']);
+        $marksheet->load(['student.grade.teacher', 'student.school', 'examType', 'marks.subject']);
         
         // Get all marksheets for this student to show all exam types
         $allMarksheets = Marksheet::where('student_id', $marksheet->student_id)
@@ -152,7 +152,7 @@ class MarksheetController extends Controller
      */
     public function printSingle(Marksheet $marksheet)
     {
-        $marksheet->load(['student', 'examType', 'marks.subject']);
+        $marksheet->load(['student.grade.teacher', 'student.school', 'examType', 'marks.subject']);
         return view('marksheets.print', compact('marksheet'));
     }
 

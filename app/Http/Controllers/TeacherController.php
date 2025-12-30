@@ -48,6 +48,8 @@ class TeacherController extends Controller
             'address' => 'nullable|string',
             'school_id' => 'required|exists:schools,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'designation' => 'nullable|string|max:100',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();
@@ -56,6 +58,12 @@ class TeacherController extends Controller
         if ($request->hasFile('image')) {
             $teacher = new Teacher();
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers');
+        }
+        
+        // Handle signature upload
+        if ($request->hasFile('signature')) {
+            $teacher = new Teacher();
+            $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures');
         }
 
         Teacher::create($data);
@@ -95,6 +103,8 @@ class TeacherController extends Controller
             'date_of_joining' => 'nullable|date',
             'address' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'designation' => 'nullable|string|max:100',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $teacher = Teacher::findOrFail($id);
@@ -108,6 +118,11 @@ class TeacherController extends Controller
         // Handle image upload
         if ($request->hasFile('image')) {
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers', $teacher->image);
+        }
+        
+        // Handle signature upload
+        if ($request->hasFile('signature')) {
+            $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures', $teacher->signature);
         }
         
         $teacher->update($data);
@@ -147,5 +162,20 @@ class TeacherController extends Controller
         }
 
         return redirect()->back()->with('success', 'Teacher image removed successfully.');
+    }
+    
+    /**
+     * Remove teacher signature
+     */
+    public function removeSignature(string $id)
+    {
+        $teacher = Teacher::findOrFail($id);
+        
+        if ($teacher->signature) {
+            $teacher->deleteImage($teacher->signature);
+            $teacher->update(['signature' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Teacher signature removed successfully.');
     }
 }

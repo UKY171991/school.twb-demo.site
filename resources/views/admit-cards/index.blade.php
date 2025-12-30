@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'Admit Cards')
 
@@ -299,13 +299,4 @@
         </div>
     </div>
 </div>
-@stop
-
-@section('js')
-<script>
-function generateAdmitCard(studentId, studentName) {
-    document.getElementById('modal_student_id').value = studentId;
-    document.getElementById('modal_student_name').value = studentName;
-}
-</script>
 @stop

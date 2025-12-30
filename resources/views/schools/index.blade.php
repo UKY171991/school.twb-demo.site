@@ -1,9 +1,9 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'Schools Management')
 
 @section('adminlte_css_pre')
-    <link rel="stylesheet" href="{{ asset('css/app-custom.css') }}">
+    @parent
 @stop
 
 @section('content_header')
@@ -68,10 +68,9 @@
                             <td class="text-center">
                                 @if($school->logo)
                                     <img src="{{ $school->logo_url }}" alt="{{ $school->name }} Logo" 
-                                         class="school-logo img-thumbnail" 
-                                         style="width: 55px; height: 55px; object-fit: contain; border-radius: 8px; background-color: #f8f9fa; cursor: pointer;">
+                                         class="school-logo img-thumbnail">
                                 @else
-                                    <div class="logo-placeholder" style="width: 55px; height: 55px; margin: 0 auto;">
+                                    <div class="logo-placeholder">
                                         <i class="fas fa-school"></i>
                                     </div>
                                 @endif
@@ -159,126 +158,4 @@
         </div>
         @endif
     </div>
-@stop
-
-@section('css')
-<style>
-.school-logo {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.school-logo:hover {
-    transform: scale(1.15);
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-}
-
-/* Modal styles for logo preview */
-.logo-modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.9);
-    animation: fadeIn 0.3s ease;
-}
-
-.logo-modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 90%;
-    max-height: 90%;
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.logo-modal img {
-    max-width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-}
-
-.logo-modal-close {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    color: white;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.logo-modal-close:hover {
-    color: #ccc;
-}
-
-.table-actions {
-    display: flex;
-    gap: 0.25rem;
-    flex-wrap: wrap;
-}
-
-.table-actions .btn {
-    padding: 0.375rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-@media (max-width: 768px) {
-    .table-actions {
-        flex-direction: column;
-    }
-    
-    .table-actions .btn {
-        width: 100%;
-    }
-}
-</style>
-@stop
-
-@section('js')
-<script>
-$(document).ready(function() {
-    // Add logo modal functionality
-    $('body').append(`
-        <div id="logoModal" class="logo-modal">
-            <span class="logo-modal-close">&times;</span>
-            <div class="logo-modal-content">
-                <img id="modalLogo" src="" alt="">
-                <p id="modalSchoolName" class="mt-3 mb-0"></p>
-            </div>
-        </div>
-    `);
-    
-    // Handle school logo click
-    $(document).on('click', '.school-logo', function() {
-        const imageSrc = $(this).attr('src');
-        const schoolName = $(this).attr('alt');
-        
-        $('#modalLogo').attr('src', imageSrc).attr('alt', schoolName);
-        $('#modalSchoolName').text(schoolName);
-        $('#logoModal').fadeIn(300);
-    });
-    
-    // Close modal when clicking the close button or outside the image
-    $(document).on('click', '.logo-modal-close, #logoModal', function(e) {
-        if (e.target === this || $(e.target).hasClass('logo-modal-close')) {
-            $('#logoModal').fadeOut(300);
-        }
-    });
-    
-    // Close modal with Escape key
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Escape') {
-            $('#logoModal').fadeOut(300);
-        }
-    });
-});
-</script>
 @stop

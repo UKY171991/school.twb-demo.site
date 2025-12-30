@@ -40,6 +40,8 @@ class SchoolController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'exam_controller_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();
@@ -48,6 +50,17 @@ class SchoolController extends Controller
         if ($request->hasFile('logo')) {
             $school = new School();
             $data['logo'] = $school->uploadImage($request->file('logo'), 'schools/logos');
+        }
+
+        // Handle signatures
+        if ($request->hasFile('principal_signature')) {
+            $school = new School();
+            $data['principal_signature'] = $school->uploadImage($request->file('principal_signature'), 'schools/signatures');
+        }
+
+        if ($request->hasFile('exam_controller_signature')) {
+            $school = new School();
+            $data['exam_controller_signature'] = $school->uploadImage($request->file('exam_controller_signature'), 'schools/signatures');
         }
 
         School::create($data);
@@ -97,6 +110,8 @@ class SchoolController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'exam_controller_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();
@@ -104,6 +119,15 @@ class SchoolController extends Controller
         // Handle logo upload
         if ($request->hasFile('logo')) {
             $data['logo'] = $school->uploadImage($request->file('logo'), 'schools/logos', $school->logo);
+        }
+
+        // Handle signatures
+        if ($request->hasFile('principal_signature')) {
+            $data['principal_signature'] = $school->uploadImage($request->file('principal_signature'), 'schools/signatures', $school->principal_signature);
+        }
+
+        if ($request->hasFile('exam_controller_signature')) {
+            $data['exam_controller_signature'] = $school->uploadImage($request->file('exam_controller_signature'), 'schools/signatures', $school->exam_controller_signature);
         }
 
         $school->update($data);
@@ -156,9 +180,6 @@ class SchoolController extends Controller
                         ->with('success', 'Switched to ' . $school->name);
     }
 
-    /**
-     * Remove school logo
-     */
     public function removeLogo(School $school)
     {
         if ($school->logo) {
@@ -167,5 +188,31 @@ class SchoolController extends Controller
         }
 
         return redirect()->back()->with('success', 'School logo removed successfully.');
+    }
+
+    /**
+     * Remove principal signature
+     */
+    public function removePrincipalSignature(School $school)
+    {
+        if ($school->principal_signature) {
+            $school->deleteImage($school->principal_signature);
+            $school->update(['principal_signature' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Principal signature removed successfully.');
+    }
+
+    /**
+     * Remove exam controller signature
+     */
+    public function removeExamControllerSignature(School $school)
+    {
+        if ($school->exam_controller_signature) {
+            $school->deleteImage($school->exam_controller_signature);
+            $school->update(['exam_controller_signature' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Exam controller signature removed successfully.');
     }
 }

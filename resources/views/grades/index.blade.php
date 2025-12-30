@@ -1,9 +1,9 @@
-@extends('adminlte::page')
+@extends('layouts.app')
 
 @section('title', 'Grades/Classes Management')
 
 @section('adminlte_css_pre')
-    <link rel="stylesheet" href="{{ asset('css/grades.css') }}">
+    @parent
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 @stop
 
@@ -162,9 +162,9 @@
                                 </div>
                             </td>
                             <td>
-                                @if($grade->class_teacher)
+                                @if($grade->teacher)
                                     <span class="text-muted">
-                                        <i class="fas fa-chalkboard-teacher"></i> {{ $grade->class_teacher }}
+                                        <i class="fas fa-chalkboard-teacher text-info"></i> {{ $grade->teacher->name }}
                                     </span>
                                 @else
                                     <span class="text-muted">Not assigned</span>
@@ -221,9 +221,3 @@
     </div>
 @stop
 
-@section('css')
-@stop
-
-@section('js')
-    <script src="{{ asset('js/grades.js') }}"></script>
-@stop
