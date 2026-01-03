@@ -30,7 +30,7 @@
             <div class="stat-icon">
                 <i class="fas fa-layer-group"></i>
             </div>
-            <?php print_r($grades);?>
+            <?php print_r($grades); ?>
             <div class="stat-value" id="totalGrades">{{ $grades->count() }}</div>
             <div class="stat-label">Total Classes</div>
         </div>
