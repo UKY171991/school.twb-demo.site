@@ -17,21 +17,26 @@ class GradeController extends Controller
      */
     public function index(Request $request)
     {
-        // Get school ID from request (set by middleware) or session
-        $schoolId = $request->input('current_school_id') ?: session('current_school_id');
+        // Get school ID from multiple sources with fallback
+        $schoolId = $request->input('current_school_id') 
+                   ?: session('current_school_id')
+                   ?: \App\Models\School::value('id');
         
-        // If still no school context, get the first school
+        // Ensure we have a valid school ID
         if (!$schoolId) {
-            $firstSchool = \App\Models\School::first();
-            if ($firstSchool) {
-                $schoolId = $firstSchool->id;
-                session(['current_school_id' => $schoolId]);
-                $request->merge(['current_school_id' => $schoolId]);
-            }
+            // Create a default school if none exists
+            $school = \App\Models\School::firstOrCreate([
+                'code' => 'DEFAULT'
+            ], [
+                'name' => 'Default School',
+                'address' => 'Default Address',
+                'status' => 'active'
+            ]);
+            $schoolId = $school->id;
+            session(['current_school_id' => $schoolId]);
         }
         
         $query = Grade::with(['teacher'])->withCount('students')->where('school_id', $schoolId);
-
         $grades = $query->paginate(10);
 
         return view('grades.index', compact('grades'));
@@ -42,17 +47,23 @@ class GradeController extends Controller
      */
     public function create()
     {
-        // Get school ID from request (set by middleware) or session
-        $schoolId = $request->input('current_school_id') ?: session('current_school_id');
+        // Get school ID from multiple sources with fallback
+        $schoolId = $request->input('current_school_id') 
+                   ?: session('current_school_id')
+                   ?: \App\Models\School::value('id');
         
-        // If still no school context, get the first school
+        // Ensure we have a valid school ID
         if (!$schoolId) {
-            $firstSchool = \App\Models\School::first();
-            if ($firstSchool) {
-                $schoolId = $firstSchool->id;
-                session(['current_school_id' => $schoolId]);
-                $request->merge(['current_school_id' => $schoolId]);
-            }
+            // Create a default school if none exists
+            $school = \App\Models\School::firstOrCreate([
+                'code' => 'DEFAULT'
+            ], [
+                'name' => 'Default School',
+                'address' => 'Default Address',
+                'status' => 'active'
+            ]);
+            $schoolId = $school->id;
+            session(['current_school_id' => $schoolId]);
         }
         
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
@@ -119,17 +130,23 @@ class GradeController extends Controller
      */
     public function edit(string $id, Request $request)
     {
-        // Get school ID from request (set by middleware) or session
-        $schoolId = $request->input('current_school_id') ?: session('current_school_id');
+        // Get school ID from multiple sources with fallback
+        $schoolId = $request->input('current_school_id') 
+                   ?: session('current_school_id')
+                   ?: \App\Models\School::value('id');
         
-        // If still no school context, get the first school
+        // Ensure we have a valid school ID
         if (!$schoolId) {
-            $firstSchool = \App\Models\School::first();
-            if ($firstSchool) {
-                $schoolId = $firstSchool->id;
-                session(['current_school_id' => $schoolId]);
-                $request->merge(['current_school_id' => $schoolId]);
-            }
+            // Create a default school if none exists
+            $school = \App\Models\School::firstOrCreate([
+                'code' => 'DEFAULT'
+            ], [
+                'name' => 'Default School',
+                'address' => 'Default Address',
+                'status' => 'active'
+            ]);
+            $schoolId = $school->id;
+            session(['current_school_id' => $schoolId]);
         }
         
         $grade = Grade::findOrFail($id);
