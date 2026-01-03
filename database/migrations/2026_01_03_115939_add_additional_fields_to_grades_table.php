@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('grades', function (Blueprint $table) {
-            //
+            $table->integer('capacity')->nullable()->default(40)->after('teacher_id');
+            $table->text('description')->nullable()->after('capacity');
+            $table->integer('grade_theme')->nullable()->default(1)->after('description');
+            $table->string('status')->nullable()->default('active')->after('grade_theme');
         });
     }
 
@@ -22,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('grades', function (Blueprint $table) {
-            //
+            $table->dropColumn(['capacity', 'description', 'grade_theme', 'status']);
         });
     }
 };
