@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Management System</title>
+    <title>TheWebBrain - School Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -128,7 +128,7 @@
     <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-graduation-cap"></i> SchoolMS
+                <i class="fas fa-graduation-cap"></i> TheWebBrain
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -318,7 +318,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="fas fa-graduation-cap"></i> School Management System</h5>
+                    <h5><i class="fas fa-graduation-cap"></i> TheWebBrain</h5>
                     <p class="mt-3">Empowering education through technology. Making school management simple, efficient, and effective.</p>
                 </div>
                 <div class="col-md-3">
@@ -340,7 +340,7 @@
             </div>
             <hr class="bg-white-50 my-4">
             <div class="text-center">
-                <p class="mb-0">&copy; {{ date('Y') }} School Management System. All rights reserved.</p>
+                <p class="mb-0">&copy; {{ date('Y') }} TheWebBrain. All rights reserved.</p>
             </div>
         </div>
     </footer>
