@@ -30,7 +30,7 @@
                         <th>ID</th>
                         <th>Subject Name</th>
                         <th>Code</th>
-                        <th>Grade/Class</th>
+                        <th>Class</th>
                         <th>Teacher</th>
                         <th>Max/Pass Marks</th>
                         <th>Actions</th>
