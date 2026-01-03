@@ -149,7 +149,7 @@
                 </div>
                 <div class="col-md-2 col-sm-4 col-6 mb-3">
                     <a href="{{ route('grades.create') }}" class="btn btn-app btn-block bg-light hover-shadow">
-                        <i class="fas fa-layer-group text-warning"></i> Add Grade
+                        <i class="fas fa-layer-group text-warning"></i> Add Class
                     </a>
                 </div>
                 <div class="col-md-2 col-sm-4 col-6 mb-3">
