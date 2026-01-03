@@ -38,7 +38,7 @@
                             <th width="8%">Photo</th>
                             <th width="20%">Name</th>
                             <th width="20%">Email</th>
-                            <th width="15%">Grade/Class</th>
+                            <th width="15%">Class</th>
                             <th width="10%">Gender</th>
                             <th width="12%">Date of Birth</th>
                             <th width="10%">Actions</th>

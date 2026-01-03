@@ -41,9 +41,9 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="grade_id">Grade/Class <span class="text-danger">*</span></label>
+                            <label for="grade_id">Class <span class="text-danger">*</span></label>
                             <select name="grade_id" id="grade_id" class="form-control @error('grade_id') is-invalid @enderror" required>
-                                <option value="">Select Grade</option>
+                                <option value="">Select Class</option>
                                 @foreach($grades as $grade)
                                     <option value="{{ $grade->id }}" {{ old('grade_id', $student->grade_id) == $grade->id ? 'selected' : '' }}>
                                         {{ $grade->name }} @if($grade->section) - {{ $grade->section }} @endif

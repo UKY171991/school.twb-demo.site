@@ -54,7 +54,7 @@
                 <div class="col-md-6">
                     <table class="table table-bordered">
                         <tr>
-                            <th width="200">Grade/Class</th>
+                            <th width="200">Class</th>
                             <td>
                                 <span class="badge badge-info">
                                     {{ $student->grade->name ?? 'N/A' }}
