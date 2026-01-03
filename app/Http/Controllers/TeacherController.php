@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Teacher;
+use App\Models\School;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
@@ -30,7 +31,8 @@ class TeacherController extends Controller
      */
     public function create()
     {
-        return view('teachers.create');
+        $schools = School::where('status', 'active')->orderBy('name')->get();
+        return view('teachers.create', compact('schools'));
     }
 
     /**
@@ -86,8 +88,9 @@ class TeacherController extends Controller
     public function edit(string $id)
     {
         $teacher = Teacher::findOrFail($id);
+        $schools = School::where('status', 'active')->orderBy('name')->get();
 
-        return view('teachers.edit', compact('teacher'));
+        return view('teachers.edit', compact('teacher', 'schools'));
     }
 
     /**
