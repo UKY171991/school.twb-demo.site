@@ -102,6 +102,10 @@ class GradeController extends Controller
             'name' => 'required|string|max:255',
             'section' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|exists:teachers,id',
+            'capacity' => 'nullable|integer|min:1|max:100',
+            'description' => 'nullable|string|max:1000',
+            'grade_theme' => 'nullable|integer|min:1|max:12',
+            'status' => 'nullable|string|in:active,inactive,upcoming',
         ]);
 
         $grade = Grade::findOrFail($id);
@@ -111,6 +115,11 @@ class GradeController extends Controller
         if ($request->has('current_school_id')) {
             $data['school_id'] = $request->get('current_school_id');
         }
+
+        // Set default values if not provided
+        $data['capacity'] = $data['capacity'] ?? 40;
+        $data['grade_theme'] = $data['grade_theme'] ?? 1;
+        $data['status'] = $data['status'] ?? 'active';
 
         $grade->update($data);
 
