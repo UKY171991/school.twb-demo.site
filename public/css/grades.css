@@ -367,6 +367,20 @@
     box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
+/* Color Option Background Colors */
+.color-option.grade-1 { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+.color-option.grade-2 { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+.color-option.grade-3 { background: linear-gradient(135deg, #45B7D1, #2196F3); }
+.color-option.grade-4 { background: linear-gradient(135deg, #96CEB4, #88D8B0); }
+.color-option.grade-5 { background: linear-gradient(135deg, #FFEAA7, #FDCB6E); }
+.color-option.grade-6 { background: linear-gradient(135deg, #DDA0DD, #DA70D6); }
+.color-option.grade-7 { background: linear-gradient(135deg, #98D8C8, #6DC0D5); }
+.color-option.grade-8 { background: linear-gradient(135deg, #F7DC6F, #F4D03F); }
+.color-option.grade-9 { background: linear-gradient(135deg, #BB8FCE, #8E44AD); }
+.color-option.grade-10 { background: linear-gradient(135deg, #85C1E2, #3498DB); }
+.color-option.grade-11 { background: linear-gradient(135deg, #F8B739, #F39C12); }
+.color-option.grade-12 { background: linear-gradient(135deg, #EC7063, #E74C3C); }
+
 /* Recent Grades */
 .recent-grades {
     display: flex;
