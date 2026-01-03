@@ -405,6 +405,19 @@ return [
             'icon' => 'fas fa-fw fa-wallet',
             'active' => ['admin/teacher-salaries*'],
         ],
+        ['header' => 'EXAM SETUP'],
+        [
+            'text' => 'Exam Types',
+            'route' => 'exam-types.index',
+            'icon' => 'fas fa-fw fa-clipboard-list',
+            'active' => ['admin/exam-types*'],
+        ],
+        [
+            'text' => 'Grading System',
+            'route' => 'grading-systems.index',
+            'icon' => 'fas fa-fw fa-graduation-cap',
+            'active' => ['admin/grading-systems*'],
+        ],
         ['header' => 'MARKSHEETS & RESULTS'],
         [
             'text' => 'Marksheets',
@@ -438,16 +451,10 @@ return [
             'active' => ['admin/settings*'],
         ],
         [
-            'text' => 'Grading System',
-            'route' => 'grading-systems.index',
-            'icon' => 'fas fa-fw fa-graduation-cap',
-            'active' => ['admin/grading-systems*'],
-        ],
-        [
-            'text' => 'Exam Types',
-            'route' => 'exam-types.index',
-            'icon' => 'fas fa-fw fa-clipboard-list',
-            'active' => ['admin/exam-types*'],
+            'text' => 'Settings',
+            'route' => 'settings.index',
+            'icon' => 'fas fa-fw fa-cogs',
+            'active' => ['admin/settings*'],
         ],
         ['header' => 'ACCOUNT SETTINGS'],
         [

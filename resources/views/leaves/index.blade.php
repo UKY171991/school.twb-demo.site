@@ -16,7 +16,7 @@
         <div class="card-header">
             <h3 class="card-title">Student Leaves</h3>
             <div class="card-tools">
-                <a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm">New Leave</a>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openLeaveForm('create')">New Leave</button>
             </div>
         </div>
         <div class="card-body">
@@ -171,5 +171,4 @@ $(function(){ loadLeaves(); });
   </div>
 </div>
 
-@stop
 @stop

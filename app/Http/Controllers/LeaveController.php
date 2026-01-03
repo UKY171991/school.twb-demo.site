@@ -14,10 +14,10 @@ class LeaveController extends Controller
 {
     public function index(Request $request)
     {
+        $schoolId = $request->current_school_id;
         try {
-            $leaves = Leave::with(['student', 'grade'])->orderBy('start_date', 'desc')->paginate(25);
+            $leaves = Leave::where('school_id', $schoolId)->with(['student', 'grade'])->orderBy('start_date', 'desc')->paginate(25);
         } catch (QueryException $e) {
-            // If the table doesn't exist yet, return an empty paginator so the page doesn't 500
             if (str_contains($e->getMessage(), 'no such table') || !Schema::hasTable('leaves')) {
                 $leaves = new LengthAwarePaginator([], 0, 25);
             } else {
@@ -34,16 +34,21 @@ class LeaveController extends Controller
 
     public function create()
     {
-        $students = Student::orderBy('name')->get();
-        $grades = Grade::orderBy('name')->get();
+        $schoolId = request()->current_school_id;
+        $students = Student::where('school_id', $schoolId)->orderBy('name')->get();
+        $grades = Grade::where('school_id', $schoolId)->orderBy('name')->get();
+        $leave = new Leave();
+        
         if (request()->ajax()) {
-            return view('leaves._form', compact('students', 'grades'));
+            return view('leaves._form', compact('leave', 'students', 'grades'));
         }
-        return view('leaves.create', compact('students', 'grades'));
+        return view('leaves.create', compact('leave', 'students', 'grades'));
     }
 
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+        
         $data = $request->validate([
             'student_id' => 'nullable|exists:students,id',
             'grade_id' => 'nullable|exists:grades,id',
@@ -53,6 +58,7 @@ class LeaveController extends Controller
             'type' => 'required|string',
         ]);
 
+        $data['school_id'] = $schoolId;
         $data['created_by'] = auth()->id();
 
         if (!Schema::hasTable('leaves')) {

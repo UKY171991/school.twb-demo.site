@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 
 class HolidayController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $holidays = Holiday::orderBy('start_date', 'desc')->paginate(25);
+        $schoolId = $request->current_school_id;
+        $holidays = Holiday::where('school_id', $schoolId)->orderBy('start_date', 'desc')->paginate(25);
         if (request()->wantsJson() || request()->ajax()) {
             return response()->json($holidays);
         }
@@ -18,14 +19,17 @@ class HolidayController extends Controller
 
     public function create()
     {
+        $holiday = new Holiday();
         if (request()->ajax()) {
-            return view('holidays._form');
+            return view('holidays._form', compact('holiday'));
         }
-        return view('holidays.create');
+        return view('holidays.create', compact('holiday'));
     }
 
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
         $data = $request->validate([
             'title' => 'required|string',
             'start_date' => 'required|date',
@@ -33,6 +37,7 @@ class HolidayController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        $data['school_id'] = $schoolId;
         $data['created_by'] = auth()->id();
 
         $holiday = Holiday::create($data);

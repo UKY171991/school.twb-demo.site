@@ -16,7 +16,7 @@
         <div class="card-header">
             <h3 class="card-title">Holiday Calendar</h3>
             <div class="card-tools">
-                <a href="{{ route('holidays.create') }}" class="btn btn-primary btn-sm">New Holiday</a>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openHolidayForm('create')">New Holiday</button>
             </div>
         </div>
         <div class="card-body">
@@ -79,7 +79,7 @@ function renderHolidaysTable(resp){
         html += `</ul></nav>`;
     }
 
-    html = `<div class="mb-2"><button class="btn btn-primary" id="new-holiday-btn">New Holiday</button></div>` + html;
+    // html = `<div class="mb-2"><button class="btn btn-primary" id="new-holiday-btn">New Holiday</button></div>` + html; // Removed duplicate button
 
     $('#holidays-table-container').html(html);
     $('#new-holiday-btn').click(function(){ openHolidayForm('create'); });
@@ -166,5 +166,4 @@ $(function(){ loadHolidays(); });
   </div>
 </div>
 
-@stop
 @stop
