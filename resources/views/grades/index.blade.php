@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Grades/Classes Management')
+@section('title', 'Classes Management')
 
 @section('adminlte_css_pre')
     @parent
@@ -9,8 +9,8 @@
 
 @section('content_header')
     <div class="grades-header">
-        <h1><i class="fas fa-graduation-cap"></i> Grades/Classes Management</h1>
-        <p class="subtitle">Manage academic grades, sections, and student assignments</p>
+        <h1><i class="fas fa-graduation-cap"></i> Classes Management</h1>
+        <p class="subtitle">Manage academic classes, sections, and student assignments</p>
     </div>
 @stop
 
@@ -31,7 +31,7 @@
                 <i class="fas fa-layer-group"></i>
             </div>
             <div class="stat-value" id="totalGrades">{{ $grades->count() }}</div>
-            <div class="stat-label">Total Grades</div>
+            <div class="stat-label">Total Classes</div>
         </div>
         <div class="stat-card students">
             <div class="stat-icon">
@@ -52,7 +52,7 @@
                 <i class="fas fa-chart-bar"></i>
             </div>
             <div class="stat-value" id="avgStudents">{{ $grades->count() > 0 ? round($grades->sum('students_count') / $grades->count()) : 0 }}</div>
-            <div class="stat-label">Avg Students/Grade</div>
+            <div class="stat-label">Avg Students/Class</div>
         </div>
     </div>
 
@@ -65,14 +65,14 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
                         </div>
-                        <input type="text" class="form-control" id="gradeSearch" placeholder="Search grades...">
+                        <input type="text" class="form-control" id="gradeSearch" placeholder="Search classes...">
                     </div>
                 </div>
                 <div class="col-md-2">
                     <select class="form-control" id="gradeFilter">
-                        <option value="">All Grades</option>
+                        <option value="">All Classes</option>
                         @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}">Grade {{ $i }}</option>
+                            <option value="{{ $i }}">Class {{ $i }}</option>
                         @endfor
                     </select>
                 </div>
@@ -93,7 +93,7 @@
                             <i class="fas fa-tasks"></i> Bulk Actions
                         </button>
                         <a href="{{ route('grades.create') }}" class="btn btn-add-grade btn-sm">
-                            <i class="fas fa-plus"></i> Add New Grade
+                            <i class="fas fa-plus"></i> Add New Class
                         </a>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
     <!-- Grades Table -->
     <div class="card grade-card">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list"></i> List of Grades/Classes</h3>
+            <h3 class="card-title"><i class="fas fa-list"></i> List of Classes</h3>
             <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                     <i class="fas fa-minus"></i>
@@ -125,7 +125,7 @@
                                     <label class="custom-control-label" for="selectAll"></label>
                                 </div>
                             </th>
-                            <th width="15%">Grade</th>
+                            <th width="15%">Class</th>
                             <th width="15%">Section</th>
                             <th width="20%">Students Count</th>
                             <th width="15%">Class Teacher</th>
@@ -200,10 +200,10 @@
                                     <div class="icon">
                                         <i class="fas fa-graduation-cap"></i>
                                     </div>
-                                    <h3>No Grades Found</h3>
-                                    <p>Start by adding your first grade to begin organizing your classes.</p>
+                                    <h3>No Classes Found</h3>
+                                    <p>Start by adding your first class to begin organizing your students.</p>
                                     <a href="{{ route('grades.create') }}" class="btn btn-add-grade">
-                                        <i class="fas fa-plus"></i> Add First Grade
+                                        <i class="fas fa-plus"></i> Add First Class
                                     </a>
                                 </div>
                             </td>

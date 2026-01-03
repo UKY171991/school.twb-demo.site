@@ -362,7 +362,7 @@ return [
             'active' => ['admin/students*'],
         ],
         [
-            'text' => 'Grades/Classes',
+            'text' => 'Classes',
             'route' => 'grades.index',
             'icon' => 'fas fa-fw fa-layer-group',
             'active' => ['admin/grades*'],
