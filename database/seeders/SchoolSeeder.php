@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\School;
+use Illuminate\Database\Seeder;
 
 class SchoolSeeder extends Seeder
 {
@@ -23,7 +22,7 @@ class SchoolSeeder extends Seeder
                 'website' => 'https://www.greenwoodhigh.edu',
                 'principal_name' => 'Dr. Sarah Johnson',
                 'description' => 'A premier educational institution committed to excellence in academics and character development.',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Riverside Elementary School',
@@ -34,7 +33,7 @@ class SchoolSeeder extends Seeder
                 'website' => 'https://www.riverside-elem.edu',
                 'principal_name' => 'Mr. Michael Chen',
                 'description' => 'Nurturing young minds with innovative teaching methods and a caring environment.',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Oakwood Academy',
@@ -45,8 +44,8 @@ class SchoolSeeder extends Seeder
                 'website' => 'https://www.oakwoodacademy.edu',
                 'principal_name' => 'Ms. Emily Rodriguez',
                 'description' => 'A comprehensive K-12 institution focusing on STEM education and arts integration.',
-                'status' => 'active'
-            ]
+                'status' => 'active',
+            ],
         ];
 
         foreach ($schools as $school) {

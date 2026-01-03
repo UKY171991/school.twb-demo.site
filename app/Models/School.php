@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Traits\ImageUploadTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\ImageUploadTrait;
 
 class School extends Model
 {
@@ -23,11 +23,11 @@ class School extends Model
         'logo',
         'description',
         'status',
-        'settings'
+        'settings',
     ];
 
     protected $casts = [
-        'settings' => 'array'
+        'settings' => 'array',
     ];
 
     // Relationships

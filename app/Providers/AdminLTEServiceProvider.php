@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Models\SystemSetting;
+use Illuminate\Support\ServiceProvider;
 
 class AdminLTEServiceProvider extends ServiceProvider
 {
@@ -26,7 +26,7 @@ class AdminLTEServiceProvider extends ServiceProvider
                 $schoolName = SystemSetting::get('school_name', 'SchoolMS');
                 $schoolLogo = SystemSetting::get('school_logo', 'vendor/adminlte/dist/img/AdminLTELogo.png');
                 $schoolFavicon = SystemSetting::get('school_favicon');
-                
+
                 $view->with([
                     'dynamicSchoolName' => $schoolName,
                     'dynamicSchoolLogo' => $schoolLogo,
@@ -46,12 +46,12 @@ class AdminLTEServiceProvider extends ServiceProvider
         try {
             $schoolName = SystemSetting::get('school_name', 'SchoolMS');
             $schoolLogo = SystemSetting::get('school_logo');
-            
+
             if ($schoolName) {
                 config(['adminlte.title' => $schoolName]);
-                config(['adminlte.logo' => '<b>' . $schoolName . '</b>']);
+                config(['adminlte.logo' => '<b>'.$schoolName.'</b>']);
             }
-            
+
             if ($schoolLogo) {
                 config(['adminlte.logo_img' => $schoolLogo]);
                 config(['adminlte.auth_logo.img.path' => $schoolLogo]);

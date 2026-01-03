@@ -19,8 +19,9 @@ class GradeController extends Controller
     {
         $schoolId = session('current_school_id');
         $query = Grade::with(['teacher'])->withCount('students')->where('school_id', $schoolId);
-        
+
         $grades = $query->paginate(10);
+
         return view('grades.index', compact('grades'));
     }
 
@@ -31,6 +32,7 @@ class GradeController extends Controller
     {
         $schoolId = session('current_school_id');
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+
         return view('grades.create', compact('teachers'));
     }
 
@@ -54,7 +56,7 @@ class GradeController extends Controller
         Grade::create($data);
 
         return redirect()->route('grades.index')
-                        ->with('success','Grade created successfully.');
+            ->with('success', 'Grade created successfully.');
     }
 
     /**
@@ -63,7 +65,7 @@ class GradeController extends Controller
     public function show(string $id)
     {
         $grade = Grade::with(['teacher'])->withCount('students')->findOrFail($id);
-        
+
         if (request()->wantsJson()) {
             return response()->json([
                 'id' => $grade->id,
@@ -72,10 +74,10 @@ class GradeController extends Controller
                 'students_count' => $grade->students_count,
                 'created_at' => $grade->created_at->format('d/m/Y'),
                 'status' => 'Active', // Assuming active for now as per view
-                'last_activity' => $grade->updated_at->diffForHumans()
+                'last_activity' => $grade->updated_at->diffForHumans(),
             ]);
         }
-        
+
         return view('grades.show', compact('grade'));
     }
 
@@ -87,6 +89,7 @@ class GradeController extends Controller
         $grade = Grade::findOrFail($id);
         $schoolId = session('current_school_id');
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+
         return view('grades.edit', compact('grade', 'teachers'));
     }
 
@@ -102,17 +105,17 @@ class GradeController extends Controller
         ]);
 
         $grade = Grade::findOrFail($id);
-        
+
         // Add current school context
         $data = $request->all();
         if ($request->has('current_school_id')) {
             $data['school_id'] = $request->get('current_school_id');
         }
-        
+
         $grade->update($data);
 
         return redirect()->route('grades.index')
-                        ->with('success','Grade updated successfully.');
+            ->with('success', 'Grade updated successfully.');
     }
 
     /**
@@ -124,7 +127,7 @@ class GradeController extends Controller
         $grade->delete();
 
         return redirect()->route('grades.index')
-                        ->with('success','Grade deleted successfully.');
+            ->with('success', 'Grade deleted successfully.');
     }
 
     /**
@@ -136,7 +139,7 @@ class GradeController extends Controller
             ->select('id', 'name', 'section')
             ->orderBy('name')
             ->get();
-            
+
         return response()->json($grades);
     }
 }

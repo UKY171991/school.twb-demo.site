@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\Teacher;
+use Illuminate\Http\Request;
 
 class TeacherController extends Controller
 {
@@ -20,8 +19,9 @@ class TeacherController extends Controller
     {
         $schoolId = session('current_school_id');
         $query = Teacher::where('school_id', $schoolId);
-        
+
         $teachers = $query->latest()->paginate(10);
+
         return view('teachers.index', compact('teachers'));
     }
 
@@ -56,20 +56,20 @@ class TeacherController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $teacher = new Teacher();
+            $teacher = new Teacher;
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers');
         }
-        
+
         // Handle signature upload
         if ($request->hasFile('signature')) {
-            $teacher = new Teacher();
+            $teacher = new Teacher;
             $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures');
         }
 
         Teacher::create($data);
 
         return redirect()->route('teachers.index')
-                        ->with('success','Teacher created successfully.');
+            ->with('success', 'Teacher created successfully.');
     }
 
     /**
@@ -86,6 +86,7 @@ class TeacherController extends Controller
     public function edit(string $id)
     {
         $teacher = Teacher::findOrFail($id);
+
         return view('teachers.edit', compact('teacher'));
     }
 
@@ -108,7 +109,7 @@ class TeacherController extends Controller
         ]);
 
         $teacher = Teacher::findOrFail($id);
-        
+
         // Add current school context
         $data = $request->all();
         if ($request->has('current_school_id')) {
@@ -119,16 +120,16 @@ class TeacherController extends Controller
         if ($request->hasFile('image')) {
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers', $teacher->image);
         }
-        
+
         // Handle signature upload
         if ($request->hasFile('signature')) {
             $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures', $teacher->signature);
         }
-        
+
         $teacher->update($data);
 
         return redirect()->route('teachers.index')
-                        ->with('success','Teacher updated successfully.');
+            ->with('success', 'Teacher updated successfully.');
     }
 
     /**
@@ -137,16 +138,16 @@ class TeacherController extends Controller
     public function destroy(string $id)
     {
         $teacher = Teacher::findOrFail($id);
-        
+
         // Delete teacher image if exists
         if ($teacher->image) {
             $teacher->deleteImage($teacher->image);
         }
-        
+
         $teacher->delete();
 
         return redirect()->route('teachers.index')
-                        ->with('success','Teacher deleted successfully.');
+            ->with('success', 'Teacher deleted successfully.');
     }
 
     /**
@@ -155,7 +156,7 @@ class TeacherController extends Controller
     public function removeImage(string $id)
     {
         $teacher = Teacher::findOrFail($id);
-        
+
         if ($teacher->image) {
             $teacher->deleteImage($teacher->image);
             $teacher->update(['image' => null]);
@@ -163,14 +164,14 @@ class TeacherController extends Controller
 
         return redirect()->back()->with('success', 'Teacher image removed successfully.');
     }
-    
+
     /**
      * Remove teacher signature
      */
     public function removeSignature(string $id)
     {
         $teacher = Teacher::findOrFail($id);
-        
+
         if ($teacher->signature) {
             $teacher->deleteImage($teacher->signature);
             $teacher->update(['signature' => null]);

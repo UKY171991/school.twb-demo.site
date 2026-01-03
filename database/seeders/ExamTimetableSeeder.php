@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\ExamTimetable;
-use App\Models\School;
 use App\Models\ExamType;
+use App\Models\School;
 use App\Models\Subject;
+use Illuminate\Database\Seeder;
 
 class ExamTimetableSeeder extends Seeder
 {
@@ -17,23 +16,23 @@ class ExamTimetableSeeder extends Seeder
     public function run(): void
     {
         $schools = School::all();
-        
+
         foreach ($schools as $school) {
             $examTypes = ExamType::where('school_id', $school->id)->get();
             $subjects = Subject::where('school_id', $school->id)->take(5)->get();
-            
+
             if ($examTypes->isEmpty() || $subjects->isEmpty()) {
                 continue;
             }
-            
+
             $classes = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
             $sections = ['A', 'B'];
-            
+
             foreach ($examTypes->take(2) as $examType) { // Only first 2 exam types
                 foreach ($classes as $class) {
                     foreach ($sections as $section) {
                         $startDate = now()->addDays(rand(10, 30));
-                        
+
                         foreach ($subjects as $index => $subject) {
                             ExamTimetable::create([
                                 'school_id' => $school->id,

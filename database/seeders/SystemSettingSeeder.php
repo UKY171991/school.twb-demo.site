@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\SystemSetting;
+use Illuminate\Database\Seeder;
 
 class SystemSettingSeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'School Name',
-                'description' => 'The name of the school'
+                'description' => 'The name of the school',
             ],
             [
                 'key' => 'academic_year',
@@ -29,7 +28,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'Academic Year',
-                'description' => 'Current academic year'
+                'description' => 'Current academic year',
             ],
             [
                 'key' => 'school_address',
@@ -37,7 +36,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'School Address',
-                'description' => 'Physical address of the school'
+                'description' => 'Physical address of the school',
             ],
             [
                 'key' => 'school_phone',
@@ -45,7 +44,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'School Phone',
-                'description' => 'Main phone number'
+                'description' => 'Main phone number',
             ],
             [
                 'key' => 'school_email',
@@ -53,7 +52,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'School Email',
-                'description' => 'Main email address'
+                'description' => 'Main email address',
             ],
             [
                 'key' => 'school_website',
@@ -61,7 +60,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'School Website',
-                'description' => 'School website URL'
+                'description' => 'School website URL',
             ],
             [
                 'key' => 'school_principal',
@@ -69,9 +68,9 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'school',
                 'label' => 'Principal Name',
-                'description' => 'Name of the school principal'
+                'description' => 'Name of the school principal',
             ],
-            
+
             // Grading Settings
             [
                 'key' => 'pass_percentage',
@@ -79,7 +78,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'float',
                 'group' => 'grading',
                 'label' => 'Pass Percentage',
-                'description' => 'Minimum percentage required to pass'
+                'description' => 'Minimum percentage required to pass',
             ],
             [
                 'key' => 'grade_calculation_method',
@@ -87,9 +86,9 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'grading',
                 'label' => 'Grade Calculation Method',
-                'description' => 'Method used to calculate grades'
+                'description' => 'Method used to calculate grades',
             ],
-            
+
             // Marking Settings
             [
                 'key' => 'decimal_places',
@@ -97,7 +96,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'integer',
                 'group' => 'marking',
                 'label' => 'Decimal Places',
-                'description' => 'Number of decimal places for marks'
+                'description' => 'Number of decimal places for marks',
             ],
             [
                 'key' => 'rounding_method',
@@ -105,7 +104,7 @@ class SystemSettingSeeder extends Seeder
                 'type' => 'string',
                 'group' => 'marking',
                 'label' => 'Rounding Method',
-                'description' => 'Method used for rounding marks'
+                'description' => 'Method used for rounding marks',
             ],
         ];
 

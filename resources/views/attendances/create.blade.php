@@ -55,14 +55,17 @@
                         <div class="col-md-8">
                             <label>&nbsp;</label>
                             <div class="btn-group d-block">
-                                <button type="button" class="btn btn-success btn-sm" id="checkAll">
-                                    <i class="fas fa-check-square"></i> Check All Present
+                                <button type="button" class="btn btn-success btn-lg" id="checkAll">
+                                    <i class="fas fa-check-square"></i> Mark All Present
                                 </button>
                                 <button type="button" class="btn btn-warning btn-sm" id="uncheckAll">
-                                    <i class="fas fa-square"></i> Uncheck All
+                                    <i class="fas fa-square"></i> Clear All
                                 </button>
-                                <button type="button" class="btn btn-info btn-sm" id="markAbsent">
+                                <button type="button" class="btn btn-danger btn-sm" id="markAbsent">
                                     <i class="fas fa-times-circle"></i> Mark All Absent
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm" id="markLate">
+                                    <i class="fas fa-clock"></i> Mark All Late
                                 </button>
                             </div>
                         </div>
@@ -144,8 +147,15 @@
                     <div id="attendanceSummary" class="mb-3"></div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Submit Attendance</button>
-                        <a href="{{ route('attendances.index') }}" class="btn btn-default">Cancel</a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Submit Attendance
+                        </button>
+                        <button type="submit" name="save_and_continue" value="1" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Save & Mark Another Class
+                        </button>
+                        <a href="{{ route('attendances.index') }}" class="btn btn-default">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
                     </div>
                 </form>
             @elseif(request('grade_id'))
@@ -330,6 +340,61 @@ $(document).ready(function() {
     $('.present-radio:checked').each(function() {
         $(this).closest('tr').addClass('table-success');
     });
+    
+    // Keyboard shortcuts for bulk actions
+    $(document).keydown(function(e) {
+        // Only work if not typing in input fields
+        if ($(e.target).is('input, textarea, select')) {
+            return;
+        }
+        
+        switch(e.key) {
+            case '1':
+                e.preventDefault();
+                $('#checkAll').click();
+                showFeedback('All students marked as Present (Shortcut: 1)', 'success');
+                break;
+            case '2':
+                e.preventDefault();
+                $('#markAbsent').click();
+                showFeedback('All students marked as Absent (Shortcut: 2)', 'danger');
+                break;
+            case '3':
+                e.preventDefault();
+                $('#markLate').click();
+                showFeedback('All students marked as Late (Shortcut: 3)', 'warning');
+                break;
+            case '4':
+                e.preventDefault();
+                $('#uncheckAll').click();
+                showFeedback('All selections cleared (Shortcut: 4)', 'secondary');
+                break;
+        }
+    });
+    
+    // Add tooltip to show shortcuts
+    $('.btn-group .btn').attr('title', function() {
+        var btnId = $(this).attr('id');
+        switch(btnId) {
+            case 'checkAll': return 'Mark All Present (Shortcut: Press 1)';
+            case 'markAbsent': return 'Mark All Absent (Shortcut: Press 2)';
+            case 'markLate': return 'Mark All Late (Shortcut: Press 3)';
+            case 'uncheckAll': return 'Clear All (Shortcut: Press 4)';
+        }
+    });
 });
 </script>
+
+<!-- Keyboard Shortcuts Help -->
+<div class="mt-3">
+    <div class="alert alert-light border">
+        <h6><i class="fas fa-keyboard"></i> Keyboard Shortcuts:</h6>
+        <div class="row">
+            <div class="col-md-3"><kbd>1</kbd> Mark All Present</div>
+            <div class="col-md-3"><kbd>2</kbd> Mark All Absent</div>
+            <div class="col-md-3"><kbd>3</kbd> Mark All Late</div>
+            <div class="col-md-3"><kbd>4</kbd> Clear All</div>
+        </div>
+    </div>
+</div>
 @stop

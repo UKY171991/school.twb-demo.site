@@ -10,6 +10,7 @@ class GradingSystemController extends Controller
     public function index()
     {
         $gradingSystems = GradingSystem::orderBy('sort_order')->orderBy('min_percentage', 'desc')->get();
+
         return view('settings.grading-system.index', compact('gradingSystems'));
     }
 
@@ -28,13 +29,13 @@ class GradingSystemController extends Controller
             'grade_points' => 'nullable|numeric|min:0|max:10',
             'description' => 'nullable|string',
             'is_passing' => 'boolean',
-            'sort_order' => 'nullable|integer'
+            'sort_order' => 'nullable|integer',
         ]);
 
         GradingSystem::create($request->all());
 
         return redirect()->route('grading-systems.index')
-                        ->with('success', 'Grading system created successfully.');
+            ->with('success', 'Grading system created successfully.');
     }
 
     public function show(GradingSystem $gradingSystem)
@@ -57,13 +58,13 @@ class GradingSystemController extends Controller
             'grade_points' => 'nullable|numeric|min:0|max:10',
             'description' => 'nullable|string',
             'is_passing' => 'boolean',
-            'sort_order' => 'nullable|integer'
+            'sort_order' => 'nullable|integer',
         ]);
 
         $gradingSystem->update($request->all());
 
         return redirect()->route('grading-systems.index')
-                        ->with('success', 'Grading system updated successfully.');
+            ->with('success', 'Grading system updated successfully.');
     }
 
     public function destroy(GradingSystem $gradingSystem)
@@ -71,14 +72,14 @@ class GradingSystemController extends Controller
         $gradingSystem->delete();
 
         return redirect()->route('grading-systems.index')
-                        ->with('success', 'Grading system deleted successfully.');
+            ->with('success', 'Grading system deleted successfully.');
     }
 
     public function toggleStatus(GradingSystem $gradingSystem)
     {
-        $gradingSystem->update(['is_active' => !$gradingSystem->is_active]);
+        $gradingSystem->update(['is_active' => ! $gradingSystem->is_active]);
 
         return redirect()->route('grading-systems.index')
-                        ->with('success', 'Grading system status updated successfully.');
+            ->with('success', 'Grading system status updated successfully.');
     }
 }

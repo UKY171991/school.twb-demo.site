@@ -1,15 +1,13 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use App\Models\ExamType;
+use App\Models\Grade;
+use App\Models\Marksheet;
 use App\Models\School;
 use App\Models\Student;
-use App\Models\Teacher;
-use App\Models\Grade;
 use App\Models\Subject;
-use App\Models\Marksheet;
-use App\Models\ExamType;
+use App\Models\Teacher;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -20,7 +18,7 @@ return new class extends Migration
     {
         // Get the first school (default school)
         $defaultSchool = School::first();
-        
+
         if ($defaultSchool) {
             // Assign all existing data to the default school
             Student::whereNull('school_id')->update(['school_id' => $defaultSchool->id]);

@@ -14,12 +14,12 @@ class MarkingScheme extends Model
         'type',
         'configuration',
         'description',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'configuration' => 'array',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     public static function getActiveScheme()
@@ -30,7 +30,7 @@ class MarkingScheme extends Model
     public function calculateGrade($obtainedMarks, $totalMarks)
     {
         $percentage = ($obtainedMarks / $totalMarks) * 100;
-        
+
         switch ($this->type) {
             case 'percentage':
                 return $this->calculatePercentageGrade($percentage);
@@ -46,13 +46,13 @@ class MarkingScheme extends Model
     private function calculatePercentageGrade($percentage)
     {
         $grades = $this->configuration['grades'] ?? [];
-        
+
         foreach ($grades as $grade) {
             if ($percentage >= $grade['min'] && $percentage <= $grade['max']) {
                 return $grade['grade'];
             }
         }
-        
+
         return 'F';
     }
 
@@ -60,6 +60,7 @@ class MarkingScheme extends Model
     {
         // Implementation for points-based grading
         $percentage = ($obtainedMarks / $totalMarks) * 100;
+
         return $this->calculatePercentageGrade($percentage);
     }
 

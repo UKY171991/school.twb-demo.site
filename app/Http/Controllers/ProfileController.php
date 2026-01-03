@@ -17,16 +17,17 @@ class ProfileController extends Controller
     public function index()
     {
         $user = Auth::user();
+
         return view('profile.index', compact('user'));
     }
 
     public function update(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
         ]);
 
         $user->update([
@@ -46,7 +47,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'The current password is incorrect.']);
         }
 

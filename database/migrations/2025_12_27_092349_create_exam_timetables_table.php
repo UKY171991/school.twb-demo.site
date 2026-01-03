@@ -26,7 +26,7 @@ return new class extends Migration
             $table->text('instructions')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             // Ensure unique combination per school/exam/subject/class
             $table->unique(['school_id', 'exam_type_id', 'subject_id', 'class', 'section', 'academic_year'], 'unique_exam_schedule');
         });

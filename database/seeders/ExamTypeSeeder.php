@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\ExamType;
+use Illuminate\Database\Seeder;
 
 class ExamTypeSeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 7,
                 'weightage' => 50.00,
                 'is_active' => true,
-                'sort_order' => 1
+                'sort_order' => 1,
             ],
             [
                 'name' => 'Annual',
@@ -30,7 +29,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 10,
                 'weightage' => 50.00,
                 'is_active' => true,
-                'sort_order' => 2
+                'sort_order' => 2,
             ],
             [
                 'name' => 'First Term',
@@ -39,7 +38,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 5,
                 'weightage' => 33.33,
                 'is_active' => true,
-                'sort_order' => 3
+                'sort_order' => 3,
             ],
             [
                 'name' => 'Second Term',
@@ -48,7 +47,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 5,
                 'weightage' => 33.33,
                 'is_active' => true,
-                'sort_order' => 4
+                'sort_order' => 4,
             ],
             [
                 'name' => 'Third Term',
@@ -57,7 +56,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 5,
                 'weightage' => 33.33,
                 'is_active' => true,
-                'sort_order' => 5
+                'sort_order' => 5,
             ],
             [
                 'name' => 'Unit Test 1',
@@ -66,7 +65,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 2,
                 'weightage' => 20.00,
                 'is_active' => true,
-                'sort_order' => 6
+                'sort_order' => 6,
             ],
             [
                 'name' => 'Unit Test 2',
@@ -75,7 +74,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 2,
                 'weightage' => 20.00,
                 'is_active' => true,
-                'sort_order' => 7
+                'sort_order' => 7,
             ],
             [
                 'name' => 'Monthly Test',
@@ -84,7 +83,7 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 1,
                 'weightage' => 15.00,
                 'is_active' => true,
-                'sort_order' => 8
+                'sort_order' => 8,
             ],
             [
                 'name' => 'Pre-Board',
@@ -93,8 +92,8 @@ class ExamTypeSeeder extends Seeder
                 'duration_days' => 8,
                 'weightage' => 100.00,
                 'is_active' => true,
-                'sort_order' => 9
-            ]
+                'sort_order' => 9,
+            ],
         ];
 
         foreach ($examTypes as $examType) {

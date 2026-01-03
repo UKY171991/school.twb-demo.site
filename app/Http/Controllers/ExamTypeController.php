@@ -17,6 +17,7 @@ class ExamTypeController extends Controller
         $schoolId = session('current_school_id');
         $examTypes = ExamType::where('school_id', $schoolId)
             ->orderBy('sort_order')->orderBy('name')->get();
+
         return view('exam-types.index', compact('examTypes'));
     }
 
@@ -33,13 +34,13 @@ class ExamTypeController extends Controller
             'description' => 'nullable|string',
             'duration_days' => 'nullable|integer|min:1',
             'weightage' => 'required|numeric|min:0|max:100',
-            'sort_order' => 'nullable|integer'
+            'sort_order' => 'nullable|integer',
         ]);
 
         ExamType::create($request->all());
 
         return redirect()->route('exam-types.index')
-                        ->with('success', 'Exam type created successfully.');
+            ->with('success', 'Exam type created successfully.');
     }
 
     public function show(ExamType $examType)
@@ -56,17 +57,17 @@ class ExamTypeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|unique:exam_types,code,' . $examType->id,
+            'code' => 'required|string|unique:exam_types,code,'.$examType->id,
             'description' => 'nullable|string',
             'duration_days' => 'nullable|integer|min:1',
             'weightage' => 'required|numeric|min:0|max:100',
-            'sort_order' => 'nullable|integer'
+            'sort_order' => 'nullable|integer',
         ]);
 
         $examType->update($request->all());
 
         return redirect()->route('exam-types.index')
-                        ->with('success', 'Exam type updated successfully.');
+            ->with('success', 'Exam type updated successfully.');
     }
 
     public function destroy(ExamType $examType)
@@ -74,14 +75,14 @@ class ExamTypeController extends Controller
         $examType->delete();
 
         return redirect()->route('exam-types.index')
-                        ->with('success', 'Exam type deleted successfully.');
+            ->with('success', 'Exam type deleted successfully.');
     }
 
     public function toggleStatus(ExamType $examType)
     {
-        $examType->update(['is_active' => !$examType->is_active]);
+        $examType->update(['is_active' => ! $examType->is_active]);
 
         return redirect()->route('exam-types.index')
-                        ->with('success', 'Exam type status updated successfully.');
+            ->with('success', 'Exam type status updated successfully.');
     }
 }

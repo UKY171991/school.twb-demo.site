@@ -2,13 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Grade;
-use App\Models\Student;
-use App\Models\Subject;
 use App\Models\Marksheet;
 use App\Models\MarksheetMark;
+use App\Models\Student;
+use App\Models\Subject;
+use Illuminate\Database\Seeder;
 
 class MarksheetSeeder extends Seeder
 {
@@ -35,7 +34,7 @@ class MarksheetSeeder extends Seeder
                 'date_of_birth' => '2008-05-15',
                 'gender' => 'male',
                 'address' => '123 Main Street',
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'Jane Smith',
@@ -49,7 +48,7 @@ class MarksheetSeeder extends Seeder
                 'date_of_birth' => '2008-08-20',
                 'gender' => 'female',
                 'address' => '456 Oak Avenue',
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'Mike Johnson',
@@ -63,8 +62,8 @@ class MarksheetSeeder extends Seeder
                 'date_of_birth' => '2009-03-10',
                 'gender' => 'male',
                 'address' => '789 Pine Road',
-                'grade_id' => $grade9->id
-            ]
+                'grade_id' => $grade9->id,
+            ],
         ];
 
         foreach ($students as $studentData) {
@@ -79,7 +78,7 @@ class MarksheetSeeder extends Seeder
                 'description' => 'Basic Mathematics',
                 'max_marks' => 100,
                 'pass_marks' => 33,
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'English',
@@ -87,7 +86,7 @@ class MarksheetSeeder extends Seeder
                 'description' => 'English Language',
                 'max_marks' => 100,
                 'pass_marks' => 33,
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'Science',
@@ -95,7 +94,7 @@ class MarksheetSeeder extends Seeder
                 'description' => 'General Science',
                 'max_marks' => 100,
                 'pass_marks' => 33,
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'History',
@@ -103,7 +102,7 @@ class MarksheetSeeder extends Seeder
                 'description' => 'World History',
                 'max_marks' => 100,
                 'pass_marks' => 33,
-                'grade_id' => $grade10->id
+                'grade_id' => $grade10->id,
             ],
             [
                 'name' => 'Geography',
@@ -111,8 +110,8 @@ class MarksheetSeeder extends Seeder
                 'description' => 'Physical Geography',
                 'max_marks' => 100,
                 'pass_marks' => 33,
-                'grade_id' => $grade10->id
-            ]
+                'grade_id' => $grade10->id,
+            ],
         ];
 
         foreach ($subjects as $subjectData) {
@@ -122,7 +121,7 @@ class MarksheetSeeder extends Seeder
         // Create sample marksheets
         $student1 = Student::where('roll_number', 'STU001')->first();
         $student2 = Student::where('roll_number', 'STU002')->first();
-        
+
         if ($student1) {
             $marksheet1 = Marksheet::create([
                 'student_id' => $student1->id,
@@ -130,7 +129,7 @@ class MarksheetSeeder extends Seeder
                 'exam_date' => '2024-10-15',
                 'class' => $student1->class,
                 'section' => $student1->section,
-                'academic_year' => '2024-2025'
+                'academic_year' => '2024-2025',
             ]);
 
             // Add marks for student 1
@@ -139,7 +138,7 @@ class MarksheetSeeder extends Seeder
                 'ENG101' => 78,
                 'SCI101' => 92,
                 'HIS101' => 76,
-                'GEO101' => 88
+                'GEO101' => 88,
             ];
 
             foreach ($marks1 as $subjectCode => $obtainedMarks) {
@@ -149,7 +148,7 @@ class MarksheetSeeder extends Seeder
                         'student_id' => $student1->id,
                         'subject_id' => $subject->id,
                         'marksheet_id' => $marksheet1->id,
-                        'obtained_marks' => $obtainedMarks
+                        'obtained_marks' => $obtainedMarks,
                     ]);
                 }
             }
@@ -164,7 +163,7 @@ class MarksheetSeeder extends Seeder
                 'exam_date' => '2024-10-15',
                 'class' => $student2->class,
                 'section' => $student2->section,
-                'academic_year' => '2024-2025'
+                'academic_year' => '2024-2025',
             ]);
 
             // Add marks for student 2
@@ -173,7 +172,7 @@ class MarksheetSeeder extends Seeder
                 'ENG101' => 89,
                 'SCI101' => 67,
                 'HIS101' => 84,
-                'GEO101' => 91
+                'GEO101' => 91,
             ];
 
             foreach ($marks2 as $subjectCode => $obtainedMarks) {
@@ -183,7 +182,7 @@ class MarksheetSeeder extends Seeder
                         'student_id' => $student2->id,
                         'subject_id' => $subject->id,
                         'marksheet_id' => $marksheet2->id,
-                        'obtained_marks' => $obtainedMarks
+                        'obtained_marks' => $obtainedMarks,
                     ]);
                 }
             }

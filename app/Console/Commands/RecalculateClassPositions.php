@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Marksheet;
+use Illuminate\Console\Command;
 
 class RecalculateClassPositions extends Command
 {
@@ -45,10 +45,10 @@ class RecalculateClassPositions extends Command
 
         // Group marksheets by class, section, exam_type, and academic year
         $marksheets = $query->get();
-        
-        $groups = $marksheets->groupBy(function($marksheet) {
-            return $marksheet->class . '-' . $marksheet->section . '-' . 
-                   ($marksheet->exam_type_id ?? 'no-exam-type') . '-' . 
+
+        $groups = $marksheets->groupBy(function ($marksheet) {
+            return $marksheet->class.'-'.$marksheet->section.'-'.
+                   ($marksheet->exam_type_id ?? 'no-exam-type').'-'.
                    $marksheet->academic_year;
         });
 
@@ -57,10 +57,10 @@ class RecalculateClassPositions extends Command
 
         foreach ($groups as $groupKey => $groupMarksheets) {
             $processedGroups++;
-            
+
             // Sort by percentage (descending) and obtained marks (descending)
             $sortedMarksheets = $groupMarksheets->sortByDesc('percentage')
-                                               ->sortByDesc('obtained_marks');
+                ->sortByDesc('obtained_marks');
 
             $totalStudents = $sortedMarksheets->count();
             $position = 1;
@@ -68,7 +68,7 @@ class RecalculateClassPositions extends Command
             foreach ($sortedMarksheets as $marksheet) {
                 $marksheet->update([
                     'class_position' => $position,
-                    'total_students' => $totalStudents
+                    'total_students' => $totalStudents,
                 ]);
                 $position++;
             }

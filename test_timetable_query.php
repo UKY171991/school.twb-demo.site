@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Student;
 use App\Models\ExamTimetable;
+use App\Models\Student;
 use Illuminate\Support\Facades\Session;
 
 // Mock session if needed, or just fetch first school
 $school = \App\Models\School::first();
-if (!$school) {
+if (! $school) {
     echo "No school found.\n";
     exit;
 }
@@ -16,7 +16,7 @@ echo "School ID: $schoolId\n";
 
 // Get a student
 $student = Student::where('school_id', $schoolId)->first();
-if (!$student) {
+if (! $student) {
     echo "No student found.\n";
     exit;
 }
@@ -28,10 +28,10 @@ $timetables = ExamTimetable::where('school_id', $schoolId)
     ->where('class', $student->class)
     ->get();
 
-echo "Found " . $timetables->count() . " timetable entries for class {$student->class}.\n";
+echo 'Found '.$timetables->count()." timetable entries for class {$student->class}.\n";
 
 foreach ($timetables as $t) {
-    echo "  - Subject: {$t->subject_id}, ExamType: {$t->exam_type_id}, Year: {$t->academic_year}, Section: '{$t->section}' (IsNull: " . (is_null($t->section) ? 'Yes' : 'No') . ")\n";
+    echo "  - Subject: {$t->subject_id}, ExamType: {$t->exam_type_id}, Year: {$t->academic_year}, Section: '{$t->section}' (IsNull: ".(is_null($t->section) ? 'Yes' : 'No').")\n";
 }
 
 // Simulate the query
@@ -42,10 +42,10 @@ echo "\nTesting Query for Student Section '{$student->section}':\n";
 
 $result = ExamTimetable::where('school_id', $schoolId)
     ->where('class', $student->class)
-    ->where(function($query) use ($student) {
+    ->where(function ($query) use ($student) {
         $query->where('section', $student->section)
-              ->orWhereNull('section')
-              ->orWhere('section', '');
+            ->orWhereNull('section')
+            ->orWhere('section', '');
     })
     ->where('exam_type_id', $examTypeId)
     ->where('academic_year', $academicYear)

@@ -2,20 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\School;
-use App\Models\Grade;
-use App\Models\Teacher;
-use App\Models\Student;
-use App\Models\Subject;
+use App\Models\Attendance;
 use App\Models\ExamType;
+use App\Models\Grade;
+use App\Models\GradingSystem;
+use App\Models\Mark;
 use App\Models\Marksheet;
 use App\Models\MarksheetMark;
-use App\Models\Mark;
-use App\Models\Attendance;
+use App\Models\School;
+use App\Models\Student;
+use App\Models\Subject;
 use App\Models\SystemSetting;
-use App\Models\GradingSystem;
+use App\Models\Teacher;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ComprehensiveDummyDataSeeder extends Seeder
 {
@@ -31,7 +31,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
                 'email' => 'info@greenwood.edu',
                 'website' => 'www.greenwood.edu',
                 'principal_name' => 'Dr. Margaret Thompson',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Riverside Academy',
@@ -41,7 +41,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
                 'email' => 'admin@riverside.edu',
                 'website' => 'www.riverside.edu',
                 'principal_name' => 'Mr. James Wilson',
-                'status' => 'active'
+                'status' => 'active',
             ],
             [
                 'name' => 'Oakwood International School',
@@ -51,8 +51,8 @@ class ComprehensiveDummyDataSeeder extends Seeder
                 'email' => 'contact@oakwood.edu',
                 'website' => 'www.oakwood.edu',
                 'principal_name' => 'Ms. Sarah Johnson',
-                'status' => 'active'
-            ]
+                'status' => 'active',
+            ],
         ];
 
         foreach ($schools as $schoolData) {
@@ -130,7 +130,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
             ['name' => 'Mathematics', 'code' => 'MATH', 'max_marks' => 100, 'pass_marks' => 40, 'description' => 'Basic Mathematics'],
             ['name' => 'General Knowledge', 'code' => 'GK', 'max_marks' => 50, 'pass_marks' => 20, 'description' => 'General Knowledge'],
             ['name' => 'Drawing', 'code' => 'ART', 'max_marks' => 50, 'pass_marks' => 20, 'description' => 'Art and Drawing'],
-            
+
             // Primary grades additional subjects
             ['name' => 'Science', 'code' => 'SCI', 'max_marks' => 100, 'pass_marks' => 40, 'description' => 'General Science'],
             ['name' => 'Social Studies', 'code' => 'SST', 'max_marks' => 100, 'pass_marks' => 40, 'description' => 'Social Studies'],
@@ -140,20 +140,20 @@ class ComprehensiveDummyDataSeeder extends Seeder
 
         foreach ($allGrades as $grade) {
             $schoolTeachers = $allTeachers->where('school_id', $grade->school_id);
-            
+
             // Determine subjects based on grade level
             if (in_array($grade->name, ['Nursery', 'KG-1', 'KG-2'])) {
                 $subjects = array_slice($subjectTemplates, 0, 4); // First 4 subjects for early grades
             } else {
                 $subjects = $subjectTemplates; // All subjects for primary grades
             }
-            
+
             foreach ($subjects as $index => $subject) {
                 $teacher = $schoolTeachers->skip($index % $schoolTeachers->count())->first();
                 Subject::create(array_merge($subject, [
                     'grade_id' => $grade->id,
                     'teacher_id' => $teacher->id,
-                    'school_id' => $grade->school_id
+                    'school_id' => $grade->school_id,
                 ]));
             }
         }
@@ -171,7 +171,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
             ['name' => 'Henry Taylor', 'gender' => 'male'],
             ['name' => 'Isaac Thompson', 'gender' => 'male'],
             ['name' => 'Jacob White', 'gender' => 'male'],
-            
+
             // Female names
             ['name' => 'Amelia Rodriguez', 'gender' => 'female'],
             ['name' => 'Bella Chen', 'gender' => 'female'],
@@ -187,26 +187,26 @@ class ComprehensiveDummyDataSeeder extends Seeder
 
         foreach ($allGrades as $grade) {
             $studentsPerSection = min(15, $grade->capacity); // Max 15 students per section for demo
-            
+
             for ($i = 0; $i < $studentsPerSection; $i++) {
                 $studentTemplate = $studentNames[$i % count($studentNames)];
                 $rollNumber = str_pad($i + 1, 3, '0', STR_PAD_LEFT);
-                
+
                 Student::create([
                     'name' => $studentTemplate['name'],
-                    'roll_number' => $grade->name . '-' . $grade->section . '-' . $rollNumber,
-                    'email' => strtolower(str_replace(' ', '.', $studentTemplate['name'])) . '@student.edu',
-                    'phone' => '+1-555-' . rand(2000, 9999),
+                    'roll_number' => $grade->name.'-'.$grade->section.'-'.$rollNumber,
+                    'email' => strtolower(str_replace(' ', '.', $studentTemplate['name'])).'@student.edu',
+                    'phone' => '+1-555-'.rand(2000, 9999),
                     'date_of_birth' => Carbon::now()->subYears(rand(5, 12))->subDays(rand(1, 365)),
                     'gender' => $studentTemplate['gender'],
-                    'address' => rand(100, 999) . ' Student Street, City',
-                    'father_name' => 'Mr. ' . explode(' ', $studentTemplate['name'])[1],
-                    'mother_name' => 'Mrs. ' . explode(' ', $studentTemplate['name'])[1],
-                    'guardian_phone' => '+1-555-' . rand(3000, 8999),
+                    'address' => rand(100, 999).' Student Street, City',
+                    'father_name' => 'Mr. '.explode(' ', $studentTemplate['name'])[1],
+                    'mother_name' => 'Mrs. '.explode(' ', $studentTemplate['name'])[1],
+                    'guardian_phone' => '+1-555-'.rand(3000, 8999),
                     'grade_id' => $grade->id,
                     'school_id' => $grade->school_id,
                     'admission_date' => Carbon::now()->subMonths(rand(1, 24)),
-                    'is_active' => true
+                    'is_active' => true,
                 ]);
             }
         }
@@ -254,10 +254,10 @@ class ComprehensiveDummyDataSeeder extends Seeder
         foreach ($schoolIds as $schoolId) {
             foreach ($gradingGrades as $grade) {
                 GradingSystem::create(array_merge($grade, [
-                    'name' => 'Grade ' . $grade['grade'],
-                    'description' => 'Grade ' . $grade['grade'] . ' for ' . $grade['min_percentage'] . '-' . $grade['max_percentage'] . '%',
+                    'name' => 'Grade '.$grade['grade'],
+                    'description' => 'Grade '.$grade['grade'].' for '.$grade['min_percentage'].'-'.$grade['max_percentage'].'%',
                     'is_active' => true,
-                    'school_id' => $schoolId
+                    'school_id' => $schoolId,
                 ]));
             }
         }
@@ -270,11 +270,11 @@ class ComprehensiveDummyDataSeeder extends Seeder
         foreach ($allStudents as $student) {
             $gradeSubjects = $allSubjects->where('grade_id', $student->grade_id);
             $schoolExamTypes = $allExamTypes->where('school_id', $student->school_id);
-            
+
             foreach ($schoolExamTypes->take(3) as $examType) { // Create marksheets for 3 exam types
                 $marksheet = Marksheet::create([
                     'student_id' => $student->id,
-                    'exam_name' => $examType->name . ' Examination',
+                    'exam_name' => $examType->name.' Examination',
                     'exam_type_id' => $examType->id,
                     'exam_date' => Carbon::now()->subDays(rand(30, 180)),
                     'class' => $student->grade->name,
@@ -285,7 +285,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
                     'percentage' => 0,
                     'grade' => 'A',
                     'result' => 'PASS',
-                    'school_id' => $student->school_id
+                    'school_id' => $student->school_id,
                 ]);
 
                 $totalMarks = 0;
@@ -298,40 +298,58 @@ class ComprehensiveDummyDataSeeder extends Seeder
 
                     // Calculate grade
                     $percentage = ($obtained / $subject->max_marks) * 100;
-                    if ($percentage >= 90) $grade = 'A+';
-                    elseif ($percentage >= 80) $grade = 'A';
-                    elseif ($percentage >= 70) $grade = 'B+';
-                    elseif ($percentage >= 60) $grade = 'B';
-                    elseif ($percentage >= 50) $grade = 'C+';
-                    elseif ($percentage >= 40) $grade = 'C';
-                    elseif ($percentage >= 33) $grade = 'D';
-                    else $grade = 'F';
+                    if ($percentage >= 90) {
+                        $grade = 'A+';
+                    } elseif ($percentage >= 80) {
+                        $grade = 'A';
+                    } elseif ($percentage >= 70) {
+                        $grade = 'B+';
+                    } elseif ($percentage >= 60) {
+                        $grade = 'B';
+                    } elseif ($percentage >= 50) {
+                        $grade = 'C+';
+                    } elseif ($percentage >= 40) {
+                        $grade = 'C';
+                    } elseif ($percentage >= 33) {
+                        $grade = 'D';
+                    } else {
+                        $grade = 'F';
+                    }
 
                     MarksheetMark::create([
                         'marksheet_id' => $marksheet->id,
                         'subject_id' => $subject->id,
                         'obtained_marks' => $obtained,
-                        'grade' => $grade
+                        'grade' => $grade,
                     ]);
                 }
 
                 // Update marksheet totals
                 $overallPercentage = ($obtainedMarks / $totalMarks) * 100;
-                if ($overallPercentage >= 90) $overallGrade = 'A+';
-                elseif ($overallPercentage >= 80) $overallGrade = 'A';
-                elseif ($overallPercentage >= 70) $overallGrade = 'B+';
-                elseif ($overallPercentage >= 60) $overallGrade = 'B';
-                elseif ($overallPercentage >= 50) $overallGrade = 'C+';
-                elseif ($overallPercentage >= 40) $overallGrade = 'C';
-                elseif ($overallPercentage >= 33) $overallGrade = 'D';
-                else $overallGrade = 'F';
+                if ($overallPercentage >= 90) {
+                    $overallGrade = 'A+';
+                } elseif ($overallPercentage >= 80) {
+                    $overallGrade = 'A';
+                } elseif ($overallPercentage >= 70) {
+                    $overallGrade = 'B+';
+                } elseif ($overallPercentage >= 60) {
+                    $overallGrade = 'B';
+                } elseif ($overallPercentage >= 50) {
+                    $overallGrade = 'C+';
+                } elseif ($overallPercentage >= 40) {
+                    $overallGrade = 'C';
+                } elseif ($overallPercentage >= 33) {
+                    $overallGrade = 'D';
+                } else {
+                    $overallGrade = 'F';
+                }
 
                 $marksheet->update([
                     'total_marks' => $totalMarks,
                     'obtained_marks' => $obtainedMarks,
                     'percentage' => round($overallPercentage, 2),
                     'grade' => $overallGrade,
-                    'result' => $overallPercentage >= 40 ? 'PASS' : 'FAIL'
+                    'result' => $overallPercentage >= 40 ? 'PASS' : 'FAIL',
                 ]);
             }
         }
@@ -343,14 +361,14 @@ class ComprehensiveDummyDataSeeder extends Seeder
                 if ($date->isWeekday()) { // Only weekdays
                     $statuses = ['present', 'absent', 'late', 'excused'];
                     $weights = [85, 5, 7, 3]; // 85% present, 5% absent, 7% late, 3% excused
-                    
+
                     $status = $this->weightedRandom($statuses, $weights);
-                    
+
                     Attendance::create([
                         'student_id' => $student->id,
                         'attendance_date' => $date,
                         'status' => $status,
-                        'note' => $status === 'absent' ? 'Family emergency' : null
+                        'note' => $status === 'absent' ? 'Family emergency' : null,
                     ]);
                 }
             }
@@ -360,7 +378,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
         foreach ($allStudents->take(50) as $student) { // Limit to 50 students for performance
             $gradeSubjects = $allSubjects->where('grade_id', $student->grade_id);
             $schoolExamTypes = $allExamTypes->where('school_id', $student->school_id);
-            
+
             foreach ($gradeSubjects->take(3) as $subject) { // 3 subjects per student
                 foreach ($schoolExamTypes->take(2) as $examType) { // 2 exam types
                     Mark::create([
@@ -369,7 +387,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
                         'mark_obtained' => rand($subject->pass_marks, $subject->max_marks),
                         'total_marks' => $subject->max_marks,
                         'exam_type' => $examType->name,
-                        'exam_date' => Carbon::now()->subDays(rand(15, 90))
+                        'exam_date' => Carbon::now()->subDays(rand(15, 90)),
                     ]);
                 }
             }
@@ -377,23 +395,23 @@ class ComprehensiveDummyDataSeeder extends Seeder
 
         $this->command->info('Comprehensive dummy data created successfully!');
         $this->command->info('Created:');
-        $this->command->info('- ' . School::count() . ' Schools');
-        $this->command->info('- ' . Grade::count() . ' Grades/Classes');
-        $this->command->info('- ' . Teacher::count() . ' Teachers');
-        $this->command->info('- ' . Student::count() . ' Students');
-        $this->command->info('- ' . Subject::count() . ' Subjects');
-        $this->command->info('- ' . ExamType::count() . ' Exam Types');
-        $this->command->info('- ' . Marksheet::count() . ' Marksheets');
-        $this->command->info('- ' . MarksheetMark::count() . ' Marksheet Marks');
-        $this->command->info('- ' . Mark::count() . ' Individual Marks');
-        $this->command->info('- ' . Attendance::count() . ' Attendance Records');
+        $this->command->info('- '.School::count().' Schools');
+        $this->command->info('- '.Grade::count().' Grades/Classes');
+        $this->command->info('- '.Teacher::count().' Teachers');
+        $this->command->info('- '.Student::count().' Students');
+        $this->command->info('- '.Subject::count().' Subjects');
+        $this->command->info('- '.ExamType::count().' Exam Types');
+        $this->command->info('- '.Marksheet::count().' Marksheets');
+        $this->command->info('- '.MarksheetMark::count().' Marksheet Marks');
+        $this->command->info('- '.Mark::count().' Individual Marks');
+        $this->command->info('- '.Attendance::count().' Attendance Records');
     }
 
     private function weightedRandom($values, $weights)
     {
         $totalWeight = array_sum($weights);
         $random = rand(1, $totalWeight);
-        
+
         $currentWeight = 0;
         foreach ($values as $index => $value) {
             $currentWeight += $weights[$index];
@@ -401,7 +419,7 @@ class ComprehensiveDummyDataSeeder extends Seeder
                 return $value;
             }
         }
-        
+
         return $values[0]; // Fallback
     }
 }

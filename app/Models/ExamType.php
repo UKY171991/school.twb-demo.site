@@ -17,12 +17,12 @@ class ExamType extends Model
         'duration_days',
         'weightage',
         'is_active',
-        'sort_order'
+        'sort_order',
     ];
 
     protected $casts = [
         'weightage' => 'decimal:2',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     public function school()
@@ -43,14 +43,14 @@ class ExamType extends Model
     public static function getActiveTypes($schoolId = null)
     {
         $query = self::where('is_active', true);
-        
+
         if ($schoolId) {
             $query->where('school_id', $schoolId);
         }
-        
+
         return $query->orderBy('sort_order')
-                    ->orderBy('name')
-                    ->get();
+            ->orderBy('name')
+            ->get();
     }
 
     public static function getTypeOptions($schoolId = null)

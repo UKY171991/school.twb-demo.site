@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
 use App\Models\Grade;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,8 +21,9 @@ class StudentController extends Controller
     {
         $schoolId = session('current_school_id');
         $query = Student::with('grade')->where('school_id', $schoolId);
-        
+
         $students = $query->latest()->paginate(10);
+
         return view('students.index', compact('students'));
     }
 
@@ -33,13 +34,13 @@ class StudentController extends Controller
     {
         // Get all schools for selection, but filter grades by current school if one is selected
         $currentSchoolId = session('current_school_id');
-        
+
         if ($currentSchoolId) {
             $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
         } else {
             $grades = \App\Models\Grade::all();
         }
-        
+
         return view('students.create', compact('grades'));
     }
 
@@ -72,20 +73,20 @@ class StudentController extends Controller
             $maxRoll = Student::where('school_id', $request->school_id)
                 ->where('grade_id', $request->grade_id)
                 ->max(DB::raw('CAST(roll_number AS UNSIGNED)'));
-            
+
             $data['roll_number'] = $maxRoll ? $maxRoll + 1 : 1;
         }
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $student = new Student();
+            $student = new Student;
             $data['image'] = $student->uploadImage($request->file('image'), 'students');
         }
 
         Student::create($data);
 
         return redirect()->route('students.index')
-                        ->with('success','Student created successfully.');
+            ->with('success', 'Student created successfully.');
     }
 
     /**
@@ -94,6 +95,7 @@ class StudentController extends Controller
     public function show(Student $student)
     {
         $student->load(['grade', 'marksheets']);
+
         return view('students.show', compact('student'));
     }
 
@@ -102,15 +104,17 @@ class StudentController extends Controller
      */
     public function edit(Student $student, Request $request)
     {
-        $query = function() use ($request) {
+        $query = function () use ($request) {
             $q = \App\Models\Grade::query();
             if ($request->has('current_school_id')) {
                 $q->where('school_id', $request->get('current_school_id'));
             }
+
             return $q;
         };
-        
+
         $grades = $query()->get();
+
         return view('students.edit', compact('student', 'grades'));
     }
 
@@ -121,7 +125,7 @@ class StudentController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:students,email,' . $student->id,
+            'email' => 'nullable|email|unique:students,email,'.$student->id,
             'phone' => 'nullable|string|max:20',
             'date_of_birth' => 'nullable|date',
             'gender' => 'required|in:male,female,other',
@@ -144,7 +148,7 @@ class StudentController extends Controller
         $student->update($data);
 
         return redirect()->route('students.index')
-                        ->with('success','Student updated successfully.');
+            ->with('success', 'Student updated successfully.');
     }
 
     /**
@@ -160,7 +164,7 @@ class StudentController extends Controller
         $student->delete();
 
         return redirect()->route('students.index')
-                        ->with('success','Student deleted successfully.');
+            ->with('success', 'Student deleted successfully.');
     }
 
     /**

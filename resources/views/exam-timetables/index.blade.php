@@ -161,45 +161,33 @@
                             @endif
                         </div>
                         
-                        <div class="action-buttons">
+                        <div class="action-buttons d-flex gap-2 flex-wrap">
                             @if($timetable->has_subjects)
-                                <button type="button" class="btn btn-warning btn-sm edit-class-btn"
-                                        data-exam-type="{{ $timetable->exam_type_id }}"
-                                        data-class="{{ $timetable->class }}"
-                                        data-section="{{ $timetable->section }}"
-                                        data-academic-year="{{ $timetable->academic_year }}"
-                                        title="Edit Timetable">
+                                <a href="{{ route('exam-timetables.edit-group', ['exam_type' => $timetable->exam_type_id, 'class' => $timetable->class, 'section' => $timetable->section ?? '', 'academic_year' => $timetable->academic_year]) }}" 
+                                   class="btn btn-warning btn-sm" title="Edit Timetable">
                                     <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button type="button" class="btn btn-info btn-sm print-class-btn"
-                                        data-exam-type="{{ $timetable->exam_type_id }}"
-                                        data-class="{{ $timetable->class }}"
-                                        data-section="{{ $timetable->section }}"
-                                        data-academic-year="{{ $timetable->academic_year }}"
-                                        title="Print Timetable">
+                                </a>
+                                <a href="{{ route('exam-timetables.print', ['exam_type' => $timetable->exam_type_id, 'class' => $timetable->class, 'section' => $timetable->section ?? '', 'academic_year' => $timetable->academic_year]) }}" 
+                                   class="btn btn-info btn-sm" target="_blank" title="Print Timetable">
                                     <i class="fas fa-print"></i> Print
-                                </button>
+                                </a>
                                 <button type="button" class="btn btn-danger btn-sm delete-class-btn"
                                         data-exam-type="{{ $timetable->exam_type_id }}"
                                         data-class="{{ $timetable->class }}"
-                                        data-section="{{ $timetable->section }}"
+                                        data-section="{{ $timetable->section ?? '' }}"
                                         data-academic-year="{{ $timetable->academic_year }}"
                                         title="Delete Class">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             @else
-                                <button type="button" class="btn btn-success btn-sm add-subjects-btn" 
-                                        data-exam-type="{{ $timetable->exam_type_id }}"
-                                        data-class="{{ $timetable->class }}"
-                                        data-section="{{ $timetable->section }}"
-                                        data-academic-year="{{ $timetable->academic_year }}"
-                                        title="Add Subjects">
+                                <a href="{{ route('exam-timetables.add-subjects', ['exam_type' => $timetable->exam_type_id, 'class' => $timetable->class, 'section' => $timetable->section ?? '', 'academic_year' => $timetable->academic_year]) }}" 
+                                   class="btn btn-success btn-sm" title="Add Subjects">
                                     <i class="fas fa-plus"></i> Add Subjects
-                                </button>
+                                </a>
                                 <button type="button" class="btn btn-danger btn-sm delete-class-btn"
                                         data-exam-type="{{ $timetable->exam_type_id }}"
                                         data-class="{{ $timetable->class }}"
-                                        data-section="{{ $timetable->section }}"
+                                        data-section="{{ $timetable->section ?? '' }}"
                                         data-academic-year="{{ $timetable->academic_year }}"
                                         title="Delete Class">
                                     <i class="fas fa-trash"></i> Delete
@@ -222,12 +210,87 @@
             <div class="d-flex justify-content-center mt-4">
                 {{ $timetables->links() }}
             </div>
+        @endif
     </form>
 </div>
 @stop
 
 @section('js')
-    @parent
-    <script>
+<script>
+$(document).ready(function() {
     // Select/Deselect all functionality
-    $(document).ready(function() {
+    $('#selectAll').on('change', function() {
+        $('.row-checkbox').prop('checked', $(this).prop('checked')).trigger('change');
+    });
+
+    // Update selected count and button states
+    $(document).on('change', '.row-checkbox', function() {
+        updateSelectionState();
+    });
+
+    function updateSelectionState() {
+        var selectedCount = $('.row-checkbox:checked').length;
+        var totalCount = $('.row-checkbox').length;
+        
+        $('#selectedCount').text(selectedCount + ' selected');
+        $('#bulkEditBtn, #bulkDeleteBtn').prop('disabled', selectedCount === 0);
+        
+        $('#selectAll').prop('checked', selectedCount === totalCount && totalCount > 0);
+        $('#selectAll').prop('indeterminate', selectedCount > 0 && selectedCount < totalCount);
+    }
+
+    // Bulk Edit action
+    $('#bulkEditBtn').on('click', function(e) {
+        e.preventDefault();
+        var selectedData = [];
+        $('.row-checkbox:checked').each(function() {
+            selectedData.push($(this).val());
+        });
+        
+        if (selectedData.length > 0) {
+            window.location.href = '{{ route("exam-timetables.bulk-edit") }}?selected=' + encodeURIComponent(selectedData.join(','));
+        }
+    });
+
+    // Bulk Delete action
+    $('#bulkDeleteBtn').on('click', function(e) {
+        e.preventDefault();
+        var selectedCount = $('.row-checkbox:checked').length;
+        if (confirm('Are you sure you want to delete ' + selectedCount + ' selected timetable(s)? This action cannot be undone.')) {
+            $('#bulkActionForm').attr('action', '{{ route("exam-timetables.bulk-delete") }}').submit();
+        }
+    });
+
+    // Delete single timetable
+    $(document).on('click', '.delete-class-btn', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var $btn = $(this);
+        var examType = $btn.attr('data-exam-type');
+        var className = $btn.attr('data-class');
+        var section = $btn.attr('data-section') || '';
+        var academicYear = $btn.attr('data-academic-year');
+        
+        if (confirm('Are you sure you want to delete this timetable for ' + className + ' ' + (section || 'All') + '? This action cannot be undone.')) {
+            var $form = $('<form>', {
+                method: 'POST',
+                action: '{{ route("exam-timetables.delete-group") }}'
+            });
+            
+            $form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
+            $form.append($('<input>', { type: 'hidden', name: '_method', value: 'DELETE' }));
+            $form.append($('<input>', { type: 'hidden', name: 'exam_type', value: examType }));
+            $form.append($('<input>', { type: 'hidden', name: 'class', value: className }));
+            $form.append($('<input>', { type: 'hidden', name: 'section', value: section }));
+            $form.append($('<input>', { type: 'hidden', name: 'academic_year', value: academicYear }));
+            
+            $form.appendTo('body').submit();
+        }
+    });
+
+    // Initialize selection state on page load
+    updateSelectionState();
+});
+</script>
+@endsection

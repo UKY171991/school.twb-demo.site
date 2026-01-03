@@ -19,8 +19,9 @@ class SubjectController extends Controller
     {
         $schoolId = session('current_school_id');
         $query = Subject::with(['grade', 'teacher', 'school'])->where('school_id', $schoolId);
-        
+
         $subjects = $query->latest()->paginate(10);
+
         return view('subjects.index', compact('subjects'));
     }
 
@@ -29,16 +30,18 @@ class SubjectController extends Controller
      */
     public function create(Request $request)
     {
-        $query = function($model) use ($request) {
+        $query = function ($model) use ($request) {
             $q = $model::query();
             if ($request->has('current_school_id')) {
                 $q->where('school_id', $request->get('current_school_id'));
             }
+
             return $q;
         };
-        
+
         $grades = $query(\App\Models\Grade::class)->get();
         $teachers = $query(\App\Models\Teacher::class)->get();
+
         return view('subjects.create', compact('grades', 'teachers'));
     }
 
@@ -66,7 +69,7 @@ class SubjectController extends Controller
         Subject::create($data);
 
         return redirect()->route('subjects.index')
-                        ->with('success','Subject created successfully.');
+            ->with('success', 'Subject created successfully.');
     }
 
     /**
@@ -75,6 +78,7 @@ class SubjectController extends Controller
     public function show(Subject $subject)
     {
         $subject->load(['grade', 'teacher', 'school']);
+
         return view('subjects.show', compact('subject'));
     }
 
@@ -83,16 +87,18 @@ class SubjectController extends Controller
      */
     public function edit(Subject $subject, Request $request)
     {
-        $query = function($model) use ($request) {
+        $query = function ($model) use ($request) {
             $q = $model::query();
             if ($request->has('current_school_id')) {
                 $q->where('school_id', $request->get('current_school_id'));
             }
+
             return $q;
         };
-        
+
         $grades = $query(\App\Models\Grade::class)->get();
         $teachers = $query(\App\Models\Teacher::class)->get();
+
         return view('subjects.edit', compact('subject', 'grades', 'teachers'));
     }
 
@@ -103,7 +109,7 @@ class SubjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|unique:subjects,code,' . $subject->id,
+            'code' => 'nullable|string|unique:subjects,code,'.$subject->id,
             'description' => 'nullable|string',
             'max_marks' => 'nullable|integer|min:1',
             'pass_marks' => 'nullable|integer|min:1',
@@ -120,7 +126,7 @@ class SubjectController extends Controller
         $subject->update($data);
 
         return redirect()->route('subjects.index')
-                        ->with('success','Subject updated successfully.');
+            ->with('success', 'Subject updated successfully.');
     }
 
     /**
@@ -131,7 +137,7 @@ class SubjectController extends Controller
         $subject->delete();
 
         return redirect()->route('subjects.index')
-                        ->with('success','Subject deleted successfully.');
+            ->with('success', 'Subject deleted successfully.');
     }
 
     /**
@@ -143,7 +149,7 @@ class SubjectController extends Controller
             ->select('id', 'name', 'code')
             ->orderBy('name')
             ->get();
-            
+
         return response()->json($subjects);
     }
 }

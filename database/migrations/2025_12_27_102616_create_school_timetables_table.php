@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('academic_year');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            
+
             // Indexes for better performance
             $table->index(['school_id', 'class', 'section', 'day_of_week']);
             $table->index(['teacher_id', 'day_of_week']);

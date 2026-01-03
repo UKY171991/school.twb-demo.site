@@ -13,6 +13,7 @@ class SchoolController extends Controller
     public function index()
     {
         $schools = School::latest()->paginate(10);
+
         return view('schools.index', compact('schools'));
     }
 
@@ -48,25 +49,25 @@ class SchoolController extends Controller
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
-            $school = new School();
+            $school = new School;
             $data['logo'] = $school->uploadImage($request->file('logo'), 'schools/logos');
         }
 
         // Handle signatures
         if ($request->hasFile('principal_signature')) {
-            $school = new School();
+            $school = new School;
             $data['principal_signature'] = $school->uploadImage($request->file('principal_signature'), 'schools/signatures');
         }
 
         if ($request->hasFile('exam_controller_signature')) {
-            $school = new School();
+            $school = new School;
             $data['exam_controller_signature'] = $school->uploadImage($request->file('exam_controller_signature'), 'schools/signatures');
         }
 
         School::create($data);
 
         return redirect()->route('schools.index')
-                        ->with('success', 'School created successfully!');
+            ->with('success', 'School created successfully!');
     }
 
     /**
@@ -75,12 +76,12 @@ class SchoolController extends Controller
     public function show(School $school)
     {
         $school->load(['students', 'teachers', 'grades', 'subjects']);
-        
+
         $stats = [
             'students_count' => $school->getActiveStudentsCount(),
             'teachers_count' => $school->getActiveTeachersCount(),
             'grades_count' => $school->getGradesCount(),
-            'subjects_count' => $school->subjects()->count()
+            'subjects_count' => $school->subjects()->count(),
         ];
 
         return view('schools.show', compact('school', 'stats'));
@@ -101,10 +102,10 @@ class SchoolController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:schools,code,' . $school->id,
+            'code' => 'required|string|max:50|unique:schools,code,'.$school->id,
             'address' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:schools,email,' . $school->id,
+            'email' => 'nullable|email|unique:schools,email,'.$school->id,
             'website' => 'nullable|url',
             'principal_name' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -133,7 +134,7 @@ class SchoolController extends Controller
         $school->update($data);
 
         return redirect()->route('schools.index')
-                        ->with('success', 'School updated successfully!');
+            ->with('success', 'School updated successfully!');
     }
 
     /**
@@ -144,7 +145,7 @@ class SchoolController extends Controller
         // Check if school has any associated data
         if ($school->students()->count() > 0 || $school->teachers()->count() > 0) {
             return redirect()->route('schools.index')
-                           ->with('error', 'Cannot delete school with existing students or teachers. Please transfer them first.');
+                ->with('error', 'Cannot delete school with existing students or teachers. Please transfer them first.');
         }
 
         // Delete school logo if exists
@@ -155,7 +156,7 @@ class SchoolController extends Controller
         $school->delete();
 
         return redirect()->route('schools.index')
-                        ->with('success', 'School deleted successfully!');
+            ->with('success', 'School deleted successfully!');
     }
 
     /**
@@ -164,20 +165,20 @@ class SchoolController extends Controller
     public function switchSchool(Request $request, School $school)
     {
         session(['current_school_id' => $school->id]);
-        
+
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Switched to ' . $school->name,
+                'message' => 'Switched to '.$school->name,
                 'school' => [
                     'id' => $school->id,
-                    'name' => $school->name
-                ]
+                    'name' => $school->name,
+                ],
             ]);
         }
-        
+
         return redirect()->back()
-                        ->with('success', 'Switched to ' . $school->name);
+            ->with('success', 'Switched to '.$school->name);
     }
 
     public function removeLogo(School $school)

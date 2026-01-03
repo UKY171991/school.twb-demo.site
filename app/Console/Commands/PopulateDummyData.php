@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class PopulateDummyData extends Command
 {
     protected $signature = 'school:populate-dummy-data {--fresh : Fresh migration and seed}';
+
     protected $description = 'Populate the database with comprehensive dummy data for school management system';
 
     public function handle()
@@ -20,25 +21,26 @@ class PopulateDummyData extends Command
         }
 
         $this->info('Populating database with dummy data...');
-        
+
         // Check if data already exists
         $schoolCount = DB::table('schools')->count();
         if ($schoolCount > 0) {
-            if (!$this->confirm('Database already contains data. Do you want to continue? This will add more data.')) {
+            if (! $this->confirm('Database already contains data. Do you want to continue? This will add more data.')) {
                 $this->info('Operation cancelled.');
+
                 return;
             }
         }
 
         // Run the seeder
         Artisan::call('db:seed', ['--class' => 'ComprehensiveDummyDataSeeder']);
-        
+
         $this->info('✅ Dummy data populated successfully!');
         $this->newLine();
-        
+
         // Display summary
         $this->displaySummary();
-        
+
         $this->newLine();
         $this->info('🎉 Your school management system is now ready with comprehensive test data!');
         $this->info('You can login with: admin@school.com / password');

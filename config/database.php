@@ -16,7 +16,13 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-detect database connection based on environment
+    | Local (APP_ENV=local) uses SQLite, Production uses MySQL
+    |--------------------------------------------------------------------------
+    */
+    'default' => env('DB_CONNECTION', env('APP_ENV') === 'local' ? 'sqlite' : 'mysql'),
 
     /*
     |--------------------------------------------------------------------------

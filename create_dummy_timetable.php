@@ -8,7 +8,7 @@ $student = Student::where('name', 'John Doe')->first();
 $className = $student->grade->name; // "Grade 10"
 $subject = Subject::where('grade_id', $student->grade_id)->first();
 
-if (!$subject) {
+if (! $subject) {
     echo "No subject found for student grade.\n";
     exit;
 }
@@ -32,10 +32,10 @@ echo "Created dummy timetable ID: {$timetable->id} for Class: '{$timetable->clas
 // Now test the query from AdmitCardController logic
 $result = ExamTimetable::where('school_id', $student->school_id)
     ->where('class', $className) // Logic I added
-    ->where(function($query) use ($student) {
+    ->where(function ($query) use ($student) {
         $query->where('section', $student->section)
-              ->orWhereNull('section')
-              ->orWhere('section', '');
+            ->orWhereNull('section')
+            ->orWhere('section', '');
     })
     ->where('exam_type_id', 1)
     ->where('academic_year', '2024-2025')

@@ -17,7 +17,7 @@ class Subject extends Model
         'max_marks',
         'pass_marks',
         'grade_id',
-        'teacher_id'
+        'teacher_id',
     ];
 
     public function school()

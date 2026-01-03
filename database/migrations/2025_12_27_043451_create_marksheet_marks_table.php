@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('marksheet_id')->constrained()->onDelete('cascade');
             $table->integer('obtained_marks');
             $table->timestamps();
-            
+
             $table->unique(['student_id', 'subject_id', 'marksheet_id']);
         });
     }

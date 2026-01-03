@@ -15,14 +15,14 @@ class SystemSetting extends Model
         'type',
         'group',
         'label',
-        'description'
+        'description',
     ];
 
     public static function get($key, $default = null)
     {
         $setting = self::where('key', $key)->first();
-        
-        if (!$setting) {
+
+        if (! $setting) {
             return $default;
         }
 
@@ -38,7 +38,7 @@ class SystemSetting extends Model
                 'type' => $type,
                 'group' => $group,
                 'label' => $label ?? $key,
-                'description' => $description
+                'description' => $description,
             ]
         );
     }

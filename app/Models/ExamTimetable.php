@@ -21,14 +21,14 @@ class ExamTimetable extends Model
         'end_time',
         'exam_center',
         'instructions',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'exam_date' => 'date',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     public function school()
@@ -48,7 +48,7 @@ class ExamTimetable extends Model
 
     public function getTimeSlotAttribute()
     {
-        return $this->start_time->format('H:i') . ' - ' . $this->end_time->format('H:i');
+        return $this->start_time->format('H:i').' - '.$this->end_time->format('H:i');
     }
 
     public function getFormattedDateAttribute()

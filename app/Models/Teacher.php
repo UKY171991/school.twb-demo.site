@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\ImageUploadTrait;
+use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
 {
     use ImageUploadTrait;
+
     protected $fillable = [
         'school_id',
         'name',
@@ -19,7 +20,7 @@ class Teacher extends Model
         'address',
         'designation',
         'image',
-        'signature'
+        'signature',
     ];
 
     protected $casts = [
@@ -44,7 +45,7 @@ class Teacher extends Model
     {
         return $this->getImageUrl($this->attributes['image'] ?? null);
     }
-    
+
     public function getSignatureUrlAttribute()
     {
         return $this->getImageUrl($this->attributes['signature'] ?? null);

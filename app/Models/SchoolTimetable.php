@@ -21,13 +21,13 @@ class SchoolTimetable extends Model
         'room_number',
         'notes',
         'academic_year',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     // Relationships
@@ -63,6 +63,7 @@ class SchoolTimetable extends Model
         if ($section) {
             $query->where('section', $section);
         }
+
         return $query;
     }
 
@@ -86,16 +87,16 @@ class SchoolTimetable extends Model
     {
         $start = \Carbon\Carbon::parse($this->start_time);
         $end = \Carbon\Carbon::parse($this->end_time);
-        
+
         $hours = $start->diffInHours($end);
         $minutes = $start->diffInMinutes($end) % 60;
-        
-        return $hours . 'h' . ($minutes > 0 ? ' ' . $minutes . 'm' : '');
+
+        return $hours.'h'.($minutes > 0 ? ' '.$minutes.'m' : '');
     }
 
     public function getClassSectionAttribute()
     {
-        return $this->class . ($this->section ? '-' . $this->section : '');
+        return $this->class.($this->section ? '-'.$this->section : '');
     }
 
     // Static methods
@@ -118,7 +119,7 @@ class SchoolTimetable extends Model
             '14:00' => '2:00 PM',
             '14:45' => '2:45 PM',
             '15:30' => '3:30 PM',
-            '16:15' => '4:15 PM'
+            '16:15' => '4:15 PM',
         ];
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\GradingSystem;
-use App\Models\SystemSetting;
 use App\Models\MarkingScheme;
+use App\Models\SystemSetting;
+use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
 {
@@ -42,12 +41,12 @@ class SettingsSeeder extends Seeder
             ['key' => 'school_phone', 'value' => '+1234567890', 'type' => 'string', 'group' => 'school', 'label' => 'School Phone'],
             ['key' => 'school_email', 'value' => 'info@abcschool.edu', 'type' => 'string', 'group' => 'school', 'label' => 'School Email'],
             ['key' => 'academic_year', 'value' => '2024-2025', 'type' => 'string', 'group' => 'school', 'label' => 'Academic Year'],
-            
+
             // Grading Settings
             ['key' => 'current_grading_scheme', 'value' => 'default', 'type' => 'string', 'group' => 'grading', 'label' => 'Current Grading Scheme'],
             ['key' => 'pass_percentage', 'value' => '33', 'type' => 'float', 'group' => 'grading', 'label' => 'Pass Percentage'],
             ['key' => 'grade_calculation_method', 'value' => 'percentage', 'type' => 'string', 'group' => 'grading', 'label' => 'Grade Calculation Method'],
-            
+
             // Marking Settings
             ['key' => 'current_marking_scheme', 'value' => 'percentage', 'type' => 'string', 'group' => 'marking', 'label' => 'Current Marking Scheme'],
             ['key' => 'decimal_places', 'value' => '2', 'type' => 'integer', 'group' => 'marking', 'label' => 'Decimal Places'],
@@ -79,11 +78,11 @@ class SettingsSeeder extends Seeder
                         ['grade' => 'C', 'min' => 40, 'max' => 49],
                         ['grade' => 'D', 'min' => 33, 'max' => 39],
                         ['grade' => 'F', 'min' => 0, 'max' => 32],
-                    ]
+                    ],
                 ],
                 'description' => 'Standard percentage-based grading system',
-                'is_active' => true
-            ]
+                'is_active' => true,
+            ],
         ];
 
         foreach ($markingSchemes as $scheme) {

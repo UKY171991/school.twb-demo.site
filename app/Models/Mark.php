@@ -16,7 +16,7 @@ class Mark extends Model
         'mark_obtained',
         'total_marks',
         'exam_type',
-        'exam_date'
+        'exam_date',
     ];
 
     protected $casts = [
@@ -46,22 +46,37 @@ class Mark extends Model
     public function getGradeAttribute()
     {
         $percentage = $this->percentage;
-        
+
         // Use configurable grading system
         $gradingSystem = \App\Models\GradingSystem::getGradeForPercentage($percentage);
-        
+
         if ($gradingSystem) {
             return $gradingSystem->grade;
         }
-        
+
         // Fallback to default grading if no system configured
-        if ($percentage >= 90) return 'A+';
-        if ($percentage >= 80) return 'A';
-        if ($percentage >= 70) return 'B+';
-        if ($percentage >= 60) return 'B';
-        if ($percentage >= 50) return 'C+';
-        if ($percentage >= 40) return 'C';
-        if ($percentage >= 33) return 'D';
+        if ($percentage >= 90) {
+            return 'A+';
+        }
+        if ($percentage >= 80) {
+            return 'A';
+        }
+        if ($percentage >= 70) {
+            return 'B+';
+        }
+        if ($percentage >= 60) {
+            return 'B';
+        }
+        if ($percentage >= 50) {
+            return 'C+';
+        }
+        if ($percentage >= 40) {
+            return 'C';
+        }
+        if ($percentage >= 33) {
+            return 'D';
+        }
+
         return 'F';
     }
 
@@ -69,7 +84,7 @@ class Mark extends Model
     {
         $percentage = $this->percentage;
         $passPercentage = \App\Models\SystemSetting::get('pass_percentage', 33);
-        
+
         return $percentage >= $passPercentage;
     }
 }

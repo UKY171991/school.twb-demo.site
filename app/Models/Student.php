@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Traits\ImageUploadTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\ImageUploadTrait;
 
 class Student extends Model
 {
@@ -24,7 +24,7 @@ class Student extends Model
         'gender',
         'address',
         'grade_id',
-        'image'
+        'image',
     ];
 
     protected $casts = [
