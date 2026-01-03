@@ -20,7 +20,7 @@ class SchoolContext
         $currentSchoolId = session('current_school_id');
 
         if (! $currentSchoolId) {
-            // Auto-select the first active school if none selected
+            // Auto-select first active school if none selected
             $firstSchool = School::active()->first();
             if ($firstSchool) {
                 session(['current_school_id' => $firstSchool->id]);
