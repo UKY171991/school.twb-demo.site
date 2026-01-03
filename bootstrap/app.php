@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SchoolContext::class,
         ]);
+        
+        $middleware->redirectTo(
+            guest: '/login',
+            auth: '/admin/home'
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
