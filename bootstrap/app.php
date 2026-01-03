@@ -23,8 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         
         $middleware->redirectTo(
-            guest: '/login',
-            auth: '/admin/home'
+            guests: '/login',
+            users: '/admin/home'
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
