@@ -10,7 +10,7 @@ class TeacherController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+        // Middleware is already applied in bootstrap/app.php
     }
 
     /**
@@ -18,7 +18,12 @@ class TeacherController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolId = session('current_school_id');
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $query = Teacher::where('school_id', $schoolId);
 
         $teachers = $query->latest()->paginate(10);
@@ -29,8 +34,9 @@ class TeacherController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $schoolId = $request->current_school_id;
         $schools = School::where('status', 'active')->orderBy('name')->get();
         return view('teachers.create', compact('schools'));
     }
@@ -40,21 +46,34 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers',
+            'email' => [
+                'required',
+                'email',
+                // Unique email within the same school
+                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) use ($schoolId) {
+                    return $query->where('school_id', $schoolId);
+                }),
+            ],
             'phone' => 'nullable|string|max:20',
             'gender' => 'required|in:male,female,other',
             'date_of_birth' => 'nullable|date',
             'date_of_joining' => 'nullable|date',
             'address' => 'nullable|string',
-            'school_id' => 'required|exists:schools,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'designation' => 'nullable|string|max:100',
             'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->all();
+        $data['school_id'] = $schoolId;
 
         // Handle image upload
         if ($request->hasFile('image')) {

@@ -9,7 +9,7 @@ class GradeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+        // Middleware is already applied in bootstrap/app.php
     }
 
     /**
@@ -17,26 +17,12 @@ class GradeController extends Controller
      */
     public function index(Request $request)
     {
-        // Get school ID from multiple sources with fallback
-        $schoolId = $request->input('current_school_id') 
-                   ?: session('current_school_id')
-                   ?: \App\Models\School::value('id');
+        $schoolId = $request->current_school_id;
         
-        // Ensure we have a valid school ID
         if (!$schoolId) {
-            // Create a default school if none exists
-            $school = \App\Models\School::firstOrCreate([
-                'code' => 'DEFAULT'
-            ], [
-                'name' => 'Default School',
-                'address' => 'Default Address',
-                'status' => 'active'
-            ]);
-            $schoolId = $school->id;
-            session(['current_school_id' => $schoolId]);
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
         
-        // Use a simpler query without withCount to avoid potential issues
         $query = Grade::with(['teacher'])->where('school_id', $schoolId);
         $grades = $query->paginate(10);
 
@@ -46,25 +32,12 @@ class GradeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        // Get school ID from multiple sources with fallback
-        $schoolId = $request->input('current_school_id') 
-                   ?: session('current_school_id')
-                   ?: \App\Models\School::value('id');
+        $schoolId = $request->current_school_id;
         
-        // Ensure we have a valid school ID
         if (!$schoolId) {
-            // Create a default school if none exists
-            $school = \App\Models\School::firstOrCreate([
-                'code' => 'DEFAULT'
-            ], [
-                'name' => 'Default School',
-                'address' => 'Default Address',
-                'status' => 'active'
-            ]);
-            $schoolId = $school->id;
-            session(['current_school_id' => $schoolId]);
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
         
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
@@ -77,36 +50,30 @@ class GradeController extends Controller
      */
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // Unique name within the same school
+                \Illuminate\Validation\Rule::unique('grades')->where(function ($query) use ($schoolId) {
+                    return $query->where('school_id', $schoolId);
+                }),
+            ],
             'section' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|exists:teachers,id',
-            'capacity' => 'nullable|integer|min:1|max:100',
+            'capacity' => 'nullable|integer|min:1|max:500',
             'description' => 'nullable|string|max:1000',
             'grade_theme' => 'nullable|integer|min:1|max:12',
             'status' => 'nullable|string|in:active,inactive,upcoming',
         ]);
 
-        // Get school ID from multiple sources with fallback
-        $schoolId = $request->input('current_school_id') 
-                   ?: session('current_school_id')
-                   ?: \App\Models\School::value('id');
-        
-        // Ensure we have a valid school ID
-        if (!$schoolId) {
-            // Create a default school if none exists
-            $school = \App\Models\School::firstOrCreate([
-                'code' => 'DEFAULT'
-            ], [
-                'name' => 'Default School',
-                'address' => 'Default Address',
-                'status' => 'active'
-            ]);
-            $schoolId = $school->id;
-            session(['current_school_id' => $schoolId]);
-        }
-
-        // Add school context to data
         $data = $request->all();
         $data['school_id'] = $schoolId;
 

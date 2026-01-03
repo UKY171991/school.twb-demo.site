@@ -11,7 +11,7 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+        // Middleware is already applied in bootstrap/app.php
     }
 
     /**
@@ -19,7 +19,12 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolId = session('current_school_id');
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $query = Student::with('grade')->where('school_id', $schoolId);
 
         $students = $query->latest()->paginate(10);
@@ -32,14 +37,13 @@ class StudentController extends Controller
      */
     public function create(Request $request)
     {
-        // Get all schools for selection, but filter grades by current school if one is selected
-        $currentSchoolId = session('current_school_id');
-
-        if ($currentSchoolId) {
-            $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
-        } else {
-            $grades = \App\Models\Grade::all();
+        $currentSchoolId = $request->current_school_id;
+        
+        if (!$currentSchoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
+
+        $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
 
         return view('students.create', compact('grades'));
     }
@@ -49,36 +53,29 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:students,email',
+            'email' => [
+                'nullable',
+                'email',
+                // Unique email within the same school
+                \Illuminate\Validation\Rule::unique('students')->where(function ($query) use ($schoolId) {
+                    return $query->where('school_id', $schoolId);
+                }),
+            ],
             'phone' => 'nullable|string|max:20',
             'date_of_birth' => 'nullable|date',
             'gender' => 'required|in:male,female,other',
             'address' => 'nullable|string',
             'grade_id' => 'required|exists:grades,id',
-            'school_id' => 'required|exists:schools,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Get school ID from multiple sources with fallback
-        $schoolId = $request->input('current_school_id') 
-                   ?: session('current_school_id')
-                   ?: \App\Models\School::value('id');
-        
-        // Ensure we have a valid school ID
-        if (!$schoolId) {
-            // Create a default school if none exists
-            $school = \App\Models\School::firstOrCreate([
-                'code' => 'DEFAULT'
-            ], [
-                'name' => 'Default School',
-                'address' => 'Default Address',
-                'status' => 'active'
-            ]);
-            $schoolId = $school->id;
-            session(['current_school_id' => $schoolId]);
-        }
 
         $data = $request->all();
         $data['school_id'] = $schoolId;

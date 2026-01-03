@@ -9,7 +9,7 @@ class SubjectController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+        // Middleware is already applied in bootstrap/app.php
     }
 
     /**
@@ -17,7 +17,12 @@ class SubjectController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolId = session('current_school_id');
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $query = Subject::with(['grade', 'teacher', 'school'])->where('school_id', $schoolId);
 
         $subjects = $query->latest()->paginate(10);
@@ -30,17 +35,14 @@ class SubjectController extends Controller
      */
     public function create(Request $request)
     {
-        $query = function ($model) use ($request) {
-            $q = $model::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
 
-            return $q;
-        };
-
-        $grades = $query(\App\Models\Grade::class)->get();
-        $teachers = $query(\App\Models\Teacher::class)->get();
+        $grades = \App\Models\Grade::where('school_id', $schoolId)->get();
+        $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
 
         return view('subjects.create', compact('grades', 'teachers'));
     }
@@ -50,9 +52,22 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|unique:subjects,code',
+            'code' => [
+                'nullable',
+                'string',
+                // Unique code within the same school
+                \Illuminate\Validation\Rule::unique('subjects')->where(function ($query) use ($schoolId) {
+                    return $query->where('school_id', $schoolId);
+                }),
+            ],
             'description' => 'nullable|string',
             'max_marks' => 'nullable|integer|min:1',
             'pass_marks' => 'nullable|integer|min:1',
@@ -60,11 +75,8 @@ class SubjectController extends Controller
             'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
-        // Add current school context
         $data = $request->all();
-        if ($request->has('current_school_id')) {
-            $data['school_id'] = $request->get('current_school_id');
-        }
+        $data['school_id'] = $schoolId;
 
         Subject::create($data);
 

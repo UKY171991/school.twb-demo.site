@@ -25,16 +25,30 @@ class SchoolContext
             if ($firstSchool) {
                 session(['current_school_id' => $firstSchool->id]);
                 $currentSchoolId = $firstSchool->id;
+                // Optional: Notify user about auto-selection in next session persistent check
             }
         }
 
         // Make current school available globally
         if ($currentSchoolId) {
             $currentSchool = School::find($currentSchoolId);
-            view()->share('currentSchool', $currentSchool);
+            
+            // If school no longer exists, clear session and retry auto-select
+            if (!$currentSchool) {
+                session()->forget('current_school_id');
+                $firstSchool = School::active()->first();
+                if ($firstSchool) {
+                    session(['current_school_id' => $firstSchool->id]);
+                    $currentSchool = $firstSchool;
+                    $currentSchoolId = $firstSchool->id;
+                }
+            }
 
-            // Store in request for controllers to use
-            $request->merge(['current_school_id' => $currentSchoolId]);
+            if ($currentSchool) {
+                view()->share('currentSchool', $currentSchool);
+                // Store in request for controllers to use
+                $request->merge(['current_school_id' => $currentSchoolId]);
+            }
         }
 
         return $next($request);

@@ -13,12 +13,17 @@ class MarksheetController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(\App\Http\Middleware\SchoolContext::class);
+        // Middleware is already applied in bootstrap/app.php
     }
 
     public function index(Request $request)
     {
-        $schoolId = session('current_school_id');
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $query = Marksheet::with('student')->where('school_id', $schoolId);
 
         $marksheets = $query->latest()->paginate(10);
@@ -28,7 +33,11 @@ class MarksheetController extends Controller
 
     public function create(Request $request)
     {
-        $schoolId = session('current_school_id');
+        $schoolId = $request->current_school_id;
+        
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
 
         $students = Student::where('school_id', $schoolId)->with('grade')->get();
         $subjects = Subject::where('school_id', $schoolId)->get();
@@ -40,6 +49,12 @@ class MarksheetController extends Controller
 
     public function store(Request $request)
     {
+        $schoolId = $request->current_school_id;
+
+        if (!$schoolId) {
+            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
+        }
+
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'class' => 'required|string|max:255',
@@ -51,10 +66,11 @@ class MarksheetController extends Controller
             'marks.*' => 'required|integer|min:0',
         ]);
 
-        DB::transaction(function () use ($request) {
-            $student = Student::find($request->student_id);
+        DB::transaction(function () use ($request, $schoolId) {
+            $student = Student::findOrFail($request->student_id);
 
             $data = [
+                'school_id' => $schoolId,
                 'student_id' => $request->student_id,
                 'exam_type_id' => $request->exam_type_id,
                 'exam_name' => $request->exam_name,
@@ -63,11 +79,6 @@ class MarksheetController extends Controller
                 'section' => $student->section,
                 'academic_year' => $request->academic_year,
             ];
-
-            // Add current school context
-            if ($request->has('current_school_id')) {
-                $data['school_id'] = $request->get('current_school_id');
-            }
 
             $marksheet = Marksheet::create($data);
 

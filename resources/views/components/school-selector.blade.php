@@ -45,7 +45,7 @@ function switchSchool(schoolId) {
     dropdown.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Switching...';
     
     // Submit form to switch school
-    fetch(`/schools/${schoolId}/switch`, {
+    fetch(`/admin/schools/${schoolId}/switch`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
