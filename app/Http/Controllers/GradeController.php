@@ -87,11 +87,28 @@ class GradeController extends Controller
             'status' => 'nullable|string|in:active,inactive,upcoming',
         ]);
 
-        // Add current school context
-        $data = $request->all();
-        if ($request->has('current_school_id')) {
-            $data['school_id'] = $request->get('current_school_id');
+        // Get school ID from multiple sources with fallback
+        $schoolId = $request->input('current_school_id') 
+                   ?: session('current_school_id')
+                   ?: \App\Models\School::value('id');
+        
+        // Ensure we have a valid school ID
+        if (!$schoolId) {
+            // Create a default school if none exists
+            $school = \App\Models\School::firstOrCreate([
+                'code' => 'DEFAULT'
+            ], [
+                'name' => 'Default School',
+                'address' => 'Default Address',
+                'status' => 'active'
+            ]);
+            $schoolId = $school->id;
+            session(['current_school_id' => $schoolId]);
         }
+
+        // Add school context to data
+        $data = $request->all();
+        $data['school_id'] = $schoolId;
 
         // Set default values if not provided
         $data['capacity'] = $data['capacity'] ?? 40;
