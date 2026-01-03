@@ -19,6 +19,7 @@ class GradeSeeder extends Seeder
         if (!$school) {
             $school = School::create([
                 'name' => 'Default School',
+                'code' => 'DEFAULT001',
                 'address' => 'Default Address',
                 'phone' => '0000000000',
                 'email' => 'default@school.com',
