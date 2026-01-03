@@ -28,8 +28,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+@stop
+
 @section('js')
 <script>
 function showAjaxMessage(message, type='success'){
