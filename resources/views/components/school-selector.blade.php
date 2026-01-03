@@ -3,34 +3,45 @@
     $currentSchool = $currentSchool ?? null;
 @endphp
 
-@if($schools->count() > 1)
 <div class="navbar-nav ml-auto">
-    <div class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="schoolDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-school"></i>
-            <span class="d-none d-md-inline">
-                {{ $currentSchool ? $currentSchool->name : 'Select School' }}
-            </span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="schoolDropdown">
-            <h6 class="dropdown-header">
-                <i class="fas fa-building"></i> Switch School
-            </h6>
-            <div class="dropdown-divider"></div>
-            @foreach($schools as $school)
-                <a class="dropdown-item {{ $currentSchool && $currentSchool->id == $school->id ? 'active' : '' }}" 
-                   href="#" onclick="switchSchool({{ $school->id }})">
-                    <i class="fas fa-school mr-2"></i>
-                    {{ $school->name }}
-                    @if($currentSchool && $currentSchool->id == $school->id)
-                        <i class="fas fa-check text-success float-right mt-1"></i>
-                    @endif
-                </a>
-            @endforeach
+    @if($schools->count() > 1)
+        <div class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="schoolDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-school"></i>
+                <span class="d-none d-md-inline">
+                    {{ $currentSchool ? (strlen($currentSchool->name) > 20 ? substr($currentSchool->name, 0, 17) . '...' : $currentSchool->name) : 'Select School' }}
+                </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="schoolDropdown">
+                <h6 class="dropdown-header">
+                    <i class="fas fa-building"></i> Switch School
+                </h6>
+                <div class="dropdown-divider"></div>
+                @foreach($schools as $school)
+                    <a class="dropdown-item {{ $currentSchool && $currentSchool->id == $school->id ? 'active' : '' }}" 
+                       href="#" onclick="switchSchool({{ $school->id }})">
+                        <i class="fas fa-school mr-2"></i>
+                        {{ $school->name }}
+                        @if($currentSchool && $currentSchool->id == $school->id)
+                            <i class="fas fa-check text-success float-right mt-1"></i>
+                        @endif
+                    </a>
+                @endforeach
+            </div>
         </div>
-    </div>
+    @elseif($currentSchool)
+        <div class="nav-item">
+            <span class="nav-link">
+                <i class="fas fa-school"></i>
+                <span class="d-none d-md-inline">
+                    {{ $currentSchool->name }}
+                </span>
+            </span>
+        </div>
+    @endif
 </div>
 
+@if($schools->count() > 1)
 <!-- School Switch Form (Hidden) -->
 <form id="schoolSwitchForm" method="POST" style="display: none;">
     @csrf
