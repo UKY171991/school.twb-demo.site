@@ -68,7 +68,7 @@
             <div class="small-box bg-gradient-warning">
                 <div class="inner">
                     <h3>{{ $stats['grades'] }}</h3>
-                    <p>Grades</p>
+                    <p>Classes</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-layer-group"></i>
