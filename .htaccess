@@ -1,3 +1,6 @@
+<FilesMatch "\.php$">
+    SetHandler application/x-lsphp82
+</FilesMatch>
 
 
 <IfModule mod_rewrite.c>
