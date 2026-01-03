@@ -83,12 +83,7 @@ function renderLeavesTable(resp){
         html += `</ul></nav>`;
     }
 
-    // new leave button
-    html = `<div class="mb-2"><button class="btn btn-primary" id="new-leave-btn">New Leave</button></div>` + html;
-
     $('#leaves-table-container').html(html);
-
-    $('#new-leave-btn').click(function(){ openLeaveForm('create'); });
 }
 
 function openLeaveForm(mode, id){
