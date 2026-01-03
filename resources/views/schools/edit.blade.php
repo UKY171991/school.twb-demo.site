@@ -7,7 +7,33 @@
 @stop
 
 @section('css')
-    <!-- Custom CSS already included in layout -->
+    <style>
+        .image-preview {
+            max-width: 150px;
+            max-height: 100px;
+            object-fit: contain;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            background: #f8f9fa;
+        }
+        .image-upload-section {
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fff;
+        }
+        .current-image-section {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .current-image-label {
+            display: block;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+    </style>
 @stop
 
 @section('content')
