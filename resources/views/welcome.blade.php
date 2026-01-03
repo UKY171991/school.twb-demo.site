@@ -128,7 +128,7 @@
     <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="fas fa-graduation-cap"></i> TheWebBrain
+                <img src="{{ asset('images/logo.svg') }}" alt="TheWebBrain" height="30" class="d-inline-block align-top">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -318,7 +318,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="fas fa-graduation-cap"></i> TheWebBrain</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ asset('images/logo.svg') }}" alt="TheWebBrain" height="40" class="me-3">
+                        <h5 class="mb-0">TheWebBrain</h5>
+                    </div>
                     <p class="mt-3">Empowering education through technology. Making school management simple, efficient, and effective.</p>
                 </div>
                 <div class="col-md-3">

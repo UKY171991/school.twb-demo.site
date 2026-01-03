@@ -3,7 +3,6 @@
 @section('content')
 <div class="auth-card shadow">
     <div class="auth-header">
-        <a href="{{ url('/') }}" class="logo">TheWeb<span>Brain</span></a>
         <h5 class="text-muted fw-normal">Create your account to get started.</h5>
     </div>
     <div class="auth-body">
