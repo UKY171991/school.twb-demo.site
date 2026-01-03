@@ -61,19 +61,40 @@ class StudentController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Get school ID from multiple sources with fallback
+        $schoolId = $request->input('current_school_id') 
+                   ?: session('current_school_id')
+                   ?: \App\Models\School::value('id');
+        
+        // Ensure we have a valid school ID
+        if (!$schoolId) {
+            // Create a default school if none exists
+            $school = \App\Models\School::firstOrCreate([
+                'code' => 'DEFAULT'
+            ], [
+                'name' => 'Default School',
+                'address' => 'Default Address',
+                'status' => 'active'
+            ]);
+            $schoolId = $school->id;
+            session(['current_school_id' => $schoolId]);
+        }
+
         $data = $request->all();
+        $data['school_id'] = $schoolId;
 
         // Populate class and section from Grade
-        $grade = Grade::findOrFail($request->grade_id);
-        $data['class'] = $grade->name;
-        $data['section'] = $grade->section;
+        if ($request->grade_id) {
+            $grade = Grade::findOrFail($request->grade_id);
+            $data['class'] = $grade->name;
+            $data['section'] = $grade->section;
+        }
 
         // Auto-generate roll number if not provided
         if (empty($data['roll_number'])) {
-            $maxRoll = Student::where('school_id', $request->school_id)
+            $maxRoll = Student::where('school_id', $schoolId)
                 ->where('grade_id', $request->grade_id)
-                ->max(DB::raw('CAST(roll_number AS UNSIGNED)'));
-
+                ->max('roll_number');
             $data['roll_number'] = $maxRoll ? $maxRoll + 1 : 1;
         }
 
