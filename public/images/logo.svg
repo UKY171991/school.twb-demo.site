@@ -1,0 +1,35 @@
+<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Brain Icon -->
+  <g transform="translate(10, 10)">
+    <path d="M15 8 C15 8, 10 8, 10 12 C10 12, 10 15, 12 15 C12 15, 15 15, 15 18 C15 18, 15 20, 12 20 C12 20, 8 20, 8 16 C8 16, 8 12, 10 10 C10 10, 12 8, 15 8 Z" 
+          fill="url(#logoGradient)" />
+    <circle cx="12" cy="12" r="1.5" fill="white" />
+    <circle cx="11" cy="15" r="1" fill="white" />
+    <circle cx="13" cy="15" r="1" fill="white" />
+  </g>
+  
+  <!-- Web Lines -->
+  <g stroke="url(#logoGradient)" stroke-width="1" fill="none" opacity="0.6">
+    <line x1="25" y1="15" x2="35" y2="10" />
+    <line x1="25" y1="15" x2="35" y2="20" />
+    <line x1="25" y1="15" x2="30" y2="25" />
+    <circle cx="35" cy="10" r="2" fill="url(#logoGradient)" />
+    <circle cx="35" cy="20" r="2" fill="url(#logoGradient)" />
+    <circle cx="30" cy="25" r="2" fill="url(#logoGradient)" />
+  </g>
+  
+  <!-- Text -->
+  <text x="45" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="url(#logoGradient)">
+    TheWeb
+  </text>
+  <text x="110" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="normal" fill="#333">
+    Brain
+  </text>
+</svg>
