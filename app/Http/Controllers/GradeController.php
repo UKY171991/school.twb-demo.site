@@ -117,6 +117,16 @@ class GradeController extends Controller
     {
         $grade = Grade::findOrFail($id);
         $schoolId = session('current_school_id');
+        
+        // If no school context is set, get the first school
+        if (!$schoolId) {
+            $firstSchool = \App\Models\School::first();
+            if ($firstSchool) {
+                $schoolId = $firstSchool->id;
+                session(['current_school_id' => $schoolId]);
+            }
+        }
+        
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
 
         return view('grades.edit', compact('grade', 'teachers'));
