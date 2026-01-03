@@ -11,6 +11,10 @@ class Grade extends Model
         'teacher_id',
         'name',
         'section',
+        'capacity',
+        'description',
+        'grade_theme',
+        'status',
     ];
 
     public function teacher()
