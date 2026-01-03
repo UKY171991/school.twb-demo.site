@@ -15,24 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create admin user
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@school.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        // Create additional users
-        User::factory()->create([
-            'name' => 'School Manager',
-            'email' => 'manager@school.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        User::factory()->create([
-            'name' => 'Teacher User',
-            'email' => 'teacher@school.com',
-            'password' => bcrypt('password'),
+        $this->call([
+            CreateBasicUsers::class,
         ]);
 
         $this->command->info('Database seeded successfully with basic users!');
