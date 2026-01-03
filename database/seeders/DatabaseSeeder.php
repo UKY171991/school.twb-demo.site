@@ -35,12 +35,7 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        // Run comprehensive dummy data seeder
-        $this->call([
-            ComprehensiveDummyDataSeeder::class,
-        ]);
-
-        $this->command->info('Database seeded successfully with comprehensive dummy data!');
+        $this->command->info('Database seeded successfully with basic users!');
         $this->command->info('Login credentials:');
         $this->command->info('Admin: admin@school.com / password');
         $this->command->info('Manager: manager@school.com / password');
