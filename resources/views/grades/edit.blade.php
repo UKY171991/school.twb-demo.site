@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Grade')
+@section('title', 'Edit Class')
 
 @section('content_header')
-    <h1>Edit Grade/Class</h1>
+    <h1>Edit Class</h1>
 @stop
 
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">Grade Information</h3>
+            <h3 class="card-title">Class Information</h3>
         </div>
         <form action="{{ route('grades.update', $grade->id) }}" method="POST">
             @csrf
@@ -18,9 +18,9 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="name">Grade Name <span class="text-danger">*</span></label>
+                            <label for="name">Class Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" placeholder="e.g., Grade 1, Class 10" value="{{ old('name', $grade->name) }}" required>
+                                   id="name" placeholder="e.g., Class 1, Class 10" value="{{ old('name', $grade->name) }}" required>
                             @error('name')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
