@@ -37,7 +37,7 @@
             <div class="stat-icon">
                 <i class="fas fa-users"></i>
             </div>
-            <div class="stat-value" id="totalStudents">{{ $grades->sum('students_count') }}</div>
+            <div class="stat-value" id="totalStudents">{{ $grades->sum(function($grade) { return $grade->students_count ?? 0; }) }}</div>
             <div class="stat-label">Total Students</div>
         </div>
         <div class="stat-card sections">
@@ -155,9 +155,9 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="student-count {{ $grade->students_count == 0 ? 'zero' : '' }}">
+                                <div class="student-count {{ ($grade->students_count ?? 0) == 0 ? 'zero' : '' }}">
                                     <i class="fas fa-user-graduate"></i>
-                                    <span class="count">{{ $grade->students_count }}</span>
+                                    <span class="count">{{ $grade->students_count ?? 0 }}</span>
                                     <span>students</span>
                                 </div>
                             </td>

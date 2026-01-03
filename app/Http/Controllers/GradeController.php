@@ -36,7 +36,8 @@ class GradeController extends Controller
             session(['current_school_id' => $schoolId]);
         }
         
-        $query = Grade::with(['teacher'])->withCount('students')->where('school_id', $schoolId);
+        // Use a simpler query without withCount to avoid potential issues
+        $query = Grade::with(['teacher'])->where('school_id', $schoolId);
         $grades = $query->paginate(10);
 
         return view('grades.index', compact('grades'));
