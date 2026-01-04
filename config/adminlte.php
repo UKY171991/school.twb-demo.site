@@ -450,12 +450,6 @@ return [
             'icon' => 'fas fa-fw fa-cogs',
             'active' => ['admin/settings*'],
         ],
-        [
-            'text' => 'Settings',
-            'route' => 'settings.index',
-            'icon' => 'fas fa-fw fa-cogs',
-            'active' => ['admin/settings*'],
-        ],
         ['header' => 'ACCOUNT SETTINGS'],
         [
             'text' => 'Profile',
