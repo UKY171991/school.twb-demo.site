@@ -69,11 +69,11 @@ try {
         echo "✓ Created_by column already exists\n";
     }
     
-    // Update existing users to have default role
+    // Update existing users to have default role (admin for registration)
     \Illuminate\Support\Facades\DB::connection('mysql')->statement("
-        UPDATE users SET role = 'user' WHERE role IS NULL OR role = ''
+        UPDATE users SET role = 'admin' WHERE role IS NULL OR role = ''
     ");
-    echo "✓ Updated existing users with default role\n";
+    echo "✓ Updated existing users with default admin role\n";
     
     // Create or update master user
     $masterUser = \Illuminate\Support\Facades\DB::connection('mysql')->table('users')
