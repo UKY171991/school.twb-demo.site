@@ -19,10 +19,22 @@ return [
     /*
     |--------------------------------------------------------------------------
     | Auto-detect database connection based on environment
-    | Local (APP_ENV=local) uses SQLite, Production uses MySQL
     |--------------------------------------------------------------------------
+    |
+    | Local Development (APP_ENV=local) -> SQLite
+    | Testing (APP_ENV=testing) -> SQLite  
+    | Production (APP_ENV=production) -> MySQL
+    | Staging (APP_ENV=staging) -> MySQL
+    |
+    | This allows seamless development and deployment without changing .env
     */
-    'default' => env('DB_CONNECTION', env('APP_ENV') === 'local' ? 'sqlite' : 'mysql'),
+    'default' => env('DB_CONNECTION', match(env('APP_ENV', 'local')) {
+        'local' => 'sqlite',
+        'testing' => 'sqlite',
+        'production' => 'mysql',
+        'staging' => 'mysql',
+        default => 'sqlite'
+    }),
 
     /*
     |--------------------------------------------------------------------------
