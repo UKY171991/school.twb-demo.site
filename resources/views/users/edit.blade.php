@@ -62,21 +62,36 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="role">Role <span class="text-danger">*</span></label>
-                            <select name="role" id="role" class="form-control @error('role') is-invalid @enderror" required @if($user_to_edit->role === 'master') disabled @endif>
-                                <option value="">Select Role</option>
-                                @if(Auth::user()->role == 'master')
-                                    <option value="admin" {{ old('role', $user_to_edit->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="user" {{ old('role', $user_to_edit->role) == 'user' ? 'selected' : '' }}>User</option>
-                                @elseif(Auth::user()->role == 'admin')
-                                    <option value="user" {{ old('role', $user_to_edit->role) == 'user' ? 'selected' : '' }}>User</option>
-                                @endif
-                            </select>
                             @if($user_to_edit->role === 'master')
+                                <div class="alert alert-info">
+                                    <i class="fas fa-crown"></i> 
+                                    <strong>Current Role: Master</strong><br>
+                                    <small class="text-muted">Master user roles cannot be changed through the interface for security reasons.</small>
+                                </div>
                                 <input type="hidden" name="role" value="master" />
+                            @else
+                                <select name="role" id="role" class="form-control @error('role') is-invalid @enderror" required>
+                                    <option value="">Select Role</option>
+                                    @if(Auth::user()->role == 'master')
+                                        <option value="admin" {{ old('role', $user_to_edit->role) == 'admin' ? 'selected' : '' }}>
+                                            <i class="fas fa-user-shield"></i> Admin
+                                        </option>
+                                    @endif
+                                    <option value="user" {{ old('role', $user_to_edit->role) == 'user' ? 'selected' : '' }}>
+                                        <i class="fas fa-user"></i> User
+                                    </option>
+                                </select>
+                                @error('role')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    @if(Auth::user()->role == 'master')
+                                        Master users can modify Admin and User roles.
+                                    @else
+                                        You can only assign User roles.
+                                    @endif
+                                </small>
                             @endif
-                            @error('role')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
                         </div>
                     </div>
                 </div>

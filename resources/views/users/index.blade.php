@@ -49,13 +49,27 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
-                                @if($user->role == 'master')
-                                    <span class="badge badge-danger">Master</span>
-                                @elseif($user->role == 'admin')
-                                    <span class="badge badge-warning">Admin</span>
-                                @else
-                                    <span class="badge badge-info">User</span>
-                                @endif
+                                @switch($user->role)
+                                    @case('master')
+                                        <span class="badge badge-dark">
+                                            <i class="fas fa-crown"></i> Master
+                                        </span>
+                                        @break
+                                    @case('admin')
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-user-shield"></i> Admin
+                                        </span>
+                                        @break
+                                    @case('user')
+                                        <span class="badge badge-info">
+                                            <i class="fas fa-user"></i> User
+                                        </span>
+                                        @break
+                                    @default
+                                        <span class="badge badge-secondary">
+                                            <i class="fas fa-question"></i> {{ ucfirst($user->role) }}
+                                        </span>
+                                @endswitch
                             </td>
                             <td>
                                 <div class="table-actions">
@@ -164,7 +178,7 @@
                         
                         // For Role column, create dropdown
                         if (index === 3) { // Role
-                            var select = $('<select><option value="">All</option><option value="Master">Master</option><option value="Admin">Admin</option><option value="User">User</option></select>')
+                            var select = $('<select><option value="">All</option><option value="master">Master</option><option value="admin">Admin</option><option value="user">User</option></select>')
                                 .on('change', function () {
                                     var val = $.fn.dataTable.util.escapeRegex($(this).val());
                                     column.search(val ? val : '', true, false).draw();

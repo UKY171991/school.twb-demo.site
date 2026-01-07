@@ -64,15 +64,28 @@
                             <select name="role" id="role" class="form-control @error('role') is-invalid @enderror" required>
                                 <option value="">Select Role</option>
                                 @if(Auth::user()->role == 'master')
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>
+                                        <i class="fas fa-user-shield"></i> Admin
+                                    </option>
+                                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>
+                                        <i class="fas fa-user"></i> User
+                                    </option>
                                 @elseif(Auth::user()->role == 'admin')
-                                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
+                                    <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>
+                                        <i class="fas fa-user"></i> User
+                                    </option>
                                 @endif
                             </select>
                             @error('role')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
+                            <small class="form-text text-muted">
+                                @if(Auth::user()->role == 'master')
+                                    Master users can create Admin and User accounts. Admin users can only create User accounts.
+                                @else
+                                    You can create User accounts with limited permissions.
+                                @endif
+                            </small>
                         </div>
                     </div>
                 </div>
