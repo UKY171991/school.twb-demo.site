@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Students')
-
+@section('title', 'User Management')
 
 @section('content_header')
-    <h1><i class="fas fa-user-graduate"></i> Students Management</h1>
+    <h1><i class="fas fa-users"></i> User Management</h1>
 @stop
 
 @section('content')
@@ -22,85 +21,51 @@
 
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list"></i> List of Students</h3>
+            <h3 class="card-title"><i class="fas fa-list"></i> List of Users</h3>
             <div class="card-tools">
-                <button onclick="openAjaxModal('{{ route('students.create') }}', 'Add New Student')" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Add New Student
-                </button>
+                @if(in_array(Auth::user()->role, ['master', 'admin']))
+                    <button onclick="openAjaxModal('{{ route('users.create') }}', 'Add New User')" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add New User
+                    </button>
+                @endif
             </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-hover table-striped" id="studentsTable">
+                <table class="table table-bordered table-hover table-striped" id="usersTable">
                     <thead>
                         <tr>
                             <th width="5%">ID</th>
-                            <th width="8%">Photo</th>
-                            <th width="20%">Name</th>
-                            <th width="20%">Email</th>
-                            <th width="15%">Class</th>
-                            <th width="10%">Gender</th>
-                            <th width="12%">Date of Birth</th>
+                            <th width="35%">Name</th>
+                            <th width="35%">Email</th>
+                            <th width="15%">Role</th>
                             <th width="10%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($students as $student)
+                        @forelse($users as $user)
                         <tr>
-                            <td><span class="badge badge-secondary">{{ $student->id }}</span></td>
-                            <td class="text-center">
-                                @if($student->image)
-                                    <img src="{{ $student->image_url }}" alt="{{ $student->name }}" 
-                                         class="student-photo img-thumbnail" 
-                                         style="width: 45px; height: 45px; object-fit: cover; border-radius: 50%; cursor: pointer;">
-                                @else
-                                    <div class="photo-placeholder" 
-                                         style="width: 45px; height: 45px; margin: 0 auto;">
-                                        <i class="fas fa-user-graduate"></i>
-                                    </div>
-                                @endif
-                            </td>
-                            <td><strong>{{ $student->name }}</strong></td>
+                            <td><span class="badge badge-secondary">{{ $user->id }}</span></td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->email }}</td>
                             <td>
-                                @if($student->email)
-                                    <a href="mailto:{{ $student->email }}">{{ $student->email }}</a>
+                                @if($user->role == 'master')
+                                    <span class="badge badge-danger">Master</span>
+                                @elseif($user->role == 'admin')
+                                    <span class="badge badge-warning">Admin</span>
                                 @else
-                                    <span class="text-muted">N/A</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge badge-info">
-                                    {{ $student->grade->name ?? 'N/A' }}
-                                    @if($student->grade && $student->grade->section)
-                                        - {{ $student->grade->section }}
-                                    @endif
-                                </span>
-                            </td>
-                            <td>
-                                @if($student->gender === 'male')
-                                    <span class="badge badge-primary"><i class="fas fa-mars"></i> Male</span>
-                                @elseif($student->gender === 'female')
-                                    <span class="badge badge-danger"><i class="fas fa-venus"></i> Female</span>
-                                @else
-                                    <span class="badge badge-secondary">{{ ucfirst($student->gender) }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if($student->date_of_birth)
-                                    {{ \Carbon\Carbon::parse($student->date_of_birth)->format('d M Y') }}
-                                @else
-                                    <span class="text-muted">N/A</span>
+                                    <span class="badge badge-info">User</span>
                                 @endif
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a href="{{ route('students.show', $student->id) }}" class="btn btn-success btn-sm" title="View">
+                                    <a href="{{ route('users.show', $user) }}" class="btn btn-success btn-sm" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <button onclick="openAjaxModal('{{ route('students.edit', $student->id) }}', 'Edit {{ addslashes($student->name) }}')" class="btn btn-info btn-sm" title="Edit">
+                                    <button onclick="openAjaxModal('{{ route('users.edit', $user) }}', 'Edit {{ addslashes($user->name) }}')" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="deleteAjaxItem('{{ route('students.destroy', $student->id) }}', '{{ addslashes($student->name) }}')" class="btn btn-danger btn-sm" title="Delete">
+                                    <button onclick="deleteAjaxItem('{{ route('users.destroy', $user) }}', '{{ addslashes($user->name) }}')" class="btn btn-danger btn-sm" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -108,9 +73,9 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center py-4">
+                            <td colspan="5" class="text-center py-4">
                                 <i class="fas fa-inbox text-muted" style="font-size: 2rem;"></i>
-                                <p class="text-muted mt-2">No students found.</p>
+                                <p class="text-muted mt-2">No users found.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -164,23 +129,23 @@
     <script>
         $(document).ready(function() {
             // Initialize DataTable
-            var table = $('#studentsTable').DataTable({
+            var table = $('#usersTable').DataTable({
                 responsive: true,
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
                 order: [[0, 'asc']],
                 columnDefs: [
-                    { orderable: false, targets: [1, 7] }, // Disable sorting on Photo and Actions columns
+                    { orderable: false, targets: [4] }, // Disable sorting on Actions column
                 ],
                 language: {
                     search: "_INPUT_",
-                    searchPlaceholder: "Search students...",
+                    searchPlaceholder: "Search users...",
                     lengthMenu: "Show _MENU_ entries",
-                    info: "Showing _START_ to _END_ of _TOTAL_ students",
-                    infoEmpty: "Showing 0 to 0 of 0 students",
-                    infoFiltered: "(filtered from _MAX_ total students)",
-                    zeroRecords: "No matching students found",
-                    emptyTable: "No students available"
+                    info: "Showing _START_ to _END_ of _TOTAL_ users",
+                    infoEmpty: "Showing 0 to 0 of 0 users",
+                    infoFiltered: "(filtered from _MAX_ total users)",
+                    zeroRecords: "No matching users found",
+                    emptyTable: "No users available"
                 },
                 initComplete: function () {
                     // Add filter row
@@ -190,16 +155,16 @@
                         var column = this;
                         var th = $('<th></th>');
                         
-                        // Skip Photo and Actions columns
-                        if (index === 1 || index === 7) {
+                        // Skip Actions column
+                        if (index === 4) {
                             th.html('');
                             filterRow.append(th);
                             return;
                         }
                         
-                        // For Gender column, create dropdown
-                        if (index === 5) { // Gender
-                            var select = $('<select><option value="">All</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>')
+                        // For Role column, create dropdown
+                        if (index === 3) { // Role
+                            var select = $('<select><option value="">All</option><option value="Master">Master</option><option value="Admin">Admin</option><option value="User">User</option></select>')
                                 .on('change', function () {
                                     var val = $.fn.dataTable.util.escapeRegex($(this).val());
                                     column.search(val ? val : '', true, false).draw();
@@ -225,4 +190,3 @@
         });
     </script>
 @stop
-

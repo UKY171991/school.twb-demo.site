@@ -7,10 +7,6 @@
 @stop
 
 @section('content_header')
-    <div class="grades-header">
-        <h1><i class="fas fa-edit"></i> Edit Class</h1>
-        <p class="subtitle">Update class information and settings</p>
-    </div>
 @stop
 
 @section('content')

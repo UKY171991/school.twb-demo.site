@@ -10,6 +10,7 @@
 @section('css')
     <link rel="stylesheet" href="{{ asset('css/app-custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/iframe-fix.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/user-role-badge.css') }}">
 @stop
 
 @section('js')

@@ -45,9 +45,9 @@
             <div class="card-body d-flex flex-column">
                 <p>Configure grade boundaries, pass marks, and grading scales.</p>
                 <div class="mt-auto">
-                    <a href="{{ route('settings.grading') }}" class="btn btn-primary btn-block mb-2">
+                    <button class="btn btn-primary btn-block mb-2" data-toggle="modal" data-target="#gradingSettingsModal">
                         <i class="fas fa-cog"></i> Configure Grading
-                    </a>
+                    </button>
                     <a href="{{ route('grading-systems.index') }}" class="btn btn-secondary btn-block">
                         <i class="fas fa-list"></i> Manage Grades
                     </a>
@@ -56,6 +56,53 @@
         </div>
     </div>
 
+    <!-- Grading Settings Modal -->
+    <div class="modal fade" id="gradingSettingsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="gradingSettingsForm" action="{{ route('settings.grading.update') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h4 class="modal-title">Grading System Settings</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="current_grading_scheme">Current Grading Scheme</label>
+                            <select name="current_grading_scheme" id="current_grading_scheme" class="form-control">
+                                <option value="default" {{ \App\Models\SystemSetting::get('current_grading_scheme', 'default') == 'default' ? 'selected' : '' }}>Default System</option>
+                                <option value="percentage" {{ \App\Models\SystemSetting::get('current_grading_scheme', 'default') == 'percentage' ? 'selected' : '' }}>Percentage Based</option>
+                                <option value="points" {{ \App\Models\SystemSetting::get('current_grading_scheme', 'default') == 'points' ? 'selected' : '' }}>Points Based</option>
+                                <option value="letter" {{ \App\Models\SystemSetting::get('current_grading_scheme', 'default') == 'letter' ? 'selected' : '' }}>Letter Grades</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pass_percentage">Pass Percentage</label>
+                            <input type="number" name="pass_percentage" id="pass_percentage" class="form-control"
+                                   value="{{ \App\Models\SystemSetting::get('pass_percentage', 33) }}"
+                                   min="0" max="100" step="0.01">
+                            <small class="form-text text-muted">Minimum percentage required to pass</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grade_calculation_method">Grade Calculation Method</label>
+                            <select name="grade_calculation_method" id="grade_calculation_method" class="form-control">
+                                <option value="percentage" {{ \App\Models\SystemSetting::get('grade_calculation_method', 'percentage') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                <option value="points" {{ \App\Models\SystemSetting::get('grade_calculation_method', 'percentage') == 'points' ? 'selected' : '' }}>Points</option>
+                                <option value="weighted" {{ \App\Models\SystemSetting::get('grade_calculation_method', 'percentage') == 'weighted' ? 'selected' : '' }}>Weighted Average</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div class="col-md-4 d-flex align-items-stretch">
         <div class="card h-100 w-100 shadow-sm">
             <div class="card-header bg-gradient-indigo text-white">
@@ -66,14 +113,69 @@
             <div class="card-body d-flex flex-column">
                 <p>Configure marking schemes, calculation methods, and rounding rules.</p>
                 <div class="mt-auto">
-                    <a href="{{ route('settings.marking') }}" class="btn btn-primary btn-block">
+                    <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#markingSettingsModal">
                         <i class="fas fa-cog"></i> Configure Marking
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Marking Settings Modal -->
+    <div class="modal fade" id="markingSettingsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="markingSettingsForm" action="{{ route('settings.marking.update') }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h4 class="modal-title">Marking System Settings</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="current_marking_scheme" class="font-weight-bold">Current Marking Scheme</label>
+                            <select name="current_marking_scheme" id="current_marking_scheme" class="form-control custom-select">
+                                <option value="percentage" {{ \App\Models\SystemSetting::get('current_marking_scheme', 'percentage') == 'percentage' ? 'selected' : '' }}>Percentage Based</option>
+                                <option value="points" {{ \App\Models\SystemSetting::get('current_marking_scheme', 'percentage') == 'points' ? 'selected' : '' }}>Points Based</option>
+                                <option value="letter" {{ \App\Models\SystemSetting::get('current_marking_scheme', 'percentage') == 'letter' ? 'selected' : '' }}>Letter Grades</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="decimal_places" class="font-weight-bold">Decimal Places</label>
+                                    <select name="decimal_places" id="decimal_places" class="form-control custom-select">
+                                        <option value="0" {{ \App\Models\SystemSetting::get('decimal_places', 2) == 0 ? 'selected' : '' }}>0 (85%)</option>
+                                        <option value="1" {{ \App\Models\SystemSetting::get('decimal_places', 2) == 1 ? 'selected' : '' }}>1 (85.5%)</option>
+                                        <option value="2" {{ \App\Models\SystemSetting::get('decimal_places', 2) == 2 ? 'selected' : '' }}>2 (85.50%)</option>
+                                        <option value="3" {{ \App\Models\SystemSetting::get('decimal_places', 2) == 3 ? 'selected' : '' }}>3 (85.500%)</option>
+                                    </select>
+                                    <small class="form-text text-muted">Number of decimal places to show in percentages</small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="rounding_method" class="font-weight-bold">Rounding Method</label>
+                                    <select name="rounding_method" id="rounding_method" class="form-control custom-select">
+                                        <option value="round" {{ \App\Models\SystemSetting::get('rounding_method', 'round') == 'round' ? 'selected' : '' }}>Round (85.5 → 86)</option>
+                                        <option value="floor" {{ \App\Models\SystemSetting::get('rounding_method', 'round') == 'floor' ? 'selected' : '' }}>Floor (85.9 → 85)</option>
+                                        <option value="ceil" {{ \App\Models\SystemSetting::get('rounding_method', 'round') == 'ceil' ? 'selected' : '' }}>Ceiling (85.1 → 86)</option>
+                                    </select>
+                                    <small class="form-text text-muted">How to handle decimal values in calculations</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div class="col-md-4 d-flex align-items-stretch">
         <div class="card h-100 w-100 shadow-sm">
             <div class="card-header bg-gradient-navy text-white">
@@ -145,7 +247,7 @@
 <div class="modal fade" id="schoolSettingsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="schoolSettingsForm" action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
                     <h4 class="modal-title">School Settings</h4>
@@ -266,4 +368,8 @@
         </div>
     </div>
 </div>
+@stop
+
+@section('js')
+    <script src="{{ asset('js/settings.js') }}"></script>
 @stop

@@ -20,11 +20,11 @@
         <div class="card-header">
             <h3 class="card-title">List of Subjects</h3>
             <div class="card-tools">
-                <a href="{{ route('subjects.create') }}" class="btn btn-primary btn-sm">Add New Subject</a>
+                <button onclick="openAjaxModal('{{ route('subjects.create') }}', 'Add New Subject')" class="btn btn-primary btn-sm">Add New Subject</button>
             </div>
         </div>
         <div class="card-body">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover" id="subjectsTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -59,12 +59,8 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('subjects.edit', $subject->id) }}" class="btn btn-info btn-sm">Edit</a>
-                            <form action="{{ route('subjects.destroy', $subject->id) }}" method="POST" style="display:inline-block;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
+                            <button onclick="openAjaxModal('{{ route('subjects.edit', $subject->id) }}', 'Edit {{ addslashes($subject->name) }}')" class="btn btn-info btn-sm">Edit</button>
+                            <button onclick="deleteAjaxItem('{{ route('subjects.destroy', $subject->id) }}', '{{ addslashes($subject->name) }}')" class="btn btn-danger btn-sm">Delete</button>
                         </td>
                     </tr>
                     @empty
@@ -79,7 +75,96 @@
 @stop
 
 @section('css')
+    {{-- DataTables CSS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <style>
+        .dataTables_filter {
+            float: right;
+        }
+        .dataTables_length {
+            float: left;
+        }
+        .dataTables_wrapper .row {
+            margin-bottom: 10px;
+        }
+        /* Column filter styling */
+        .filter-row input,
+        .filter-row select {
+            width: 100%;
+            padding: 4px;
+            font-size: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .filter-row th {
+            padding: 5px !important;
+            background-color: #f8f9fa;
+        }
+    </style>
 @stop
 
 @section('js')
+    {{-- DataTables JS --}}
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    
+    {{-- AJAX CRUD --}}
+    <script src="{{ asset('js/ajax-crud.js') }}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#subjectsTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: [6] }, // Disable sorting on Actions column
+                ],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search subjects...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ subjects",
+                    infoEmpty: "Showing 0 to 0 of 0 subjects",
+                    infoFiltered: "(filtered from _MAX_ total subjects)",
+                    zeroRecords: "No matching subjects found",
+                    emptyTable: "No subjects available"
+                },
+                initComplete: function () {
+                    // Add filter row
+                    var filterRow = $('<tr class="filter-row"></tr>');
+                    
+                    this.api().columns().every(function (index) {
+                        var column = this;
+                        var th = $('<th></th>');
+                        
+                        // Skip Actions column
+                        if (index === 6) {
+                            th.html('');
+                            filterRow.append(th);
+                            return;
+                        }
+                        
+                        // For all columns, create text inputs
+                        var input = $('<input type="text" placeholder="Filter..." />')
+                            .on('keyup change', function () {
+                                if (column.search() !== this.value) {
+                                    column.search(this.value).draw();
+                                }
+                            });
+                        th.append(input);
+                        
+                        filterRow.append(th);
+                    });
+                    
+                    $(this.api().table().header()).append(filterRow);
+                }
+            });
+        });
+    </script>
 @stop

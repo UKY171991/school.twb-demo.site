@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\GradingSystem;
 use App\Models\MarkingScheme;
 use App\Models\SystemSetting;
@@ -20,7 +21,7 @@ class SystemSettingController extends Controller
 
     public function update(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'settings.school_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'settings.school_favicon' => 'nullable|image|mimes:ico,png,jpg,gif,svg|max:1024',
         ], [
@@ -31,6 +32,13 @@ class SystemSettingController extends Controller
             'settings.school_favicon.mimes' => 'The favicon must be a file of type: ico, png, jpg, gif, svg.',
             'settings.school_favicon.max' => 'The favicon may not be greater than 1MB.',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $settings = $request->input('settings', []);
 
@@ -60,25 +68,31 @@ class SystemSettingController extends Controller
             }
 
             foreach ($settings as $key => $value) {
-                $setting = SystemSetting::where('key', $key)->first();
-                if ($setting) {
-                    $setting->update(['value' => $value]);
-                } else {
-                    // Create new setting if it doesn't exist
-                    SystemSetting::create([
-                        'key' => $key,
+                SystemSetting::updateOrCreate(
+                    ['key' => $key],
+                    [
                         'value' => $value,
                         'type' => 'string',
                         'group' => 'school',
                         'label' => ucfirst(str_replace('_', ' ', $key)),
-                    ]);
-                }
+                    ]
+                );
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => 'Settings updated successfully.']);
             }
 
             return redirect()->route('settings.index')
                 ->with('success', 'Settings updated successfully.');
 
         } catch (\Exception $e) {
+            Log::error('Failed to update settings: '.$e->getMessage());
+
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Failed to update settings.'], 500);
+            }
+
             return redirect()->route('settings.index')
                 ->with('error', 'Failed to update settings: '.$e->getMessage());
         }
@@ -159,15 +173,26 @@ class SystemSettingController extends Controller
 
     public function updateGradingSettings(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'current_grading_scheme' => 'required|string',
             'pass_percentage' => 'required|numeric|min:0|max:100',
             'grade_calculation_method' => 'required|string|in:percentage,points,weighted',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         SystemSetting::set('current_grading_scheme', $request->current_grading_scheme, 'string', 'grading', 'Current Grading Scheme');
         SystemSetting::set('pass_percentage', $request->pass_percentage, 'float', 'grading', 'Pass Percentage');
         SystemSetting::set('grade_calculation_method', $request->grade_calculation_method, 'string', 'grading', 'Grade Calculation Method');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Grading settings updated successfully.']);
+        }
 
         return redirect()->route('settings.grading')
             ->with('success', 'Grading settings updated successfully.');
@@ -183,15 +208,26 @@ class SystemSettingController extends Controller
 
     public function updateMarkingSettings(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'current_marking_scheme' => 'required|string',
             'decimal_places' => 'required|integer|min:0|max:4',
             'rounding_method' => 'required|string|in:round,floor,ceil',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         SystemSetting::set('current_marking_scheme', $request->current_marking_scheme, 'string', 'marking', 'Current Marking Scheme');
         SystemSetting::set('decimal_places', $request->decimal_places, 'integer', 'marking', 'Decimal Places');
         SystemSetting::set('rounding_method', $request->rounding_method, 'string', 'marking', 'Rounding Method');
+
+        if ($request->ajax()) {
+            return response()->json(['success' => 'Marking settings updated successfully.']);
+        }
 
         return redirect()->route('settings.marking')
             ->with('success', 'Marking settings updated successfully.');

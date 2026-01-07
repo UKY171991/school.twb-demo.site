@@ -515,7 +515,7 @@ class GradesManager {
             $('#editGradeBtn').on('click', function () {
                 const gradeId = $(this).data('grade-id');
                 if (gradeId) {
-                    window.location.href = `/admin/grades/${gradeId}/edit`;
+                    window.location.href = `/admin/classes/${gradeId}/edit`;
                 }
             });
         }
@@ -550,7 +550,7 @@ class GradesManager {
 
         // Fetch data from API
         $.ajax({
-            url: `/admin/grades/${gradeId}`,
+            url: `/admin/classes/${gradeId}`,
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
@@ -629,23 +629,36 @@ class GradesManager {
 
     editGrade(gradeId) {
         // Redirect to edit page
-        window.location.href = `/admin/grades/${gradeId}/edit`;
+        window.location.href = `/admin/classes/${gradeId}/edit`;
     }
 
     filterGrades() {
         const searchTerm = $('#gradeSearch').val().toLowerCase();
-        const sectionFilter = $('#sectionFilter').val();
+        const sectionFilter = $('#sectionFilter').val().toLowerCase();
         const gradeFilter = $('#gradeFilter').val();
 
         $('#gradesTable tbody tr').each(function () {
             const row = $(this);
-            const gradeName = row.find('td:eq(1)').text().toLowerCase();
-            const section = row.find('td:eq(2)').text();
-            const gradeNumber = row.find('td:eq(0)').text();
 
-            const matchesSearch = gradeName.includes(searchTerm);
-            const matchesSection = !sectionFilter || section === sectionFilter;
-            const matchesGrade = !gradeFilter || gradeNumber === gradeFilter;
+            // Skip if this is the empty state row
+            if (row.find('.empty-state').length > 0) {
+                return;
+            }
+
+            // Get text from the correct columns (accounting for checkbox column)
+            const gradeName = row.find('td:eq(1)').text().toLowerCase().trim();
+            const section = row.find('td:eq(2)').text().toLowerCase().trim();
+
+            // Check if search term matches either class name or section
+            const matchesSearch = !searchTerm ||
+                gradeName.includes(searchTerm) ||
+                section.includes(searchTerm);
+
+            // Check if section filter matches
+            const matchesSection = !sectionFilter || section.includes(sectionFilter);
+
+            // Check if grade filter matches (search in the class name)
+            const matchesGrade = !gradeFilter || gradeName.includes(gradeFilter.toLowerCase());
 
             if (matchesSearch && matchesSection && matchesGrade) {
                 row.show();
@@ -653,6 +666,23 @@ class GradesManager {
                 row.hide();
             }
         });
+
+        // Show/hide empty state message
+        const visibleRows = $('#gradesTable tbody tr:visible').length;
+        if (visibleRows === 0) {
+            if ($('#gradesTable tbody .no-results-row').length === 0) {
+                $('#gradesTable tbody').append(`
+                    <tr class="no-results-row">
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No classes found matching your search criteria.</p>
+                        </td>
+                    </tr>
+                `);
+            }
+        } else {
+            $('#gradesTable tbody .no-results-row').remove();
+        }
     }
 
     exportGrades() {
@@ -798,7 +828,7 @@ $(document).on('keydown', function (e) {
     // Ctrl/Cmd + N for new grade
     if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
         e.preventDefault();
-        window.location.href = '/admin/grades/create';
+        window.location.href = '/admin/classes/create';
     }
 
     // Escape to close modals

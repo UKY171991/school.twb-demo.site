@@ -254,7 +254,7 @@ class GradesManager {
 
     editGrade(gradeId) {
         // Redirect to edit page or show edit modal
-        window.location.href = `/admin/grades/${gradeId}/edit`;
+        window.location.href = `/admin/classes/${gradeId}/edit`;
     }
 
     filterGrades() {
@@ -413,7 +413,7 @@ $(document).on('submit', '#gradeForm', function(e) {
         
         // Redirect to index page after a delay
         setTimeout(() => {
-            window.location.href = '/admin/grades';
+            window.location.href = '/admin/classes';
         }, 1500);
     }, 2000);
 });
@@ -439,7 +439,7 @@ $(document).on('keydown', function(e) {
     // Ctrl/Cmd + N for new grade
     if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
         e.preventDefault();
-        window.location.href = '/admin/grades/create';
+        window.location.href = '/admin/classes/create';
     }
     
     // Escape to close modals

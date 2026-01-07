@@ -10,8 +10,8 @@ Auth::routes();
 
 Route::middleware('auth')->group(function () {
     // API routes for dynamic loading
-    Route::get('/api/schools/{school}/grades', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
-    Route::get('/api/grades/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
+    Route::get('/api/schools/{school}/classes', [App\Http\Controllers\GradeController::class, 'getBySchool'])->name('api.schools.grades');
+    Route::get('/api/classes/{grade}/subjects', [App\Http\Controllers\SubjectController::class, 'getByGrade'])->name('api.grades.subjects');
     Route::get('/api/students/{student}/exam-data', [App\Http\Controllers\MarksheetController::class, 'getStudentExamData'])->name('api.students.exam-data');
     Route::get('api/exam-timetables/class-exam', [App\Http\Controllers\ExamTimetableController::class, 'getByClassAndExam'])->name('api.exam-timetables.class-exam');
 });
@@ -39,7 +39,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('schools/{school}/remove-principal-signature', [App\Http\Controllers\SchoolController::class, 'removePrincipalSignature'])->name('schools.remove-principal-signature');
     Route::get('schools/{school}/remove-exam-controller-signature', [App\Http\Controllers\SchoolController::class, 'removeExamControllerSignature'])->name('schools.remove-exam-controller-signature');
 
-    Route::resource('grades', App\Http\Controllers\GradeController::class);
+    Route::resource('classes', App\Http\Controllers\GradeController::class)->names('grades');
     Route::resource('teachers', App\Http\Controllers\TeacherController::class);
     Route::get('teachers/{teacher}/remove-image', [App\Http\Controllers\TeacherController::class, 'removeImage'])->name('teachers.remove-image');
     Route::get('teachers/{teacher}/remove-signature', [App\Http\Controllers\TeacherController::class, 'removeSignature'])->name('teachers.remove-signature');
@@ -131,4 +131,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Teacher Salaries routes
     Route::resource('teacher-salaries', App\Http\Controllers\TeacherSalaryController::class);
     Route::get('teacher-salaries/{teacherSalary}/print-slip', [App\Http\Controllers\TeacherSalaryController::class, 'printSlip'])->name('teacher-salaries.print-slip');
+
+    // User management routes
+    Route::resource('users', App\Http\Controllers\UserController::class)->names('users');
+    Route::resource('roles', App\Http\Controllers\RoleController::class)->names('roles');
 });

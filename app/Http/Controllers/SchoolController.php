@@ -20,8 +20,14 @@ class SchoolController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request)
     {
+        if ($request->ajax()) {
+            return view('schools.create')->renderSections()['content'];
+        }
         return view('schools.create');
     }
 
@@ -30,7 +36,7 @@ class SchoolController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:schools,code',
             'address' => 'nullable|string',
@@ -44,6 +50,13 @@ class SchoolController extends Controller
             'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'exam_controller_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $data = $request->all();
 
@@ -65,6 +78,10 @@ class SchoolController extends Controller
         }
 
         School::create($data);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'School created successfully!']);
+        }
 
         return redirect()->route('schools.index')
             ->with('success', 'School created successfully!');
@@ -90,8 +107,11 @@ class SchoolController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(School $school)
+    public function edit(School $school, Request $request)
     {
+        if ($request->ajax()) {
+            return view('schools.edit', compact('school'))->renderSections()['content'];
+        }
         return view('schools.edit', compact('school'));
     }
 
@@ -100,7 +120,7 @@ class SchoolController extends Controller
      */
     public function update(Request $request, School $school)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:schools,code,'.$school->id,
             'address' => 'nullable|string',
@@ -114,6 +134,13 @@ class SchoolController extends Controller
             'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'exam_controller_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $data = $request->all();
 
@@ -133,6 +160,10 @@ class SchoolController extends Controller
 
         $school->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'School updated successfully!']);
+        }
+
         return redirect()->route('schools.index')
             ->with('success', 'School updated successfully!');
     }
@@ -140,10 +171,13 @@ class SchoolController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(School $school)
+    public function destroy(Request $request, School $school)
     {
         // Check if school has any associated data
         if ($school->students()->count() > 0 || $school->teachers()->count() > 0) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot delete school with existing students or teachers. Please transfer them first.'], 422);
+            }
             return redirect()->route('schools.index')
                 ->with('error', 'Cannot delete school with existing students or teachers. Please transfer them first.');
         }
@@ -154,6 +188,10 @@ class SchoolController extends Controller
         }
 
         $school->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'School deleted successfully!']);
+        }
 
         return redirect()->route('schools.index')
             ->with('success', 'School deleted successfully!');

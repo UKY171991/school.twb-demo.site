@@ -32,15 +32,25 @@ class GradeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create(Request $request)
     {
         $schoolId = $request->current_school_id;
         
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
         
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+
+        if ($request->ajax()) {
+            return view('grades.create', compact('teachers'))->renderSections()['content'];
+        }
 
         return view('grades.create', compact('teachers'));
     }
@@ -53,10 +63,13 @@ class GradeController extends Controller
         $schoolId = $request->current_school_id;
 
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => [
                 'required',
                 'string',
@@ -74,6 +87,13 @@ class GradeController extends Controller
             'status' => 'nullable|string|in:active,inactive,upcoming',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $data = $request->all();
         $data['school_id'] = $schoolId;
 
@@ -83,6 +103,10 @@ class GradeController extends Controller
         $data['status'] = $data['status'] ?? 'active';
 
         Grade::create($data);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Grade created successfully.']);
+        }
 
         return redirect()->route('grades.index')
             ->with('success', 'Grade created successfully.');
@@ -137,6 +161,10 @@ class GradeController extends Controller
         $grade = Grade::findOrFail($id);
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
 
+        if ($request->ajax()) {
+            return view('grades.edit', compact('grade', 'teachers'))->renderSections()['content'];
+        }
+
         return view('grades.edit', compact('grade', 'teachers'));
     }
 
@@ -145,7 +173,7 @@ class GradeController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'section' => 'nullable|string|max:255',
             'teacher_id' => 'nullable|exists:teachers,id',
@@ -154,6 +182,13 @@ class GradeController extends Controller
             'grade_theme' => 'nullable|integer|min:1|max:12',
             'status' => 'nullable|string|in:active,inactive,upcoming',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $grade = Grade::findOrFail($id);
 
@@ -170,6 +205,10 @@ class GradeController extends Controller
 
         $grade->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Grade updated successfully.']);
+        }
+
         return redirect()->route('grades.index')
             ->with('success', 'Grade updated successfully.');
     }
@@ -177,10 +216,14 @@ class GradeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $grade = Grade::findOrFail($id);
         $grade->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Grade deleted successfully.']);
+        }
 
         return redirect()->route('grades.index')
             ->with('success', 'Grade deleted successfully.');

@@ -7,10 +7,6 @@
 @stop
 
 @section('content_header')
-    <div class="grades-header">
-        <h1><i class="fas fa-plus-circle"></i> Add New Class</h1>
-        <p class="subtitle">Create a new academic class section</p>
-    </div>
 @stop
 
 @section('content')

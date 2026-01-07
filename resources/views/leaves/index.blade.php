@@ -89,15 +89,21 @@ function renderLeavesTable(resp){
 
 function openLeaveForm(mode, id){
     let url = '';
-    if (mode === 'create') url = '{{ route("leaves.create") }}';
-    else url = '{{ url("admin/leaves") }}' + '/' + id + '/edit';
+    let formAction = '';
+    if (mode === 'create') {
+        url = '{{ route("leaves.create") }}';
+        formAction = '{{ route("leaves.store") }}';
+    } else {
+        url = '{{ url("admin/leaves") }}' + '/' + id + '/edit';
+        formAction = '{{ url("admin/leaves") }}' + '/' + id;
+    }
 
     $.ajax({
         url: url,
         method: 'GET',
         success: function(html){
             // show form inside modal
-            $('#leaveModal .modal-body').html(`<form id="leave-form-wrapper" method="POST" action="${mode==='create' ? '{{ route("leaves.store") }}' : '{{ url("admin/leaves") }}' + '/' + id }">` + html + `</form>`);
+            $('#leaveModal .modal-body').html(`<form id="leave-form-wrapper" method="POST" action="${formAction}">` + html + `</form>`);
             $('#leaveModal').modal('show');
         },
         error: function(xhr){
@@ -111,11 +117,21 @@ $(document).on('submit', '#leave-form-wrapper', function(e){
     e.preventDefault();
     const $form = $(this);
     const url = $form.attr('action');
-    const method = $form.find('input[name="_method"]').val() || 'POST';
+    const formData = $form.serialize();
+    const methodOverride = $form.find('input[name="_method"]').val();
+    
+    // Determine the actual HTTP method
+    let ajaxType = 'POST'; // default
+    if (methodOverride === 'PUT' || methodOverride === 'PATCH') {
+        ajaxType = 'POST'; // still use POST but with _method override
+    } else if (methodOverride === 'DELETE') {
+        ajaxType = 'POST'; // still use POST but with _method override
+    }
+    
     $.ajax({
         url: url,
-        method: 'POST',
-        data: $form.serialize(),
+        type: ajaxType,
+        data: formData, // This includes the _method field
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
         success: function(resp){
             if (resp.success) {

@@ -8,10 +8,7 @@
 @stop
 
 @section('content_header')
-    <div class="grades-header">
-        <h1><i class="fas fa-graduation-cap"></i> Classes Management</h1>
-        <p class="subtitle">Manage academic classes, sections, and student assignments</p>
-    </div>
+    <h1><i class="fas fa-layer-group"></i> Classes Management</h1>
 @stop
 
 @section('content')
@@ -24,84 +21,6 @@
         </div>
     @endif
 
-    <!-- Statistics Cards -->
-    <div class="stats-container">
-        <div class="stat-card total">
-            <div class="stat-icon">
-                <i class="fas fa-layer-group"></i>
-            </div>
-            <div class="stat-value" id="totalGrades">{{ $grades->count() }}</div>
-            <div class="stat-label">Total Classes</div>
-        </div>
-        <div class="stat-card students">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-value" id="totalStudents">{{ $grades->sum(function($grade) { return $grade->students_count ?? 0; }) }}</div>
-            <div class="stat-label">Total Students</div>
-        </div>
-        <div class="stat-card sections">
-            <div class="stat-icon">
-                <i class="fas fa-th-large"></i>
-            </div>
-            <div class="stat-value" id="totalSections">{{ $grades->whereNotNull('section')->count() }}</div>
-            <div class="stat-label">Active Sections</div>
-        </div>
-        <div class="stat-card average">
-            <div class="stat-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="stat-value" id="avgStudents">{{ $grades->count() > 0 ? round($grades->sum('students_count') / $grades->count()) : 0 }}</div>
-            <div class="stat-label">Avg Students/Class</div>
-        </div>
-    </div>
-
-    <!-- Filters and Actions -->
-    <div class="card grade-card mb-4">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="gradeSearch" placeholder="Search classes...">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control" id="gradeFilter">
-                        <option value="">All Classes</option>
-                        @for($i = 1; $i <= 12; $i++)
-                            <option value="{{ $i }}">Class {{ $i }}</option>
-                        @endfor
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select class="form-control" id="sectionFilter">
-                        <option value="">All Sections</option>
-                        <option value="A">Section A</option>
-                        <option value="B">Section B</option>
-                        <option value="C">Section C</option>
-                    </select>
-                </div>
-                <div class="col-md-4 text-right">
-                    <div class="btn-group">
-                        <button class="btn btn-info btn-sm" id="exportBtn" title="Export">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                        <button class="btn btn-warning btn-sm" id="bulkActions" style="display: none;">
-                            <i class="fas fa-tasks"></i> Bulk Actions
-                        </button>
-                        <a href="{{ route('grades.create') }}" class="btn btn-add-grade btn-sm">
-                            <i class="fas fa-plus"></i> Add New Class
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grades Table -->
     <div class="card grade-card">
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-list"></i> List of Classes</h3>
@@ -112,6 +31,9 @@
                 <button type="button" class="btn btn-tool" data-card-widget="maximize">
                     <i class="fas fa-expand"></i>
                 </button>
+                <button onclick="openAjaxModal('{{ route('grades.create') }}', 'Add New Class')" class="btn btn-primary btn-sm ml-2">
+                    <i class="fas fa-plus"></i> Add New Class
+                </button>
             </div>
         </div>
         <div class="card-body">
@@ -119,12 +41,7 @@
                 <table class="table table-bordered table-hover grades-table" id="gradesTable">
                     <thead>
                         <tr>
-                            <th width="5%">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="selectAll">
-                                    <label class="custom-control-label" for="selectAll"></label>
-                                </div>
-                            </th>
+                            <th width="5%">ID</th>
                             <th width="15%">Class</th>
                             <th width="15%">Section</th>
                             <th width="20%">Students Count</th>
@@ -137,10 +54,7 @@
                         @forelse($grades as $grade)
                         <tr>
                             <td>
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input grade-checkbox" id="grade{{ $grade->id }}">
-                                    <label class="custom-control-label" for="grade{{ $grade->id }}"></label>
-                                </div>
+                                {{ $grade->id }}
                             </td>
                             <td>
                                 <div class="grade-badge grade-{{ $grade->id <= 12 ? $grade->id : '1' }}">
@@ -176,20 +90,16 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="action-buttons">
-                                    <button class="btn btn-view btn-sm" data-grade-id="{{ $grade->id }}" title="View Details">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-success btn-sm" data-grade-id="{{ $grade->id }}" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
-                                    <a href="{{ route('grades.edit', $grade->id) }}" class="btn btn-edit btn-sm" title="Edit">
+                                    <button onclick="openAjaxModal('{{ route('grades.edit', $grade->id) }}', 'Edit {{ addslashes($grade->name) }}')" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="btn btn-delete btn-sm" data-grade-name="{{ $grade->name }}" title="Delete">
+                                    </button>
+                                    <button onclick="deleteAjaxItem('{{ route('grades.destroy', $grade->id) }}', '{{ addslashes($grade->name) }}')" class="btn btn-danger btn-sm" title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <form action="{{ route('grades.destroy', $grade->id) }}" method="POST" style="display:none;">
-                                        @csrf
-                                        @method('DELETE')
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -202,9 +112,9 @@
                                     </div>
                                     <h3>No Classes Found</h3>
                                     <p>Start by adding your first class to begin organizing your students.</p>
-                                    <a href="{{ route('grades.create') }}" class="btn btn-add-grade">
+                                    <button onclick="openAjaxModal('{{ route('grades.create') }}', 'Add New Class')" class="btn btn-primary btn-sm mt-3">
                                         <i class="fas fa-plus"></i> Add First Class
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -219,5 +129,133 @@
         </div>
         @endif
     </div>
+@stop
+
+@section('css')
+    {{-- DataTables CSS --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+    <style>
+        .dataTables_filter {
+            float: right;
+        }
+        .dataTables_length {
+            float: left;
+        }
+        .dataTables_wrapper .row {
+            margin-bottom: 10px;
+        }
+        /* Column filter styling */
+        .filter-row input,
+        .filter-row select {
+            width: 100%;
+            padding: 4px;
+            font-size: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .filter-row th {
+            padding: 5px !important;
+            background-color: #f8f9fa;
+        }
+        .grade-badge {
+            font-weight: bold;
+        }
+        .section-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .student-count i {
+            color: #17a2b8;
+            margin-right: 5px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+        }
+        .empty-state .icon {
+            font-size: 3em;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+    </style>
+@stop
+
+@section('js')
+    {{-- DataTables JS --}}
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
+    
+    {{-- AJAX CRUD --}}
+    <script src="{{ asset('js/ajax-crud.js') }}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            var table = $('#gradesTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [[1, 'asc']], // Order by Class name by default
+                columnDefs: [
+                    { orderable: false, targets: [6] }, // Disable sorting on Actions column
+                ],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search classes...",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ classes",
+                    infoEmpty: "Showing 0 to 0 of 0 classes",
+                    infoFiltered: "(filtered from _MAX_ total classes)",
+                    zeroRecords: "No matching classes found",
+                    emptyTable: "No classes available"
+                },
+                initComplete: function () {
+                    // Add filter row
+                    var filterRow = $('<tr class="filter-row"></tr>');
+                    
+                    this.api().columns().every(function (index) {
+                        var column = this;
+                        var th = $('<th></th>');
+                        
+                        // Skip Actions column
+                        if (index === 6) {
+                            th.html('');
+                            filterRow.append(th);
+                            return;
+                        }
+                        
+                        // For Status column (index 5)
+                        if (index === 5) {
+                            var select = $('<select><option value="">All</option><option value="Active">Active</option></select>')
+                                .on('change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                                    column.search(val ? '^' + val + '$' : '', true, false).draw();
+                                });
+                            th.append(select);
+                        } else {
+                            // For other columns, create text inputs
+                            var input = $('<input type="text" placeholder="Filter..." />')
+                                .on('keyup change', function () {
+                                    if (column.search() !== this.value) {
+                                        column.search(this.value).draw();
+                                    }
+                                });
+                            th.append(input);
+                        }
+                        
+                        filterRow.append(th);
+                    });
+                    
+                    $(this.api().table().header()).append(filterRow);
+                }
+            });
+        });
+    </script>
 @stop
 

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CreateBasicUsers::class,
+            MasterUserSeeder::class,
         ]);
 
         $this->command->info('Database seeded successfully with basic users!');
@@ -24,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Admin: admin@school.com / password');
         $this->command->info('Manager: manager@school.com / password');
         $this->command->info('Teacher: teacher@school.com / password');
+        $this->command->info('Master: master@example.com / password');
     }
 }

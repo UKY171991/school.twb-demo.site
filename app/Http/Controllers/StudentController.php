@@ -35,15 +35,25 @@ class StudentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create(Request $request)
     {
         $currentSchoolId = $request->current_school_id;
         
         if (!$currentSchoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
         $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
+
+        if ($request->ajax()) {
+            return view('students.create', compact('grades'))->renderSections()['content'];
+        }
 
         return view('students.create', compact('grades'));
     }
@@ -56,10 +66,13 @@ class StudentController extends Controller
         $schoolId = $request->current_school_id;
 
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => [
                 'nullable',
@@ -76,6 +89,13 @@ class StudentController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $data = $request->all();
         $data['school_id'] = $schoolId;
@@ -103,6 +123,10 @@ class StudentController extends Controller
 
         Student::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Student created successfully.']);
+        }
+
         return redirect()->route('students.index')
             ->with('success', 'Student created successfully.');
     }
@@ -122,16 +146,13 @@ class StudentController extends Controller
      */
     public function edit(Student $student, Request $request)
     {
-        $query = function () use ($request) {
-            $q = \App\Models\Grade::query();
-            if ($request->has('current_school_id')) {
-                $q->where('school_id', $request->get('current_school_id'));
-            }
+        $currentSchoolId = $request->current_school_id; // Get safe school ID
 
-            return $q;
-        };
+        $grades = \App\Models\Grade::where('school_id', $currentSchoolId)->get();
 
-        $grades = $query()->get();
+        if ($request->ajax()) {
+            return view('students.edit', compact('student', 'grades'))->renderSections()['content'];
+        }
 
         return view('students.edit', compact('student', 'grades'));
     }
@@ -141,7 +162,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:students,email,'.$student->id,
             'phone' => 'nullable|string|max:20',
@@ -151,6 +172,13 @@ class StudentController extends Controller
             'grade_id' => 'required|exists:grades,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         // Add current school context
         $data = $request->all();
@@ -165,6 +193,10 @@ class StudentController extends Controller
 
         $student->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Student updated successfully.']);
+        }
+
         return redirect()->route('students.index')
             ->with('success', 'Student updated successfully.');
     }
@@ -172,7 +204,7 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Student $student)
+    public function destroy(Request $request, Student $student)
     {
         // Delete student image if exists
         if ($student->image) {
@@ -180,6 +212,10 @@ class StudentController extends Controller
         }
 
         $student->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Student deleted successfully.']);
+        }
 
         return redirect()->route('students.index')
             ->with('success', 'Student deleted successfully.');

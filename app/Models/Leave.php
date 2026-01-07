@@ -10,7 +10,7 @@ class Leave extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id', 'grade_id', 'start_date', 'end_date', 'type', 'reason', 'created_by', 'status'
+        'student_id', 'grade_id', 'school_id', 'start_date', 'end_date', 'type', 'reason', 'created_by', 'status'
     ];
 
     protected $casts = [

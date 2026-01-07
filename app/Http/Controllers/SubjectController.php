@@ -33,16 +33,26 @@ class SubjectController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create(Request $request)
     {
         $schoolId = $request->current_school_id;
         
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
         $grades = \App\Models\Grade::where('school_id', $schoolId)->get();
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
+
+        if ($request->ajax()) {
+            return view('subjects.create', compact('grades', 'teachers'))->renderSections()['content'];
+        }
 
         return view('subjects.create', compact('grades', 'teachers'));
     }
@@ -55,10 +65,13 @@ class SubjectController extends Controller
         $schoolId = $request->current_school_id;
 
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'code' => [
                 'nullable',
@@ -75,10 +88,21 @@ class SubjectController extends Controller
             'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $data = $request->all();
         $data['school_id'] = $schoolId;
 
         Subject::create($data);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Subject created successfully.']);
+        }
 
         return redirect()->route('subjects.index')
             ->with('success', 'Subject created successfully.');
@@ -111,6 +135,10 @@ class SubjectController extends Controller
         $grades = $query(\App\Models\Grade::class)->get();
         $teachers = $query(\App\Models\Teacher::class)->get();
 
+        if ($request->ajax()) {
+            return view('subjects.edit', compact('subject', 'grades', 'teachers'))->renderSections()['content'];
+        }
+
         return view('subjects.edit', compact('subject', 'grades', 'teachers'));
     }
 
@@ -119,7 +147,7 @@ class SubjectController extends Controller
      */
     public function update(Request $request, Subject $subject)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|unique:subjects,code,'.$subject->id,
             'description' => 'nullable|string',
@@ -129,6 +157,13 @@ class SubjectController extends Controller
             'teacher_id' => 'nullable|exists:teachers,id',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         // Add current school context
         $data = $request->all();
         if ($request->has('current_school_id')) {
@@ -137,6 +172,10 @@ class SubjectController extends Controller
 
         $subject->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Subject updated successfully.']);
+        }
+
         return redirect()->route('subjects.index')
             ->with('success', 'Subject updated successfully.');
     }
@@ -144,9 +183,13 @@ class SubjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Subject $subject)
+    public function destroy(Request $request, Subject $subject)
     {
         $subject->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Subject deleted successfully.']);
+        }
 
         return redirect()->route('subjects.index')
             ->with('success', 'Subject deleted successfully.');

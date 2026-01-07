@@ -198,6 +198,7 @@
             align-items: center;
             gap: 0.5rem;
         }
+        
         .bg-gradient-info { background: linear-gradient(45deg, #17a2b8, #138496); }
         .bg-gradient-success { background: linear-gradient(45deg, #28a745, #218838); }
         .bg-gradient-warning { background: linear-gradient(45deg, #ffc107, #e0a800); color: #fff !important; }

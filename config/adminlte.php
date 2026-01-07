@@ -302,7 +302,19 @@ return [
         // Navbar items:
         [
             'type' => 'custom',
+            'text' => '<x-clock-widget />',
+            'topnav_right' => true,
+        ],
+        [
+            'type' => 'custom',
             'text' => '<x-school-selector />',
+            'topnav_right' => true,
+        ],
+        [
+            'type' => 'custom',
+            'text' => '<span class="badge badge-info mr-2" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                        <i class="fas fa-user-shield"></i> {{ ucfirst(auth()->user()->role ?? "User") }}
+                      </span>',
             'topnav_right' => true,
         ],
         [
@@ -365,7 +377,7 @@ return [
             'text' => 'Classes',
             'route' => 'grades.index',
             'icon' => 'fas fa-fw fa-layer-group',
-            'active' => ['admin/grades*'],
+            'active' => ['admin/classes*'],
         ],
         [
             'text' => 'Subjects',
@@ -463,6 +475,25 @@ return [
             'icon' => 'fas fa-fw fa-lock',
             'active' => ['admin/profile'],
         ],
+        [
+            'text' => 'User Management',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'manage-users',
+            'submenu' => [
+                [
+                    'text' => 'Users',
+                    'route' => 'users.index',
+                    'icon' => 'fas fa-fw fa-user-friends',
+                    'active' => ['admin/users*'],
+                ],
+                [
+                    'text' => 'User Roles',
+                    'route' => 'roles.index',
+                    'icon' => 'fas fa-fw fa-user-tag',
+                    'active' => ['admin/roles*'],
+                ],
+            ],
+        ],
     ],
 
     /*
@@ -546,12 +577,27 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
                     'asset' => false,
                     'location' => '//cdn.jsdelivr.net/npm/sweetalert2@8',
+                ],
+            ],
+        ],
+        'Toastr' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js',
                 ],
             ],
         ],

@@ -34,10 +34,18 @@ class TeacherController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create(Request $request)
     {
         $schoolId = $request->current_school_id;
         $schools = School::where('status', 'active')->orderBy('name')->get();
+
+        if ($request->ajax()) {
+            return view('teachers.create', compact('schools'))->renderSections()['content'];
+        }
+
         return view('teachers.create', compact('schools'));
     }
 
@@ -49,10 +57,13 @@ class TeacherController extends Controller
         $schoolId = $request->current_school_id;
 
         if (!$schoolId) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
+            }
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
@@ -72,6 +83,13 @@ class TeacherController extends Controller
             'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $data = $request->all();
         $data['school_id'] = $schoolId;
 
@@ -89,6 +107,10 @@ class TeacherController extends Controller
 
         Teacher::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Teacher created successfully.']);
+        }
+
         return redirect()->route('teachers.index')
             ->with('success', 'Teacher created successfully.');
     }
@@ -96,18 +118,28 @@ class TeacherController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        //
+        $teacher = Teacher::with('school')->findOrFail($id);
+
+        if ($request->ajax()) {
+            return view('teachers.show', compact('teacher'))->renderSections()['content'];
+        }
+
+        return view('teachers.show', compact('teacher'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
         $teacher = Teacher::findOrFail($id);
         $schools = School::where('status', 'active')->orderBy('name')->get();
+
+        if ($request->ajax()) {
+            return view('teachers.edit', compact('teacher', 'schools'))->renderSections()['content'];
+        }
 
         return view('teachers.edit', compact('teacher', 'schools'));
     }
@@ -117,7 +149,7 @@ class TeacherController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validator = \Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:teachers,email,'.$id,
             'phone' => 'nullable|string|max:20',
@@ -129,6 +161,13 @@ class TeacherController extends Controller
             'designation' => 'nullable|string|max:100',
             'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $teacher = Teacher::findOrFail($id);
 
@@ -150,6 +189,10 @@ class TeacherController extends Controller
 
         $teacher->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Teacher updated successfully.']);
+        }
+
         return redirect()->route('teachers.index')
             ->with('success', 'Teacher updated successfully.');
     }
@@ -157,7 +200,7 @@ class TeacherController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
         $teacher = Teacher::findOrFail($id);
 
@@ -167,6 +210,10 @@ class TeacherController extends Controller
         }
 
         $teacher->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Teacher deleted successfully.']);
+        }
 
         return redirect()->route('teachers.index')
             ->with('success', 'Teacher deleted successfully.');

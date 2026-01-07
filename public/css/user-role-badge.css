@@ -1,0 +1,31 @@
+/* User Role Badge in Top Navigation */
+.navbar-nav .badge.badge-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-nav .badge.badge-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.navbar-nav .badge.badge-info i {
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments for user role badge */
+@media (max-width: 768px) {
+    .navbar-nav .badge.badge-info {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.5rem;
+    }
+}

@@ -75,8 +75,9 @@ class LeaveController extends Controller
         return redirect()->route('leaves.index')->with('success', 'Leave created successfully.');
     }
 
-    public function edit(Leave $leave)
+    public function edit($leaf)
     {
+        $leave = Leave::findOrFail($leaf);
         $students = Student::orderBy('name')->get();
         $grades = Grade::orderBy('name')->get();
         if (request()->ajax()) {
@@ -85,8 +86,10 @@ class LeaveController extends Controller
         return view('leaves.create', compact('leave', 'students', 'grades'));
     }
 
-    public function update(Request $request, Leave $leave)
+    public function update(Request $request, $leaf)
     {
+        $leave = Leave::findOrFail($leaf);
+        
         $data = $request->validate([
             'student_id' => 'nullable|exists:students,id',
             'grade_id' => 'nullable|exists:grades,id',
@@ -110,8 +113,10 @@ class LeaveController extends Controller
         return redirect()->route('leaves.index')->with('success', 'Leave updated successfully.');
     }
 
-    public function destroy(Leave $leave)
+    public function destroy($leaf)
     {
+        $leave = Leave::findOrFail($leaf);
+        
         if (!Schema::hasTable('leaves')) {
             if (request()->wantsJson() || request()->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Leaves table not migrated'], 500);
@@ -124,5 +129,16 @@ class LeaveController extends Controller
             return response()->json(['success' => true]);
         }
         return redirect()->route('leaves.index')->with('success', 'Leave deleted.');
+    }
+
+    public function show($leaf)
+    {
+        $leave = Leave::with(['student', 'grade'])->findOrFail($leaf);
+        
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($leave);
+        }
+        
+        return view('leaves.show', compact('leave'));
     }
 }
