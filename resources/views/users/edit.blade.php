@@ -73,13 +73,9 @@
                                 <select name="role" id="role" class="form-control @error('role') is-invalid @enderror" required>
                                     <option value="">Select Role</option>
                                     @if(Auth::user()->role == 'master')
-                                        <option value="admin" {{ old('role', $user_to_edit->role) == 'admin' ? 'selected' : '' }}>
-                                            <i class="fas fa-user-shield"></i> Admin
-                                        </option>
+                                        <option value="admin" {{ old('role', $user_to_edit->role) == 'admin' ? 'selected' : '' }}>Admin</option>
                                     @endif
-                                    <option value="user" {{ old('role', $user_to_edit->role) == 'user' ? 'selected' : '' }}>
-                                        <i class="fas fa-user"></i> User
-                                    </option>
+                                    <option value="user" {{ old('role', $user_to_edit->role) == 'user' ? 'selected' : '' }}>User</option>
                                 </select>
                                 @error('role')
                                     <span class="invalid-feedback">{{ $message }}</span>
@@ -87,8 +83,10 @@
                                 <small class="form-text text-muted">
                                     @if(Auth::user()->role == 'master')
                                         Master users can modify Admin and User roles.
+                                    @elseif(Auth::user()->role == 'admin')
+                                        Admin users can only modify User roles.
                                     @else
-                                        You can only assign User roles.
+                                        You don't have permission to modify roles.
                                     @endif
                                 </small>
                             @endif
