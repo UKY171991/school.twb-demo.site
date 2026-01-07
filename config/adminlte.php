@@ -478,7 +478,6 @@ return [
         [
             'text' => 'User Management',
             'icon' => 'fas fa-fw fa-users',
-            'can' => 'manage-users',
             'submenu' => [
                 [
                     'text' => 'Users',
