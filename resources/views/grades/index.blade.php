@@ -181,6 +181,23 @@
             color: #dee2e6;
             margin-bottom: 15px;
         }
+        
+        /* Modal improvements */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .grade-badge {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
     </style>
 @stop
 

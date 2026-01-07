@@ -49,7 +49,7 @@ class GradeController extends Controller
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
 
         if ($request->ajax()) {
-            return view('grades.create', compact('teachers'))->renderSections()['content'];
+            return view('grades.create-modal', compact('teachers'));
         }
 
         return view('grades.create', compact('teachers'));
