@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('marking_schemes', function (Blueprint $table) {
+        Schema::create('exam_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('type'); // 'percentage', 'points', 'letter'
-            $table->json('configuration'); // Store flexible configuration
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->enum('status', ['active', 'inactive', 'completed'])->default('active');
+            $table->unsignedBigInteger('school_id');
             $table->timestamps();
+            
+            $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
+            $table->index(['school_id', 'status']);
         });
     }
 
@@ -27,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('marking_schemes');
+        Schema::dropIfExists('exam_types');
     }
 };

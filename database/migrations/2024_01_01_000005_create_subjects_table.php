@@ -11,20 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schools', function (Blueprint $table) {
+        Schema::create('subjects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->text('address')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->string('website')->nullable();
-            $table->string('principal_name')->nullable();
-            $table->string('logo')->nullable();
             $table->text('description')->nullable();
+            $table->integer('full_marks')->default(100);
+            $table->integer('pass_marks')->default(33);
+            $table->enum('type', ['theory', 'practical', 'both'])->default('theory');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->json('settings')->nullable(); // For school-specific settings
+            $table->unsignedBigInteger('school_id');
             $table->timestamps();
+            
+            $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
+            $table->index(['school_id', 'status']);
         });
     }
 
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schools');
+        Schema::dropIfExists('subjects');
     }
 };

@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subjects', function (Blueprint $table) {
+        Schema::create('system_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('code')->nullable();
+            $table->string('key')->unique();
+            $table->text('value')->nullable();
+            $table->string('type')->default('text');
             $table->text('description')->nullable();
-            $table->foreignId('grade_id')->constrained()->onDelete('cascade');
-            $table->foreignId('teacher_id')->nullable()->constrained()->onDelete('set null');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
+            
+            $table->index('key');
+            $table->index('status');
         });
     }
 
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subjects');
+        Schema::dropIfExists('system_settings');
     }
 };
