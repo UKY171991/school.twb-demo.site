@@ -43,10 +43,12 @@ DB_DATABASE=database/database.sqlite     # Used for local
 
 DB_HOST=localhost                       # Used for production
 DB_PORT=3306                           # Used for production
-DB_DATABASE=your_database_name          # Used for production
+DB_DATABASE_MYSQL=your_database_name    # Used for production
 DB_USERNAME=your_username               # Used for production
 DB_PASSWORD=your_password               # Used for production
 ```
+
+**Important:** `DB_DATABASE` is used for SQLite (local), while `DB_DATABASE_MYSQL` is used for MySQL (production).
 
 ### `config/database.php`
 The database configuration uses smart auto-detection:

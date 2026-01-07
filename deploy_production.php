@@ -42,9 +42,13 @@ echo "\nChecking database connection...\n";
 try {
     \Illuminate\Support\Facades\DB::connection('mysql')->getPdo();
     echo "✓ MySQL connection successful\n";
+    echo "  Database: " . config('database.connections.mysql.database') . "\n";
+    echo "  Host: " . config('database.connections.mysql.host') . "\n";
 } catch (\Exception $e) {
     echo "❌ MySQL connection failed: " . $e->getMessage() . "\n";
-    echo "Please check your MySQL credentials in .env\n";
+    echo "Please check your MySQL credentials in .env:\n";
+    echo "  DB_DATABASE_MYSQL: " . env('DB_DATABASE_MYSQL') . "\n";
+    echo "  DB_USERNAME: " . env('DB_USERNAME') . "\n";
     exit(1);
 }
 
