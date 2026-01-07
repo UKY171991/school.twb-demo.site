@@ -162,7 +162,7 @@ class GradeController extends Controller
         $teachers = \App\Models\Teacher::where('school_id', $schoolId)->get();
 
         if ($request->ajax()) {
-            return view('grades.edit', compact('grade', 'teachers'))->renderSections()['content'];
+            return view('grades.edit-modal', compact('grade', 'teachers'));
         }
 
         return view('grades.edit', compact('grade', 'teachers'));

@@ -256,6 +256,91 @@
                 }
             });
         });
+
+        // Function to view grade details
+        function viewGradeDetails(gradeId) {
+            $.ajax({
+                url: `/admin/classes/${gradeId}`,
+                method: 'GET',
+                success: function(response) {
+                    // Create a detailed view modal
+                    const modalHtml = `
+                        <div class="modal fade" id="gradeViewModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-graduation-cap"></i> 
+                                            Class Details: ${response.name}
+                                        </h5>
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span>&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <table class="table table-borderless">
+                                                    <tr>
+                                                        <th width="30%">Class Name:</th>
+                                                        <td><span class="grade-badge grade-${response.id <= 12 ? response.id : '1'}">${response.name}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Section:</th>
+                                                        <td>${response.section || '<span class="text-muted">N/A</span>'}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Students Count:</th>
+                                                        <td><span class="badge badge-info">${response.students_count}</span></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <table class="table table-borderless">
+                                                    <tr>
+                                                        <th width="30%">Status:</th>
+                                                        <td><span class="badge badge-success">${response.status}</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Created:</th>
+                                                        <td>${response.created_at}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Last Activity:</th>
+                                                        <td>${response.last_activity}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-warning" onclick="window.location.href='/admin/classes/${gradeId}/edit'">
+                                            <i class="fas fa-edit"></i> Edit Class
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Remove existing modal if any
+                    $('#gradeViewModal').remove();
+                    
+                    // Add new modal to body and show it
+                    $('body').append(modalHtml);
+                    $('#gradeViewModal').modal('show');
+                    
+                    // Clean up modal after hidden
+                    $('#gradeViewModal').on('hidden.bs.modal', function () {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    alert('Error loading grade details. Please try again.');
+                }
+            });
+        }
     </script>
 @stop
 
