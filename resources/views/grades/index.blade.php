@@ -91,7 +91,7 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-success btn-sm" data-grade-id="{{ $grade->id }}" title="View Details">
+                                    <button onclick="viewGradeDetails({{ $grade->id }})" class="btn btn-success btn-sm" title="View Details">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button onclick="openAjaxModal('{{ route('grades.edit', $grade->id) }}', 'Edit {{ addslashes($grade->name) }}')" class="btn btn-info btn-sm" title="Edit">
