@@ -8,6 +8,17 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $user = auth()->user();
+    
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->role === 'teacher') {
+        return redirect()->route('teacher.dashboard');
+    } elseif ($user->role === 'student') {
+        return redirect()->route('student.dashboard');
+    }
+    
+    // Fallback for users without specific roles
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
