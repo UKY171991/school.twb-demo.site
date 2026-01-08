@@ -25,7 +25,10 @@ class AdminController extends Controller
             'grades' => Grade::count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        $recentStudents = Student::with('user')->latest()->take(5)->get();
+        $recentTeachers = Teacher::with('user')->latest()->take(5)->get();
+
+        return view('admin.dashboard', compact('stats', 'recentStudents', 'recentTeachers'));
     }
 
     // Students CRUD

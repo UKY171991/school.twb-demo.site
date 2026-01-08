@@ -14,18 +14,14 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
-        <style>
-            body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        </style>
     </head>
-    <body class="font-sans antialiased text-slate-900">
+    <body class="font-sans antialiased text-slate-900 overflow-x-hidden">
         <div class="min-h-screen bg-slate-50">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-20">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -34,7 +30,11 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                <div class="py-12">
+                    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        {{ $slot }}
+                    </div>
+                </div>
             </main>
         </div>
     </body>
