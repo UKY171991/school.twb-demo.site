@@ -9,7 +9,10 @@ class Grade extends Model
 {
     protected $fillable = [
         'enrollment_id',
+        'exam_name',
         'grade',
+        'total_marks',
+        'passing_marks',
         'comments',
         'graded_at',
     ];

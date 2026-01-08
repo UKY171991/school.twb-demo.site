@@ -1,55 +1,61 @@
-<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
-<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('app-layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-     <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            <?php echo e(__('Add Subject')); ?>
 
-        </h2>
-     <?php $__env->endSlot(); ?>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <form method="POST" action="<?php echo e(route('admin.subjects.store')); ?>">
-                        <?php echo csrf_field(); ?>
-                        <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                            <input type="text" name="name" id="name" value="<?php echo e(old('name')); ?>" class="mt-1 block w-full" required>
-                            <?php $__errorArgs = ['name'];
+<?php $__env->startSection('title', 'Define Subject'); ?>
+<?php $__env->startSection('page-title', 'Course Registry'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8">
+        <a href="<?php echo e(route('admin.subjects')); ?>" class="hover:text-purple-600 transition-colors">Catalog</a>
+        <span class="opacity-30">/</span>
+        <span class="text-purple-500">New Entry</span>
+    </div>
+
+    <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl border border-white">
+        <div class="p-10 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Curriculum Definition</h2>
+                <p class="text-sm text-slate-400 font-medium">Create a new academic subject for the institution</p>
+            </div>
+            <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 shadow-inner">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+        </div>
+
+        <form method="POST" action="<?php echo e(route('admin.subjects.store')); ?>" class="p-10 space-y-8">
+            <?php echo csrf_field(); ?>
+            
+            <div class="space-y-6">
+                <div>
+                    <label for="name" class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Subject Nomenclature</label>
+                    <input type="text" name="name" id="name" required placeholder="e.g. Advanced Theoretical Mathematics"
+                           class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-8 focus:ring-purple-500/5 focus:border-purple-500 transition-all font-black text-slate-800 tracking-tight text-lg placeholder:font-medium placeholder:text-slate-300">
+                    <?php $__errorArgs = ['name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500"><?php echo e($message); ?></p> <?php unset($message);
+$message = $__bag->first($__errorArgs[0]); ?> <p class="text-[10px] font-black text-rose-500 mt-2 ml-1 uppercase tracking-widest"><?php echo e($message); ?></p> <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
-                        </div>
-                        <div class="mb-4">
-                            <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                            <textarea name="description" id="description" class="mt-1 block w-full"><?php echo e(old('description')); ?></textarea>
-                        </div>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Create Subject</button>
-                    </form>
+                </div>
+
+                <div>
+                    <label for="description" class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Curriculum Scope</label>
+                    <textarea name="description" id="description" rows="5" placeholder="Outline the primary objectives and learning outcomes..."
+                              class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-8 focus:ring-purple-500/5 focus:border-purple-500 transition-all font-medium text-slate-600 placeholder:text-slate-300"></textarea>
                 </div>
             </div>
-        </div>
+
+            <div class="pt-8 border-t border-slate-50 flex items-center justify-end space-x-4">
+                <a href="<?php echo e(route('admin.subjects')); ?>" class="btn-secondary">Dismiss</a>
+                <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+                    Register Subject
+                </button>
+            </div>
+        </form>
     </div>
- <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?><?php /**PATH C:\git\school.twb-demo.site\resources\views/admin/subjects/create.blade.php ENDPATH**/ ?>
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\git\school.twb-demo.site\resources\views/admin/subjects/create.blade.php ENDPATH**/ ?>

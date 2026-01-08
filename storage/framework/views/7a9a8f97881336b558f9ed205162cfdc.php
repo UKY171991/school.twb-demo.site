@@ -1,87 +1,112 @@
-<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
-<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('app-layout'); ?>
-<?php if ($component->shouldRender()): ?>
-<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
-<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
-<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
-<?php endif; ?>
-<?php $component->withAttributes([]); ?>
-     <?php $__env->slot('header', null, []); ?> 
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            <?php echo e(__('Edit Student')); ?>
 
-        </h2>
-     <?php $__env->endSlot(); ?>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <form method="POST" action="<?php echo e(route('admin.students.update', $student)); ?>">
-                        <?php echo csrf_field(); ?> <?php echo method_field('PUT'); ?>
-                        <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                            <input type="text" name="name" id="name" value="<?php echo e(old('name', $student->user->name)); ?>" class="mt-1 block w-full" required>
-                            <?php $__errorArgs = ['name'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500"><?php echo e($message); ?></p> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                            <input type="email" name="email" id="email" value="<?php echo e(old('email', $student->user->email)); ?>" class="mt-1 block w-full" required>
-                            <?php $__errorArgs = ['email'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500"><?php echo e($message); ?></p> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-                        <div class="mb-4">
-                            <label for="student_id" class="block text-sm font-medium text-gray-700">Student ID</label>
-                            <input type="text" name="student_id" id="student_id" value="<?php echo e(old('student_id', $student->student_id)); ?>" class="mt-1 block w-full" required>
-                            <?php $__errorArgs = ['student_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?> <p class="text-red-500"><?php echo e($message); ?></p> <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
-                        </div>
-                        <div class="mb-4">
-                            <label for="date_of_birth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
-                            <input type="date" name="date_of_birth" id="date_of_birth" value="<?php echo e(old('date_of_birth', $student->date_of_birth)); ?>" class="mt-1 block w-full">
-                        </div>
-                        <div class="mb-4">
-                            <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
-                            <textarea name="address" id="address" class="mt-1 block w-full"><?php echo e(old('address', $student->address)); ?></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
-                            <input type="text" name="phone" id="phone" value="<?php echo e(old('phone', $student->phone)); ?>" class="mt-1 block w-full">
-                        </div>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update Student</button>
-                    </form>
-                </div>
+<?php $__env->startSection('title', 'Edit Student'); ?>
+<?php $__env->startSection('page-title', 'Modify Student Profile'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="max-w-5xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+        <a href="<?php echo e(route('admin.students')); ?>" class="hover:text-indigo-600 transition-colors">Students</a>
+        <span class="opacity-50">/</span>
+        <span class="text-indigo-500">Edit Profile</span>
+    </div>
+
+    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl shadow-blue-100/50">
+        <div class="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Student Profile Update</h2>
+                <p class="text-sm text-slate-400 font-medium">Modifying records for <strong><?php echo e($student->user->name); ?></strong></p>
+            </div>
+            <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-50 transition-transform hover:scale-110">
+                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
             </div>
         </div>
+
+        <form method="POST" action="<?php echo e(route('admin.students.update', $student)); ?>" class="p-10">
+            <?php echo csrf_field(); ?>
+            <?php echo method_field('PUT'); ?>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Personal Details -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Personal Record</h4>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                            <input type="text" name="name" value="<?php echo e(old('name', $student->user->name)); ?>" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Date of Birth</label>
+                            <input type="date" name="date_of_birth" value="<?php echo e(old('date_of_birth', $student->date_of_birth)); ?>"
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Residential Address</label>
+                            <textarea name="address" rows="3" 
+                                      class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700"><?php echo e(old('address', $student->address)); ?></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Credentials -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0014 20.3m5.988-5.904A10.033 10.033 0 0119.3 20M12 11h.01M12 11l-.01.01M12 11L12 11z"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Account Data</h4>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Student ID / Enrollment No.</label>
+                            <input type="text" name="student_id" value="<?php echo e(old('student_id', $student->student_id)); ?>" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-800 tracking-wider">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Official Email Address</label>
+                            <input type="email" name="email" value="<?php echo e(old('email', $student->user->email)); ?>" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Emergency Contact</label>
+                            <input type="text" name="phone" value="<?php echo e(old('phone', $student->phone)); ?>"
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700">
+                        </div>
+
+                        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 italic text-xs text-amber-700 font-medium">
+                            * Password remains unchanged unless modified via secure reset protocol.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Actions -->
+            <div class="mt-12 pt-8 border-t border-slate-100 flex items-center justify-end space-x-4">
+                <a href="<?php echo e(route('admin.students')); ?>" class="btn-secondary">
+                    Cancel Changes
+                </a>
+                <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Update Record
+                </button>
+            </div>
+        </form>
     </div>
- <?php echo $__env->renderComponent(); ?>
-<?php endif; ?>
-<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?>
-<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
-<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
-<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
-<?php endif; ?><?php /**PATH C:\git\school.twb-demo.site\resources\views/admin/students/edit.blade.php ENDPATH**/ ?>
+</div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\git\school.twb-demo.site\resources\views/admin/students/edit.blade.php ENDPATH**/ ?>

@@ -17,6 +17,10 @@ class TeacherSalary extends Model
         'remarks',
     ];
 
+    protected $casts = [
+        'paid_date' => 'date',
+    ];
+
     public function teacher()
     {
         return $this->belongsTo(Teacher::class);

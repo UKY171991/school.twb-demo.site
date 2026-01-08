@@ -17,6 +17,10 @@ class ExamTimetable extends Model
         'remarks',
     ];
 
+    protected $casts = [
+        'exam_date' => 'date',
+    ];
+
     public function school()
     {
         return $this->belongsTo(School::class);

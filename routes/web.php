@@ -98,7 +98,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Marksheets & Admin Cards
     Route::get('/marksheets', [App\Http\Controllers\AdminController::class, 'marksheets'])->name('marksheets');
+    Route::get('/marksheets/{student}', [App\Http\Controllers\AdminController::class, 'viewMarksheet'])->name('marksheets.show');
+    Route::get('/marksheets/{student}/print/{exam}', [App\Http\Controllers\AdminController::class, 'printMarksheet'])->name('marksheets.print');
     Route::get('/id-cards', [App\Http\Controllers\AdminController::class, 'idCards'])->name('idcards');
+    Route::get('/search', [App\Http\Controllers\AdminController::class, 'search'])->name('search');
 
     Route::delete('/schools/{school}', [App\Http\Controllers\AdminController::class, 'destroySchool'])->name('schools.destroy');
 });

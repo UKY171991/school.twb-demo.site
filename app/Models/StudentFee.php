@@ -18,6 +18,10 @@ class StudentFee extends Model
         'remarks',
     ];
 
+    protected $casts = [
+        'paid_date' => 'date',
+    ];
+
     public function student()
     {
         return $this->belongsTo(Student::class);

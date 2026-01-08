@@ -308,11 +308,14 @@ class AdminController extends Controller
     {
         $request->validate([
             'enrollment_id' => 'required|exists:enrollments,id',
-            'grade' => 'required|numeric|min:0|max:100',
+            'exam_name' => 'required|string',
+            'grade' => 'required|numeric|min:0',
+            'total_marks' => 'required|numeric|min:1',
+            'passing_marks' => 'required|numeric|min:0',
             'comments' => 'nullable',
         ]);
 
-        Grade::create($request->only(['enrollment_id', 'grade', 'comments']));
+        Grade::create($request->only(['enrollment_id', 'exam_name', 'grade', 'total_marks', 'passing_marks', 'comments']));
 
         return redirect()->route('admin.grades')->with('success', 'Grade created successfully');
     }
@@ -327,11 +330,14 @@ class AdminController extends Controller
     {
         $request->validate([
             'enrollment_id' => 'required|exists:enrollments,id',
-            'grade' => 'required|numeric|min:0|max:100',
+            'exam_name' => 'required|string',
+            'grade' => 'required|numeric|min:0',
+            'total_marks' => 'required|numeric|min:1',
+            'passing_marks' => 'required|numeric|min:0',
             'comments' => 'nullable',
         ]);
 
-        $grade->update($request->only(['enrollment_id', 'grade', 'comments']));
+        $grade->update($request->only(['enrollment_id', 'exam_name', 'grade', 'total_marks', 'passing_marks', 'comments']));
 
         return redirect()->route('admin.grades')->with('success', 'Grade updated successfully');
     }
@@ -582,13 +588,78 @@ class AdminController extends Controller
     // Marksheets & ID Cards
     public function marksheets()
     {
-        $students = Student::with(['user', 'enrollments.grades.enrollment.classroom.subject'])->paginate(10);
+        $students = Student::with(['user', 'school', 'enrollments.grades', 'enrollments.classroom.subject'])->paginate(10);
         return view('admin.marksheets.index', compact('students'));
+    }
+
+    public function viewMarksheet(Student $student, Request $request)
+    {
+        $student->load(['user', 'school', 'enrollments.classroom.subject', 'enrollments.grades']);
+        
+        $examName = $request->get('exam');
+        
+        // Get unique exam names for this student
+        $exams = $student->enrollments->flatMap->grades->pluck('exam_name')->unique()->filter();
+
+        $grades = collect();
+        if ($examName) {
+            $grades = $student->enrollments->flatMap(function($enrollment) use ($examName) {
+                return $enrollment->grades->where('exam_name', $examName);
+            });
+        }
+
+        return view('admin.marksheets.show', compact('student', 'exams', 'examName', 'grades'));
+    }
+
+    public function printMarksheet(Student $student, $examName)
+    {
+        $student->load(['user', 'school', 'enrollments.classroom.subject', 'enrollments.grades']);
+        
+        $grades = $student->enrollments->flatMap(function($enrollment) use ($examName) {
+            return $enrollment->grades->where('exam_name', $examName);
+        });
+
+        return view('admin.marksheets.print', compact('student', 'examName', 'grades'));
     }
 
     public function idCards()
     {
-        $students = Student::with(['user', 'school'])->paginate(10);
+        $students = Student::with(['user', 'school', 'enrollments.classroom'])->paginate(12);
         return view('admin.idcards.index', compact('students'));
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query');
+        
+        if (!$query) {
+            return redirect()->back();
+        }
+
+        $schools = School::where('name', 'like', "%{$query}%")
+            ->orWhere('code', 'like', "%{$query}%")
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $students = Student::whereHas('user', function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->orWhere('student_id', 'like', "%{$query}%")
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        $teachers = Teacher::whereHas('user', function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->orWhere('employee_id', 'like', "%{$query}%")
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('admin.search-results', compact('schools', 'students', 'teachers', 'query'));
     }
 }

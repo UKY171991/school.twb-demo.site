@@ -76,6 +76,22 @@
                         </svg>
                         <span class="font-semibold">Subjects</span>
                     </a>
+
+                    <a href="{{ route('admin.marksheets') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.marksheets*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.marksheets*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="font-semibold">Marksheets</span>
+                    </a>
+
+                    <a href="{{ route('admin.idcards') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.idcards*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.idcards*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                        </svg>
+                        <span class="font-semibold">ID Cards</span>
+                    </a>
                 </div>
 
                 <div class="pt-6">
@@ -94,6 +110,44 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                         <span class="font-semibold">Grades</span>
+                    </a>
+                </div>
+
+                <div class="pt-6">
+                    <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 opacity-50">Finance</p>
+                    <a href="{{ route('admin.salaries') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.salaries*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.salaries*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm10-10l-1 1m-1 1l-1 1m1-1l1 1m-1-1l-1-1"></path>
+                        </svg>
+                        <span class="font-semibold">Salaries</span>
+                    </a>
+
+                    <a href="{{ route('admin.fees') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.fees*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.fees*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-semibold">Student Fees</span>
+                    </a>
+                </div>
+
+                <div class="pt-6 pb-8">
+                    <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4 opacity-50">Planning</p>
+                    <a href="{{ route('admin.timetables.exam') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.timetables.exam*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.timetables.exam*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="font-semibold">Exam Schedule</span>
+                    </a>
+
+                    <a href="{{ route('admin.timetables.class') }}" 
+                       class="group flex items-center px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.timetables.class*') ? 'sidebar-item-active' : 'hover:bg-white/5 hover:text-white' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.timetables.class*') ? 'text-indigo-400' : 'text-slate-500 group-hover:text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-semibold">Class Timing</span>
                     </a>
                 </div>
             </nav>
@@ -138,6 +192,18 @@
                     </div>
                 </div>
                 
+                <form action="{{ route('admin.search') }}" method="GET" class="flex-1 max-w-md mx-12 hidden md:block">
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" name="query" value="{{ $query ?? '' }}" placeholder="Search students, teachers, schools..." 
+                               class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-sm font-medium text-slate-600 placeholder:text-slate-400">
+                    </div>
+                </form>
+
                 <div class="flex items-center space-x-6">
                     <!-- Notifications -->
                     <button class="relative p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
