@@ -26,5 +26,5 @@
 
 <div class="form-group">
     <button type="submit" class="btn btn-primary">{{ isset($holiday) ? 'Update' : 'Create' }}</button>
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 </div>

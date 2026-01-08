@@ -16,9 +16,11 @@
     <link rel="stylesheet" href="{{ asset('css/app-custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/iframe-fix.css') }}">
     <link rel="stylesheet" href="{{ asset('css/user-role-badge.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 @stop
 
 @section('js')
     <script src="{{ asset('js/app-custom.js') }}"></script>
+    <script src="{{ asset('js/ajax-crud.js') }}"></script>
     @stack('scripts')
 @stop

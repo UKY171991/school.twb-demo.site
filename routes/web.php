@@ -129,8 +129,8 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     // Student Fees routes
     Route::resource('student-fees', App\Http\Controllers\StudentFeeController::class);
     Route::get('student-fees/{studentFee}/print-slip', [App\Http\Controllers\StudentFeeController::class, 'printSlip'])->name('student-fees.print-slip');
-    Route::get('student-fees-collect', [App\Http\Controllers\StudentFeeController::class, 'collectFee'])->name('student-fees.collect');
-    Route::post('student-fees-bulk-create', [App\Http\Controllers\StudentFeeController::class, 'bulkCreate'])->name('student-fees.bulk-create');
+    Route::get('student-fees/collect', [App\Http\Controllers\StudentFeeController::class, 'collectFee'])->name('student-fees.collect');
+    Route::post('student-fees/bulk-create', [App\Http\Controllers\StudentFeeController::class, 'bulkCreate'])->name('student-fees.bulk-create');
 
     // Teacher Salaries routes
     Route::resource('teacher-salaries', App\Http\Controllers\TeacherSalaryController::class);

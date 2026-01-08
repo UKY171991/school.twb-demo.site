@@ -73,7 +73,7 @@
             </div>
         </div>
         <div class="card-footer text-right">
-            <button class="btn btn-default" data-dismiss="modal">Close</button>
+            <button class="btn btn-default" data-bs-dismiss="modal">Close</button>
         </div>
     </div>
 @stop

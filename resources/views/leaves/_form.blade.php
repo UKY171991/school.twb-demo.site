@@ -66,7 +66,7 @@
         <i class="fas fa-save"></i> {{ isset($leave) ? 'Update' : 'Create' }}
     </button>
     @if(request()->ajax())
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
     @else
         <a href="{{ route('leaves.index') }}" class="btn btn-secondary">Cancel</a>
     @endif

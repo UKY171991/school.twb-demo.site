@@ -331,7 +331,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="button" class="btn btn-warning" onclick="window.location.href='/admin/classes/${gradeId}/edit'">
                                             <i class="fas fa-edit"></i> Edit Class
                                         </button>

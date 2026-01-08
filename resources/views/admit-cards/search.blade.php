@@ -130,7 +130,7 @@
                 @csrf
                 <div class="modal-header">
                     <h4 class="modal-title">Generate Admit Card</h4>
-                    <button type="button" class="close" data-dismiss="modal">
+                    <button type="button" class="close" data-bs-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
@@ -177,7 +177,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-print"></i> Generate & Print
                     </button>
@@ -195,7 +195,7 @@
                 @csrf
                 <div class="modal-header">
                     <h4 class="modal-title">Bulk Generate Admit Cards</h4>
-                    <button type="button" class="close" data-dismiss="modal">
+                    <button type="button" class="close" data-bs-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
@@ -235,7 +235,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-print"></i> Generate All & Print
                     </button>

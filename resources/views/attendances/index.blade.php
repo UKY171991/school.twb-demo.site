@@ -129,7 +129,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Mark Attendance - <span id="modal-grade-name"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal">
+                    <button type="button" class="close" data-bs-dismiss="modal">
                         <span>&times;</span>
                     </button>
                 </div>
@@ -171,7 +171,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="save-quick-attendance">
                         <i class="fas fa-save"></i> Save Attendance
                     </button>
