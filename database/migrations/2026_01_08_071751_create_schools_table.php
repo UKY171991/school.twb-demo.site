@@ -13,6 +13,25 @@ return new class extends Migration
     {
         Schema::create('schools', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->text('description')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('country')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
+            $table->string('website')->nullable();
+            $table->string('principal_name')->nullable();
+            $table->date('established_date')->nullable();
+            $table->enum('type', ['public', 'private', 'charter', 'international'])->default('public');
+            $table->enum('level', ['elementary', 'middle', 'high', 'k12', 'university'])->default('k12');
+            $table->integer('student_capacity')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->string('logo')->nullable();
+            $table->json('settings')->nullable(); // For storing school-specific settings
             $table->timestamps();
         });
     }
