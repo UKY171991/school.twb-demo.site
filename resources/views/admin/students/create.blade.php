@@ -1,135 +1,115 @@
 @extends('layouts.admin')
 
 @section('title', 'Add Student')
-@section('page-title', 'Add New Student')
+@section('page-title', 'Enroll New Student')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Add New Student</h2>
-            <p class="text-gray-600">Create a new student account and profile</p>
-        </div>
-        <a href="{{ route('admin.students') }}" 
-           class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            <span>Back to Students</span>
-        </a>
+<div class="max-w-5xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{{ route('admin.students') }}" class="hover:text-indigo-600 transition-colors">Students</a>
+        <span class="opacity-50">/</span>
+        <span class="text-indigo-500">New Enrollment</span>
     </div>
 
-    <!-- Form -->
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Student Information</h3>
+    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl shadow-blue-100/50">
+        <div class="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Student Admissions</h2>
+                <p class="text-sm text-slate-400 font-medium">Create a new academic profile for a student</p>
+            </div>
+            <div class="w-14 h-14 gradient-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 -rotate-3">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+            </div>
         </div>
-        
-        <form method="POST" action="{{ route('admin.students.store') }}" class="p-6">
+
+        <form method="POST" action="{{ route('admin.students.store') }}" class="p-10">
             @csrf
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Personal Information -->
-                <div class="space-y-4">
-                    <h4 class="text-md font-semibold text-gray-700 border-b pb-2">Personal Information</h4>
-                    
-                    <!-- Name -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('name') border-red-500 @enderror">
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Personal Details -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Personal Details</h4>
                     </div>
 
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address <span class="text-red-500">*</span>
-                        </label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror">
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700" 
+                                   placeholder="e.g. John Doe">
+                        </div>
 
-                    <!-- Password -->
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                            Password <span class="text-red-500">*</span>
-                        </label>
-                        <input type="password" name="password" id="password" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('password') border-red-500 @enderror">
-                        @error('password')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-sm text-gray-500">Minimum 8 characters</p>
-                    </div>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Date of Birth</label>
+                            <input type="date" name="date_of_birth" value="{{ old('date_of_birth') }}"
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700">
+                        </div>
 
-                    <!-- Date of Birth -->
-                    <div>
-                        <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">
-                            Date of Birth
-                        </label>
-                        <input type="date" name="date_of_birth" id="date_of_birth" value="{{ old('date_of_birth') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Residential Address</label>
+                            <textarea name="address" rows="3" 
+                                      class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700" 
+                                      placeholder="Current living address..."></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Academic Information -->
-                <div class="space-y-4">
-                    <h4 class="text-md font-semibold text-gray-700 border-b pb-2">Academic Information</h4>
-                    
-                    <!-- Student ID -->
-                    <div>
-                        <label for="student_id" class="block text-sm font-medium text-gray-700 mb-2">
-                            Student ID <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="student_id" id="student_id" value="{{ old('student_id') }}" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('student_id') border-red-500 @enderror">
-                        @error('student_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-sm text-gray-500">Unique identifier for the student</p>
+                <!-- Account & Academic -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0014 20.3m5.988-5.904A10.033 10.033 0 0119.3 20M12 11h.01M12 11l-.01.01M12 11L12 11z"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Account Credentials</h4>
                     </div>
 
-                    <!-- Phone -->
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            Phone Number
-                        </label>
-                        <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Student ID / Enrollment No.</label>
+                            <input type="text" name="student_id" value="{{ old('student_id') }}" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-800 tracking-wider" 
+                                   placeholder="e.g. STD/2026/001">
+                        </div>
 
-                    <!-- Address -->
-                    <div>
-                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-                            Address
-                        </label>
-                        <textarea name="address" id="address" rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('address') }}</textarea>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+                            <input type="email" name="email" value="{{ old('email') }}" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700" 
+                                   placeholder="student@example.com">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Access Password</label>
+                            <input type="password" name="password" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700" 
+                                   placeholder="Min. 8 characters">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Emergency Contact</label>
+                            <input type="text" name="phone" value="{{ old('phone') }}"
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-700" 
+                                   placeholder="+1 (555) 000-0000">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Form Actions -->
-            <div class="flex items-center justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-                <a href="{{ route('admin.students') }}" 
-                   class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg transition-colors duration-200">
+            <!-- Footer Actions -->
+            <div class="mt-12 pt-8 border-t border-slate-100 flex items-center justify-end space-x-4">
+                <a href="{{ route('admin.students') }}" class="btn-secondary">
                     Cancel
                 </a>
-                <button type="submit" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span>Create Student</span>
+                <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Enroll Student
                 </button>
             </div>
         </form>

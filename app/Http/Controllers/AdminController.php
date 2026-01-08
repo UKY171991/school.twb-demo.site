@@ -9,6 +9,10 @@ use App\Models\Classroom;
 use App\Models\Enrollment;
 use App\Models\Grade;
 use App\Models\School;
+use App\Models\TeacherSalary;
+use App\Models\StudentFee;
+use App\Models\ExamTimetable;
+use App\Models\ClassTimetable;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -453,5 +457,138 @@ class AdminController extends Controller
     {
         $school->delete();
         return redirect()->route('admin.schools')->with('success', 'School deleted successfully');
+    }
+
+    // Teacher Salary
+    public function salaries()
+    {
+        $salaries = TeacherSalary::with(['teacher.user', 'school'])->paginate(10);
+        return view('admin.salaries.index', compact('salaries'));
+    }
+
+    public function createSalary()
+    {
+        $teachers = Teacher::with('user')->get();
+        $schools = School::all();
+        return view('admin.salaries.create', compact('teachers', 'schools'));
+    }
+
+    public function storeSalary(Request $request)
+    {
+        $request->validate([
+            'teacher_id' => 'required|exists:teachers,id',
+            'school_id' => 'required|exists:schools,id',
+            'amount' => 'required|numeric|min:0',
+            'month' => 'required|string',
+            'year' => 'required|integer',
+            'status' => 'required|in:paid,pending',
+        ]);
+
+        TeacherSalary::create($request->all());
+        return redirect()->route('admin.salaries')->with('success', 'Salary record created successfully');
+    }
+
+    public function destroySalary(TeacherSalary $salary)
+    {
+        $salary->delete();
+        return redirect()->route('admin.salaries')->with('success', 'Salary record deleted successfully');
+    }
+
+    // Student Fees
+    public function fees()
+    {
+        $fees = StudentFee::with(['student.user', 'school'])->paginate(10);
+        return view('admin.fees.index', compact('fees'));
+    }
+
+    public function createFee()
+    {
+        $students = Student::with('user')->get();
+        $schools = School::all();
+        return view('admin.fees.create', compact('students', 'schools'));
+    }
+
+    public function storeFee(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'school_id' => 'required|exists:schools,id',
+            'amount' => 'required|numeric|min:0',
+            'fee_type' => 'required|string',
+            'status' => 'required|in:paid,pending',
+        ]);
+
+        StudentFee::create($request->all());
+        return redirect()->route('admin.fees')->with('success', 'Fee record created successfully');
+    }
+
+    public function destroyFee(StudentFee $fee)
+    {
+        $fee->delete();
+        return redirect()->route('admin.fees')->with('success', 'Fee record deleted successfully');
+    }
+
+    // Timetables
+    public function examTimetables()
+    {
+        $timetables = ExamTimetable::with(['school', 'subject', 'classroom'])->paginate(10);
+        $schools = School::all();
+        $subjects = Subject::all();
+        $classrooms = Classroom::all();
+        return view('admin.timetables.exam', compact('timetables', 'schools', 'subjects', 'classrooms'));
+    }
+
+    public function classTimetables()
+    {
+        $timetables = ClassTimetable::with(['school', 'classroom', 'subject', 'teacher.user'])->paginate(10);
+        $schools = School::all();
+        $classrooms = Classroom::all();
+        $subjects = Subject::all();
+        $teachers = Teacher::with('user')->get();
+        return view('admin.timetables.class', compact('timetables', 'schools', 'classrooms', 'subjects', 'teachers'));
+    }
+
+    public function storeExamTimetable(Request $request)
+    {
+        $request->validate([
+            'school_id' => 'required|exists:schools,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'exam_name' => 'required|string',
+            'exam_date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        ExamTimetable::create($request->all());
+        return redirect()->route('admin.timetables.exam')->with('success', 'Exam timetable added');
+    }
+
+    public function storeClassTimetable(Request $request)
+    {
+        $request->validate([
+            'school_id' => 'required|exists:schools,id',
+            'classroom_id' => 'required|exists:classrooms,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'day_of_week' => 'required|string',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        ClassTimetable::create($request->all());
+        return redirect()->route('admin.timetables.class')->with('success', 'Class timetable added');
+    }
+
+    // Marksheets & ID Cards
+    public function marksheets()
+    {
+        $students = Student::with(['user', 'enrollments.grades.enrollment.classroom.subject'])->paginate(10);
+        return view('admin.marksheets.index', compact('students'));
+    }
+
+    public function idCards()
+    {
+        $students = Student::with(['user', 'school'])->paginate(10);
+        return view('admin.idcards.index', compact('students'));
     }
 }

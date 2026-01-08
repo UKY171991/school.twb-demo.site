@@ -1,261 +1,183 @@
 @extends('layouts.admin')
 
 @section('title', 'Add School')
-@section('page-title', 'Add New School')
+@section('page-title', 'Create Institution')
 
 @section('content')
-<div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Add New School</h2>
-            <p class="text-gray-600">Create a new educational institution in the system</p>
-        </div>
-        <a href="{{ route('admin.schools') }}" 
-           class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-colors duration-200 flex items-center space-x-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            <span>Back to Schools</span>
-        </a>
+<div class="max-w-5xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{{ route('admin.schools') }}" class="hover:text-indigo-600 transition-colors">Schools</a>
+        <span class="opacity-50">/</span>
+        <span class="text-indigo-500">Add New</span>
     </div>
 
-    <!-- Form -->
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">School Information</h3>
+    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl shadow-indigo-100/50">
+        <div class="px-10 py-8 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Institutional Profile</h2>
+                <p class="text-sm text-slate-400 font-medium">Register a new educational facility in the network</p>
+            </div>
+            <div class="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 rotate-3">
+                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
         </div>
-        
-        <form method="POST" action="{{ route('admin.schools.store') }}" class="p-6" enctype="multipart/form-data">
+
+        <form method="POST" action="{{ route('admin.schools.store') }}" class="p-10" enctype="multipart/form-data">
             @csrf
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Basic Information -->
-                <div class="space-y-4">
-                    <h4 class="text-md font-semibold text-gray-700 border-b pb-2">Basic Information</h4>
-                    
-                    <!-- School Name -->
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                            School Name <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('name') border-red-500 @enderror">
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <!-- Column 1: Identity -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 014 0v1m-4 0a2 2 0 014 0v1"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Identity Details</h4>
                     </div>
 
-                    <!-- School Code -->
-                    <div>
-                        <label for="code" class="block text-sm font-medium text-gray-700 mb-2">
-                            School Code <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="code" id="code" value="{{ old('code') }}" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('code') border-red-500 @enderror">
-                        @error('code')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-sm text-gray-500">Unique identifier for the school</p>
-                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Official Name</label>
+                            <input type="text" name="name" value="{{ old('name') }}" required
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                   placeholder="e.g. St. Xavier International High">
+                        </div>
 
-                    <!-- School Type -->
-                    <div>
-                        <label for="type" class="block text-sm font-medium text-gray-700 mb-2">
-                            School Type <span class="text-red-500">*</span>
-                        </label>
-                        <select name="type" id="type" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('type') border-red-500 @enderror">
-                            <option value="">Select Type</option>
-                            <option value="public" {{ old('type') == 'public' ? 'selected' : '' }}>Public</option>
-                            <option value="private" {{ old('type') == 'private' ? 'selected' : '' }}>Private</option>
-                            <option value="charter" {{ old('type') == 'charter' ? 'selected' : '' }}>Charter</option>
-                            <option value="international" {{ old('type') == 'international' ? 'selected' : '' }}>International</option>
-                        </select>
-                        @error('type')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Unique Code</label>
+                                <input type="text" name="code" value="{{ old('code') }}" required
+                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                       placeholder="SCH-001">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Established</label>
+                                <input type="date" name="established_date" value="{{ old('established_date') }}"
+                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700">
+                            </div>
+                        </div>
 
-                    <!-- School Level -->
-                    <div>
-                        <label for="level" class="block text-sm font-medium text-gray-700 mb-2">
-                            School Level <span class="text-red-500">*</span>
-                        </label>
-                        <select name="level" id="level" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('level') border-red-500 @enderror">
-                            <option value="">Select Level</option>
-                            <option value="elementary" {{ old('level') == 'elementary' ? 'selected' : '' }}>Elementary</option>
-                            <option value="middle" {{ old('level') == 'middle' ? 'selected' : '' }}>Middle School</option>
-                            <option value="high" {{ old('level') == 'high' ? 'selected' : '' }}>High School</option>
-                            <option value="k12" {{ old('level') == 'k12' ? 'selected' : '' }}>K-12</option>
-                            <option value="university" {{ old('level') == 'university' ? 'selected' : '' }}>University</option>
-                        </select>
-                        @error('level')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Level</label>
+                                <select name="level" required class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-semibold text-slate-700">
+                                    <option value="elementary">Elementary</option>
+                                    <option value="middle">Middle School</option>
+                                    <option value="high">High School</option>
+                                    <option value="k12">K-12</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Type</label>
+                                <select name="type" required class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-semibold text-slate-700">
+                                    <option value="public">Public</option>
+                                    <option value="private">Private</option>
+                                    <option value="international">International</option>
+                                </select>
+                            </div>
+                        </div>
 
-                    <!-- Description -->
-                    <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                            Description
-                        </label>
-                        <textarea name="description" id="description" rows="3"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">{{ old('description') }}</textarea>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Institutional Logo</label>
+                            <div class="relative group">
+                                <input type="file" name="logo" id="logo-input" class="hidden">
+                                <label for="logo-input" class="w-full flex items-center justify-center px-5 py-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl hover:bg-slate-100/50 hover:border-indigo-300 transition-all cursor-pointer group">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                            <svg class="w-6 h-6 text-slate-400 group-hover:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        </div>
+                                        <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest" id="logo-filename">Click to upload (PNG/JPG)</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Contact & Details -->
-                <div class="space-y-4">
-                    <h4 class="text-md font-semibold text-gray-700 border-b pb-2">Contact & Details</h4>
-                    
-                    <!-- Principal Name -->
-                    <div>
-                        <label for="principal_name" class="block text-sm font-medium text-gray-700 mb-2">
-                            Principal Name
-                        </label>
-                        <input type="text" name="principal_name" id="principal_name" value="{{ old('principal_name') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                <!-- Column 2: Contact & Admin -->
+                <div class="space-y-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-wider">Contact & Administration</h4>
                     </div>
 
-                    <!-- Principal Signature -->
-                    <div>
-                        <label for="principal_signature" class="block text-sm font-medium text-gray-700 mb-2">
-                            Principal Signature
-                        </label>
-                        <input type="file" name="principal_signature" id="principal_signature" accept="image/*"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                        <p class="mt-1 text-sm text-gray-500">Upload principal's signature (PNG, JPG, GIF - Max: 1MB)</p>
-                        @error('principal_signature')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Principal Name</label>
+                            <input type="text" name="principal_name" value="{{ old('principal_name') }}"
+                                   class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                   placeholder="Full name of principal">
+                        </div>
 
-                    <!-- School Logo -->
-                    <div>
-                        <label for="logo" class="block text-sm font-medium text-gray-700 mb-2">
-                            School Logo
-                        </label>
-                        <input type="file" name="logo" id="logo" accept="image/*"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                        <p class="mt-1 text-sm text-gray-500">Upload school logo (PNG, JPG, GIF - Max: 2MB)</p>
-                        @error('logo')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Official Email</label>
+                                <input type="email" name="email" value="{{ old('email') }}"
+                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                       placeholder="hello@school.edu">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Official Phone</label>
+                                <input type="text" name="phone" value="{{ old('phone') }}"
+                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                       placeholder="+1 234 567 890">
+                            </div>
+                        </div>
 
-                    <!-- Email -->
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address
-                        </label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('email') border-red-500 @enderror">
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Street Address</label>
+                            <textarea name="address" rows="2" 
+                                      class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                                      placeholder="Full physical location details"></textarea>
+                        </div>
 
-                    <!-- Phone -->
-                    <div>
-                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                            Phone Number
-                        </label>
-                        <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Principal's Signature</label>
+                            <div class="relative">
+                                <input type="file" name="principal_signature" id="sig-input" class="hidden">
+                                <label for="sig-input" class="w-full flex items-center justify-between px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl hover:border-emerald-300 transition-all cursor-pointer group">
+                                    <span class="text-sm font-medium text-slate-500" id="sig-filename">Upload scan of signature</span>
+                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
 
-                    <!-- Website -->
-                    <div>
-                        <label for="website" class="block text-sm font-medium text-gray-700 mb-2">
-                            Website
-                        </label>
-                        <input type="url" name="website" id="website" value="{{ old('website') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('website') border-red-500 @enderror">
-                        @error('website')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Established Date -->
-                    <div>
-                        <label for="established_date" class="block text-sm font-medium text-gray-700 mb-2">
-                            Established Date
-                        </label>
-                        <input type="date" name="established_date" id="established_date" value="{{ old('established_date') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-
-                    <!-- Student Capacity -->
-                    <div>
-                        <label for="student_capacity" class="block text-sm font-medium text-gray-700 mb-2">
-                            Student Capacity
-                        </label>
-                        <input type="number" name="student_capacity" id="student_capacity" value="{{ old('student_capacity') }}" min="1"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent @error('student_capacity') border-red-500 @enderror">
-                        @error('student_capacity')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <div class="flex items-center p-4 bg-indigo-50/30 rounded-2xl border border-indigo-100">
+                            <label class="flex items-center cursor-pointer">
+                                <div class="relative">
+                                    <input type="checkbox" name="is_active" value="1" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </div>
+                                <span class="ml-3 text-sm font-bold text-slate-700 uppercase tracking-wider">Activate Immediately</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Address Section -->
-            <div class="mt-6">
-                <h4 class="text-md font-semibold text-gray-700 border-b pb-2 mb-4">Address Information</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-                        <input type="text" name="address" id="address" value="{{ old('address') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                        <input type="text" name="city" id="city" value="{{ old('city') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label for="state" class="block text-sm font-medium text-gray-700 mb-2">State/Province</label>
-                        <input type="text" name="state" id="state" value="{{ old('state') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-2">Postal Code</label>
-                        <input type="text" name="postal_code" id="postal_code" value="{{ old('postal_code') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label for="country" class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                        <input type="text" name="country" id="country" value="{{ old('country') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                    </div>
-                </div>
+            <!-- Description -->
+            <div class="mt-10">
+                <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-3 ml-1">About the school</label>
+                <textarea name="description" rows="4" 
+                          class="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[2rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-700" 
+                          placeholder="Briefly describe the school's mission and history..."></textarea>
             </div>
 
-            <!-- Status -->
-            <div class="mt-6">
-                <div class="flex items-center">
-                    <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}
-                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                    <label for="is_active" class="ml-2 block text-sm text-gray-700">
-                        School is active
-                    </label>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex items-center justify-end space-x-4 mt-8 pt-6 border-t border-gray-200 bg-gray-50 -mx-6 px-6 py-4 rounded-b-lg">
-                <a href="{{ route('admin.schools') }}" 
-                   class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg transition-colors duration-200 font-medium">
+            <!-- Footer Actions -->
+            <div class="mt-12 pt-8 border-t border-slate-100 flex items-center justify-end space-x-4">
+                <a href="{{ route('admin.schools') }}" class="btn-secondary">
                     Cancel
                 </a>
-                <button type="submit" 
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg transition-colors duration-200 flex items-center space-x-2 font-medium shadow-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    <span>Create School</span>
+                <button type="submit" class="btn-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Register School
                 </button>
             </div>
         </form>
@@ -264,31 +186,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Simple file upload feedback
-    const logoInput = document.getElementById('logo');
-    const signatureInput = document.getElementById('principal_signature');
-    
-    if (logoInput) {
-        logoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const helpText = this.nextElementSibling;
-            if (file) {
-                helpText.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                helpText.className = 'mt-1 text-sm text-green-600';
-            }
-        });
-    }
-    
-    if (signatureInput) {
-        signatureInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const helpText = this.nextElementSibling;
-            if (file) {
-                helpText.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                helpText.className = 'mt-1 text-sm text-green-600';
-            }
-        });
-    }
+    // Handle File Names Display
+    const inputs = {
+        'logo-input': 'logo-filename',
+        'sig-input': 'sig-filename'
+    };
+
+    Object.keys(inputs).forEach(id => {
+        const input = document.getElementById(id);
+        const label = document.getElementById(inputs[id]);
+        if (input) {
+            input.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    label.textContent = this.files[0].name;
+                    label.classList.add('text-indigo-600', 'font-bold');
+                }
+            });
+        }
+    });
 });
 </script>
 @endsection

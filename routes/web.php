@@ -78,6 +78,28 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/schools', [App\Http\Controllers\AdminController::class, 'storeSchool'])->name('schools.store');
     Route::get('/schools/{school}/edit', [App\Http\Controllers\AdminController::class, 'editSchool'])->name('schools.edit');
     Route::put('/schools/{school}', [App\Http\Controllers\AdminController::class, 'updateSchool'])->name('schools.update');
+    // Salaries
+    Route::get('/salaries', [App\Http\Controllers\AdminController::class, 'salaries'])->name('salaries');
+    Route::get('/salaries/create', [App\Http\Controllers\AdminController::class, 'createSalary'])->name('salaries.create');
+    Route::post('/salaries', [App\Http\Controllers\AdminController::class, 'storeSalary'])->name('salaries.store');
+    Route::delete('/salaries/{salary}', [App\Http\Controllers\AdminController::class, 'destroySalary'])->name('salaries.destroy');
+
+    // Fees
+    Route::get('/fees', [App\Http\Controllers\AdminController::class, 'fees'])->name('fees');
+    Route::get('/fees/create', [App\Http\Controllers\AdminController::class, 'createFee'])->name('fees.create');
+    Route::post('/fees', [App\Http\Controllers\AdminController::class, 'storeFee'])->name('fees.store');
+    Route::delete('/fees/{fee}', [App\Http\Controllers\AdminController::class, 'destroyFee'])->name('fees.destroy');
+
+    // Timetables
+    Route::get('/timetables/exam', [App\Http\Controllers\AdminController::class, 'examTimetables'])->name('timetables.exam');
+    Route::get('/timetables/class', [App\Http\Controllers\AdminController::class, 'classTimetables'])->name('timetables.class');
+    Route::post('/timetables/exam', [App\Http\Controllers\AdminController::class, 'storeExamTimetable'])->name('timetables.exam.store');
+    Route::post('/timetables/class', [App\Http\Controllers\AdminController::class, 'storeClassTimetable'])->name('timetables.class.store');
+
+    // Marksheets & Admin Cards
+    Route::get('/marksheets', [App\Http\Controllers\AdminController::class, 'marksheets'])->name('marksheets');
+    Route::get('/id-cards', [App\Http\Controllers\AdminController::class, 'idCards'])->name('idcards');
+
     Route::delete('/schools/{school}', [App\Http\Controllers\AdminController::class, 'destroySchool'])->name('schools.destroy');
 });
 
