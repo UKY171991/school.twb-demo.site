@@ -13,6 +13,7 @@ class Classroom extends Model
         'teacher_id',
         'subject_id',
         'capacity',
+        'school_id',
     ];
 
     public function teacher(): BelongsTo
@@ -28,5 +29,10 @@ class Classroom extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }

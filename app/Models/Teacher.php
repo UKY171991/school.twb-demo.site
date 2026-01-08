@@ -13,6 +13,7 @@ class Teacher extends Model
         'employee_id',
         'department',
         'bio',
+        'school_id',
     ];
 
     public function user(): BelongsTo
@@ -23,5 +24,10 @@ class Teacher extends Model
     public function classrooms(): HasMany
     {
         return $this->hasMany(Classroom::class);
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }

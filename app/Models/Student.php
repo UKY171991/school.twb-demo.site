@@ -14,6 +14,7 @@ class Student extends Model
         'date_of_birth',
         'address',
         'phone',
+        'school_id',
     ];
 
     public function user(): BelongsTo
@@ -24,5 +25,10 @@ class Student extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }

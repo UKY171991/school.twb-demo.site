@@ -71,6 +71,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/grades/{grade}/edit', [App\Http\Controllers\AdminController::class, 'editGrade'])->name('grades.edit');
     Route::put('/grades/{grade}', [App\Http\Controllers\AdminController::class, 'updateGrade'])->name('grades.update');
     Route::delete('/grades/{grade}', [App\Http\Controllers\AdminController::class, 'destroyGrade'])->name('grades.destroy');
+
+    // Schools
+    Route::get('/schools', [App\Http\Controllers\AdminController::class, 'schools'])->name('schools');
+    Route::get('/schools/create', [App\Http\Controllers\AdminController::class, 'createSchool'])->name('schools.create');
+    Route::post('/schools', [App\Http\Controllers\AdminController::class, 'storeSchool'])->name('schools.store');
+    Route::get('/schools/{school}/edit', [App\Http\Controllers\AdminController::class, 'editSchool'])->name('schools.edit');
+    Route::put('/schools/{school}', [App\Http\Controllers\AdminController::class, 'updateSchool'])->name('schools.update');
+    Route::delete('/schools/{school}', [App\Http\Controllers\AdminController::class, 'destroySchool'])->name('schools.destroy');
 });
 
 // Student routes

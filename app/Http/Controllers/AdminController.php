@@ -8,6 +8,7 @@ use App\Models\Subject;
 use App\Models\Classroom;
 use App\Models\Enrollment;
 use App\Models\Grade;
+use App\Models\School;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -15,6 +16,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $stats = [
+            'schools' => School::count(),
             'students' => Student::count(),
             'teachers' => Teacher::count(),
             'subjects' => Subject::count(),
@@ -331,5 +333,122 @@ class AdminController extends Controller
     {
         $grade->delete();
         return redirect()->route('admin.grades')->with('success', 'Grade deleted successfully');
+    }
+
+    // Schools CRUD
+    public function schools()
+    {
+        $schools = School::paginate(10);
+        return view('admin.schools.index', compact('schools'));
+    }
+
+    public function createSchool()
+    {
+        return view('admin.schools.create');
+    }
+
+    public function storeSchool(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:schools',
+            'description' => 'nullable|string',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'principal_name' => 'nullable|string|max:255',
+            'established_date' => 'nullable|date',
+            'type' => 'required|in:public,private,charter,international',
+            'level' => 'required|in:elementary,middle,high,k12,university',
+            'student_capacity' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
+        ]);
+
+        $data = $request->all();
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('schools/logos', 'public');
+            $data['logo'] = $logoPath;
+        }
+
+        // Handle principal signature upload
+        if ($request->hasFile('principal_signature')) {
+            $signaturePath = $request->file('principal_signature')->store('schools/signatures', 'public');
+            $data['principal_signature'] = $signaturePath;
+        }
+
+        School::create($data);
+
+        return redirect()->route('admin.schools')->with('success', 'School created successfully');
+    }
+
+    public function editSchool(School $school)
+    {
+        return view('admin.schools.edit', compact('school'));
+    }
+
+    public function updateSchool(Request $request, School $school)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:schools,code,' . $school->id,
+            'description' => 'nullable|string',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'state' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'principal_name' => 'nullable|string|max:255',
+            'established_date' => 'nullable|date',
+            'type' => 'required|in:public,private,charter,international',
+            'level' => 'required|in:elementary,middle,high,k12,university',
+            'student_capacity' => 'nullable|integer|min:1',
+            'is_active' => 'boolean',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'principal_signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
+        ]);
+
+        $data = $request->all();
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($school->logo && \Storage::disk('public')->exists($school->logo)) {
+                \Storage::disk('public')->delete($school->logo);
+            }
+            $logoPath = $request->file('logo')->store('schools/logos', 'public');
+            $data['logo'] = $logoPath;
+        }
+
+        // Handle principal signature upload
+        if ($request->hasFile('principal_signature')) {
+            // Delete old signature if exists
+            if ($school->principal_signature && \Storage::disk('public')->exists($school->principal_signature)) {
+                \Storage::disk('public')->delete($school->principal_signature);
+            }
+            $signaturePath = $request->file('principal_signature')->store('schools/signatures', 'public');
+            $data['principal_signature'] = $signaturePath;
+        }
+
+        $school->update($data);
+
+        return redirect()->route('admin.schools')->with('success', 'School updated successfully');
+    }
+
+    public function destroySchool(School $school)
+    {
+        $school->delete();
+        return redirect()->route('admin.schools')->with('success', 'School deleted successfully');
     }
 }

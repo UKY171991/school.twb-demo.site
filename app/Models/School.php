@@ -22,6 +22,7 @@ class School extends Model
         'email',
         'website',
         'principal_name',
+        'principal_signature',
         'established_date',
         'type',
         'level',
