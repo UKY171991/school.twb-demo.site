@@ -90,7 +90,7 @@ class SchoolController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(School $school)
+    public function show(School $school, Request $request)
     {
         $school->load(['students', 'teachers', 'grades', 'subjects']);
 
@@ -100,6 +100,10 @@ class SchoolController extends Controller
             'grades_count' => $school->getGradesCount(),
             'subjects_count' => $school->subjects()->count(),
         ];
+
+        if ($request->ajax()) {
+            return view('schools.show-modal', compact('school', 'stats'))->renderSections()['content'];
+        }
 
         return view('schools.show', compact('school', 'stats'));
     }

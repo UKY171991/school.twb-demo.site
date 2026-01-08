@@ -21,6 +21,8 @@ class School extends Model
         'principal_signature',
         'exam_controller_signature',
         'logo',
+        'school_logo',
+        'school_favicon',
         'description',
         'status',
         'settings',

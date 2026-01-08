@@ -282,9 +282,9 @@ return [
     |
     */
 
-    'laravel_asset_bundling' => false,
-    'laravel_css_path' => 'css/app.css',
-    'laravel_js_path' => 'js/app.js',
+    'laravel_asset_bundling' => 'vite',
+    'laravel_css_path' => 'resources/sass/app.scss',
+    'laravel_js_path' => 'resources/js/app.js',
 
     /*
     |--------------------------------------------------------------------------
@@ -354,127 +354,139 @@ return [
             'route' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
-        ['header' => 'ACADEMIC'],
         [
-            'text' => 'Schools',
-            'route' => 'schools.index',
-            'icon' => 'fas fa-fw fa-school',
-            'active' => ['admin/schools*'],
-        ],
-        [
-            'text' => 'Teachers',
-            'route' => 'teachers.index',
-            'icon' => 'fas fa-fw fa-chalkboard-teacher',
-            'active' => ['admin/teachers*'],
-        ],
-        [
-            'text' => 'Students',
-            'route' => 'students.index',
-            'icon' => 'fas fa-fw fa-user-graduate',
-            'active' => ['admin/students*'],
-        ],
-        [
-            'text' => 'Classes',
-            'route' => 'grades.index',
-            'icon' => 'fas fa-fw fa-layer-group',
-            'active' => ['admin/classes*'],
-        ],
-        [
-            'text' => 'Subjects',
-            'route' => 'subjects.index',
-            'icon' => 'fas fa-fw fa-book',
-            'active' => ['admin/subjects*'],
-        ],
-        ['header' => 'MANAGEMENT'],
-        [
-            'text' => 'Attendance',
-            'route' => 'attendances.index',
-            'icon' => 'fas fa-fw fa-calendar-check',
-            'active' => ['admin/attendances*'],
-        ],
-        [
-            'text' => 'Leaves',
-            'route' => 'leaves.index',
-            'icon' => 'fas fa-fw fa-calendar-times',
-            'active' => ['admin/leaves*'],
-        ],
-        [
-            'text' => 'Holidays',
-            'route' => 'holidays.index',
-            'icon' => 'fas fa-fw fa-umbrella-beach',
-            'active' => ['admin/holidays*'],
-        ],
-        ['header' => 'FINANCE'],
-        [
-            'text' => 'Student Fees',
-            'route' => 'student-fees.index',
-            'icon' => 'fas fa-fw fa-money-bill-wave',
-            'active' => ['admin/student-fees*'],
-        ],
-        [
-            'text' => 'Teacher Salaries',
-            'route' => 'teacher-salaries.index',
-            'icon' => 'fas fa-fw fa-wallet',
-            'active' => ['admin/teacher-salaries*'],
-        ],
-        ['header' => 'EXAM SETUP'],
-        [
-            'text' => 'Exam Types',
-            'route' => 'exam-types.index',
-            'icon' => 'fas fa-fw fa-clipboard-list',
-            'active' => ['admin/exam-types*'],
-        ],
-        [
-            'text' => 'Grading System',
-            'route' => 'grading-systems.index',
+            'text' => 'Academic',
             'icon' => 'fas fa-fw fa-graduation-cap',
-            'active' => ['admin/grading-systems*'],
+            'submenu' => [
+                [
+                    'text' => 'Schools',
+                    'route' => 'schools.index',
+                    'icon' => 'fas fa-fw fa-school',
+                    'active' => ['admin/schools*'],
+                ],
+                [
+                    'text' => 'Teachers',
+                    'route' => 'teachers.index',
+                    'icon' => 'fas fa-fw fa-chalkboard-teacher',
+                    'active' => ['admin/teachers*'],
+                ],
+                [
+                    'text' => 'Students',
+                    'route' => 'students.index',
+                    'icon' => 'fas fa-fw fa-user-graduate',
+                    'active' => ['admin/students*'],
+                ],
+                [
+                    'text' => 'Classes',
+                    'route' => 'grades.index',
+                    'icon' => 'fas fa-fw fa-layer-group',
+                    'active' => ['admin/classes*'],
+                ],
+                [
+                    'text' => 'Subjects',
+                    'route' => 'subjects.index',
+                    'icon' => 'fas fa-fw fa-book',
+                    'active' => ['admin/subjects*'],
+                ],
+            ],
         ],
-        ['header' => 'MARKSHEETS & RESULTS'],
         [
-            'text' => 'Marksheets',
-            'route' => 'marksheets.index',
+            'text' => 'Management',
+            'icon' => 'fas fa-fw fa-tasks',
+            'submenu' => [
+                [
+                    'text' => 'Attendance',
+                    'route' => 'attendances.index',
+                    'icon' => 'fas fa-fw fa-calendar-check',
+                    'active' => ['admin/attendances*'],
+                ],
+                [
+                    'text' => 'Leaves',
+                    'route' => 'leaves.index',
+                    'icon' => 'fas fa-fw fa-calendar-times',
+                    'active' => ['admin/leaves*'],
+                ],
+                [
+                    'text' => 'Holidays',
+                    'route' => 'holidays.index',
+                    'icon' => 'fas fa-fw fa-umbrella-beach',
+                    'active' => ['admin/holidays*'],
+                ],
+            ],
+        ],
+        [
+            'text' => 'Finance',
+            'icon' => 'fas fa-fw fa-dollar-sign',
+            'submenu' => [
+                [
+                    'text' => 'Student Fees',
+                    'route' => 'student-fees.index',
+                    'icon' => 'fas fa-fw fa-money-bill-wave',
+                    'active' => ['admin/student-fees*'],
+                ],
+                [
+                    'text' => 'Teacher Salaries',
+                    'route' => 'teacher-salaries.index',
+                    'icon' => 'fas fa-fw fa-wallet',
+                    'active' => ['admin/teacher-salaries*'],
+                ],
+            ],
+        ],
+        [
+            'text' => 'Exam Setup',
+            'icon' => 'fas fa-fw fa-clipboard-list',
+            'submenu' => [
+                [
+                    'text' => 'Exam Types',
+                    'route' => 'exam-types.index',
+                    'icon' => 'fas fa-fw fa-clipboard-list',
+                    'active' => ['admin/exam-types*'],
+                ],
+                [
+                    'text' => 'Grading System',
+                    'route' => 'grading-systems.index',
+                    'icon' => 'fas fa-fw fa-graduation-cap',
+                    'active' => ['admin/grading-systems*'],
+                ],
+            ],
+        ],
+        [
+            'text' => 'Marksheets & Results',
             'icon' => 'fas fa-fw fa-file-alt',
-            'active' => ['admin/marksheets*'],
+            'submenu' => [
+                [
+                    'text' => 'Marksheets',
+                    'route' => 'marksheets.index',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                    'active' => ['admin/marksheets*'],
+                ],
+                [
+                    'text' => 'Search Results',
+                    'route' => 'marksheets.search',
+                    'icon' => 'fas fa-fw fa-search',
+                    'active' => ['admin/search-result*'],
+                ],
+                [
+                    'text' => 'Admit Cards',
+                    'route' => 'admit-cards.index',
+                    'icon' => 'fas fa-fw fa-id-card',
+                    'active' => ['admin/admit-cards*'],
+                ],
+                [
+                    'text' => 'Exam Timetables',
+                    'route' => 'exam-timetables.index',
+                    'icon' => 'fas fa-fw fa-calendar-alt',
+                    'active' => ['admin/exam-timetables*'],
+                ],
+            ],
         ],
-        [
-            'text' => 'Search Results',
-            'route' => 'marksheets.search',
-            'icon' => 'fas fa-fw fa-search',
-            'active' => ['admin/search-result*'],
-        ],
-        [
-            'text' => 'Admit Cards',
-            'route' => 'admit-cards.index',
-            'icon' => 'fas fa-fw fa-id-card',
-            'active' => ['admin/admit-cards*'],
-        ],
-        [
-            'text' => 'Exam Timetables',
-            'route' => 'exam-timetables.index',
-            'icon' => 'fas fa-fw fa-calendar-alt',
-            'active' => ['admin/exam-timetables*'],
-        ],
-        ['header' => 'SYSTEM SETTINGS'],
         [
             'text' => 'Settings',
             'route' => 'settings.index',
             'icon' => 'fas fa-fw fa-cogs',
             'active' => ['admin/settings*'],
         ],
-        ['header' => 'ACCOUNT SETTINGS'],
-        [
-            'text' => 'Profile',
-            'url' => 'admin/profile',
-            'icon' => 'fas fa-fw fa-user',
-            'active' => ['admin/profile'],
-        ],
-        [
-            'text' => 'Change Password',
-            'url' => 'admin/profile',
-            'icon' => 'fas fa-fw fa-lock',
-            'active' => ['admin/profile'],
-        ],
+       
         [
             'text' => 'User Management',
             'icon' => 'fas fa-fw fa-users',
@@ -576,7 +588,7 @@ return [
             ],
         ],
         'Sweetalert2' => [
-            'active' => true,
+            'active' => false,
             'files' => [
                 [
                     'type' => 'js',
@@ -586,7 +598,7 @@ return [
             ],
         ],
         'Toastr' => [
-            'active' => true,
+            'active' => false,
             'files' => [
                 [
                     'type' => 'css',

@@ -179,7 +179,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <img src="https://via.placeholder.com/600x400/667eea/ffffff?text=School+Management" alt="School Management" class="img-fluid rounded">
+                    <img src="{{ asset('images/logo.svg') }}" alt="School Management" class="img-fluid rounded" loading="lazy">
                 </div>
             </div>
         </div>

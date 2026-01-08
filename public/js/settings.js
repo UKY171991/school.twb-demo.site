@@ -61,6 +61,12 @@ $(document).ready(function() {
         e.preventDefault();
 
         var formData = new FormData(this);
+        
+        // Log form data for debugging
+        console.log('Submitting school settings form...');
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ':', pair[1]);
+        }
 
         $.ajax({
             url: $(this).attr('action'),
@@ -68,16 +74,32 @@ $(document).ready(function() {
             data: formData,
             processData: false,
             contentType: false,
+            xhr: function() {
+                // Add progress tracking
+                this.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.round((e.loaded / e.total) * 100);
+                        console.log('Upload progress: ' + percent + '%');
+                    }
+                });
+            },
             success: function(response) {
+                console.log('Upload success:', response);
                 $('#schoolSettingsModal').modal('hide');
                 if (response.success) {
                     // Show success message using a toast or alert
                     toastr.success(response.success);
-                    // Optionally, update parts of the page without reloading
+                    // Reload page after short delay to show updated logo/favicon
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
                 }
             },
-            error: function(xhr) {
-                var errors = xhr.responseJSON.errors;
+            error: function(xhr, status, error) {
+                console.log('Upload error:', xhr.responseText);
+                console.log('Status:', status);
+                console.log('Error:', error);
+                var errors = xhr.responseJSON ? xhr.responseJSON.errors : {};
                 // Clear previous errors
                 $('.is-invalid').removeClass('is-invalid');
                 $('.invalid-feedback').remove();

@@ -114,9 +114,9 @@
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a href="{{ route('schools.show', $school) }}" class="btn btn-success btn-sm" title="View">
+                                    <button onclick="openAjaxModal('{{ route('schools.show', $school) }}', '{{ addslashes($school->name) }} Details')" class="btn btn-success btn-sm" title="View">
                                         <i class="fas fa-eye"></i>
-                                    </a>
+                                    </button>
                                     <button onclick="openAjaxModal('{{ route('schools.edit', $school) }}', 'Edit {{ addslashes($school->name) }}')" class="btn btn-info btn-sm" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
@@ -182,19 +182,26 @@
             background-color: #f8f9fa;
         }
         .school-logo {
-            width: 50px;
-            height: 50px;
+            width: 100%;
+            height: auto;
             object-fit: cover;
+            max-width: 50px;
         }
         .logo-placeholder {
-            width: 50px;
-            height: 50px;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: #f8f9fa;
             border-radius: 4px;
             margin: 0 auto;
+            max-width: 50px;
+            min-height: 50px;
+        }
+        .image-preview{
+            width: 100%;
         }
     </style>
 @stop

@@ -457,8 +457,19 @@ body {
 }
 
 .logo-placeholder {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: var(--border-radius);
+    color: #6c757d;
+    font-size: 2rem;
+    max-width: 100px;
+    min-height: 100px;
 }
 
 .student-photo {
@@ -478,12 +489,13 @@ body {
 }
 
 .school-logo {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    height: auto;
     object-fit: contain;
     border-radius: var(--border-radius);
     background-color: #f8f9fa;
     padding: 0.5rem;
+    max-width: 80px;
 }
 
 .image-upload-section {

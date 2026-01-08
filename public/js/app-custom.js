@@ -1,4 +1,49 @@
 /* ============================================
+   GLOBAL HELPER FUNCTIONS
+   ============================================ */
+
+/**
+ * Shows a success toast notification.
+ * @param {string} message - The message to display.
+ */
+function showSuccessToast(message) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Success!',
+            text: message,
+            icon: 'success', // Use 'type' for SweetAlert2 v8
+            toast: true,
+            position: 'top-end',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    } else {
+        alert(message);
+    }
+}
+
+/**
+ * Shows an error toast notification.
+ * @param {string} message - The message to display.
+ */
+function showErrorToast(message) {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'Error!',
+            text: message,
+            icon: 'error', // Use 'type' for SweetAlert2 v8
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false, // Keep it consistent with success, or set to true if actions are needed
+            timer: 5000 // Longer timer for errors
+        });
+    } else {
+        alert(message);
+    }
+}
+
+
+/* ============================================
    SCHOOL MANAGEMENT SYSTEM - CUSTOM SCRIPTS
    ============================================ */
 

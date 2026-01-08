@@ -36,7 +36,7 @@
 
     <div class="row">
         <!-- Profile Information Card -->
-        <div class="col-lg-6 col-md-12">
+        <div class="col-lg-6 col-md-12" id="profile">
             <div class="card card-primary">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -89,7 +89,7 @@
         </div>
 
         <!-- Change Password Card -->
-        <div class="col-lg-6 col-md-12">
+        <div class="col-lg-6 col-md-12" id="password">
             <div class="card card-warning">
                 <div class="card-header">
                     <h3 class="card-title">
@@ -269,6 +269,16 @@
 @section('js')
 <script>
 $(document).ready(function() {
+    // Handle hash scrolling for menu navigation
+    if (window.location.hash) {
+        var target = window.location.hash;
+        if ($(target).length) {
+            $('html, body').animate({
+                scrollTop: $(target).offset().top - 100
+            }, 800);
+        }
+    }
+    
     // Add form validation feedback
     $('form').on('submit', function() {
         const $btn = $(this).find('button[type="submit"]');

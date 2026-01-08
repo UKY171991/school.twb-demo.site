@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Teacher;
 use App\Models\School;
+use App\Http\Requests\StoreTeacherRequest;
+use App\Http\Requests\UpdateTeacherRequest;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
@@ -13,9 +15,6 @@ class TeacherController extends Controller
         // Middleware is already applied in bootstrap/app.php
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $schoolId = $request->current_school_id;
@@ -24,104 +23,52 @@ class TeacherController extends Controller
             return redirect()->route('schools.index')->with('error', 'Please select a school first.');
         }
 
-        $query = Teacher::where('school_id', $schoolId);
+        $teachers = Teacher::where('school_id', $schoolId)->with('school')->latest()->get();
 
-        $teachers = $query->latest()->paginate(10);
+        if ($request->ajax()) {
+            return response()->json(['data' => $teachers]);
+        }
 
         return view('teachers.index', compact('teachers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(Request $request)
     {
-        $schoolId = $request->current_school_id;
         $schools = School::where('status', 'active')->orderBy('name')->get();
 
         if ($request->ajax()) {
             return view('teachers.create', compact('schools'))->renderSections()['content'];
         }
-
+        
         return view('teachers.create', compact('schools'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreTeacherRequest $request)
     {
-        $schoolId = $request->current_school_id;
+        $data = $request->validated();
+        $data['school_id'] = $request->current_school_id;
 
-        if (!$schoolId) {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Please select a school first.'], 422);
-            }
-            return redirect()->route('schools.index')->with('error', 'Please select a school first.');
-        }
-
-        $validator = \Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                // Unique email within the same school
-                \Illuminate\Validation\Rule::unique('teachers')->where(function ($query) use ($schoolId) {
-                    return $query->where('school_id', $schoolId);
-                }),
-            ],
-            'phone' => 'nullable|string|max:20',
-            'gender' => 'required|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-            'date_of_joining' => 'nullable|date',
-            'address' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'designation' => 'nullable|string|max:100',
-            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-            }
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $data = $request->all();
-        $data['school_id'] = $schoolId;
-
-        // Handle image upload
         if ($request->hasFile('image')) {
             $teacher = new Teacher;
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers');
         }
 
-        // Handle signature upload
         if ($request->hasFile('signature')) {
             $teacher = new Teacher;
             $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures');
         }
 
-        Teacher::create($data);
+        $teacher = Teacher::create($data);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Teacher created successfully.']);
-        }
-
-        return redirect()->route('teachers.index')
-            ->with('success', 'Teacher created successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher created successfully.',
+            'teacher' => $teacher->load('school')
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request, string $id)
+    public function show(Request $request, Teacher $teacher)
     {
-        $teacher = Teacher::with('school')->findOrFail($id);
-
         if ($request->ajax()) {
             return view('teachers.show', compact('teacher'))->renderSections()['content'];
         }
@@ -129,12 +76,8 @@ class TeacherController extends Controller
         return view('teachers.show', compact('teacher'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Request $request, string $id)
+    public function edit(Request $request, Teacher $teacher)
     {
-        $teacher = Teacher::findOrFail($id);
         $schools = School::where('status', 'active')->orderBy('name')->get();
 
         if ($request->ajax()) {
@@ -144,88 +87,51 @@ class TeacherController extends Controller
         return view('teachers.edit', compact('teacher', 'schools'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdateTeacherRequest $request, Teacher $teacher)
     {
-        $validator = \Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers,email,'.$id,
-            'phone' => 'nullable|string|max:20',
-            'gender' => 'required|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-            'date_of_joining' => 'nullable|date',
-            'address' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'designation' => 'nullable|string|max:100',
-            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-            }
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $teacher = Teacher::findOrFail($id);
-
-        // Add current school context
-        $data = $request->all();
-        if ($request->has('current_school_id')) {
-            $data['school_id'] = $request->get('current_school_id');
-        }
-
-        // Handle image upload
+        $data = $request->validated();
+        
         if ($request->hasFile('image')) {
             $data['image'] = $teacher->uploadImage($request->file('image'), 'teachers', $teacher->image);
         }
 
-        // Handle signature upload
         if ($request->hasFile('signature')) {
             $data['signature'] = $teacher->uploadImage($request->file('signature'), 'signatures', $teacher->signature);
         }
 
         $teacher->update($data);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Teacher updated successfully.']);
-        }
-
-        return redirect()->route('teachers.index')
-            ->with('success', 'Teacher updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher updated successfully.',
+            'teacher' => $teacher->load('school')
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, Teacher $teacher)
     {
-        $teacher = Teacher::findOrFail($id);
+        if ($teacher->subjects()->count() > 0) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Cannot delete teacher. Teacher has subjects assigned.'
+            ], 422);
+        }
 
-        // Delete teacher image if exists
         if ($teacher->image) {
             $teacher->deleteImage($teacher->image);
         }
 
-        $teacher->delete();
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Teacher deleted successfully.']);
+        if ($teacher->signature) {
+            $teacher->deleteImage($teacher->signature);
         }
 
-        return redirect()->route('teachers.index')
-            ->with('success', 'Teacher deleted successfully.');
+        $teacher->delete();
+
+        return response()->json(['success' => true, 'message' => 'Teacher deleted successfully.']);
     }
-
-    /**
-     * Remove teacher image
-     */
-    public function removeImage(string $id)
+    
+    public function removeImage(Teacher $teacher)
     {
-        $teacher = Teacher::findOrFail($id);
-
         if ($teacher->image) {
             $teacher->deleteImage($teacher->image);
             $teacher->update(['image' => null]);
@@ -234,13 +140,8 @@ class TeacherController extends Controller
         return redirect()->back()->with('success', 'Teacher image removed successfully.');
     }
 
-    /**
-     * Remove teacher signature
-     */
-    public function removeSignature(string $id)
+    public function removeSignature(Teacher $teacher)
     {
-        $teacher = Teacher::findOrFail($id);
-
         if ($teacher->signature) {
             $teacher->deleteImage($teacher->signature);
             $teacher->update(['signature' => null]);

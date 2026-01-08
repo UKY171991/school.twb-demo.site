@@ -286,7 +286,7 @@
                                             @csrf
                                             <input type="hidden" name="key" value="school_logo">
                                             <button type="submit" class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to remove the logo?')">
+                                                    onclick="return confirm('Are you sure you want to remove logo?')">
                                                 <i class="fas fa-trash"></i> Remove Logo
                                             </button>
                                         </form>
@@ -308,7 +308,7 @@
                                             @csrf
                                             <input type="hidden" name="key" value="school_favicon">
                                             <button type="submit" class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to remove the favicon?')">
+                                                    onclick="return confirm('Are you sure you want to remove favicon?')">
                                                 <i class="fas fa-trash"></i> Remove Favicon
                                             </button>
                                         </form>
