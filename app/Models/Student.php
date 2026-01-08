@@ -2,65 +2,27 @@
 
 namespace App\Models;
 
-use App\Traits\ImageUploadTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
-    use HasFactory, ImageUploadTrait;
-
     protected $fillable = [
-        'school_id',
-        'name',
-        'roll_number',
-        'class',
-        'section',
-        'father_name',
-        'mother_name',
-        'email',
-        'phone',
+        'user_id',
+        'student_id',
         'date_of_birth',
-        'gender',
         'address',
-        'grade_id',
-        'image',
+        'phone',
     ];
 
-    protected $casts = [
-        'date_of_birth' => 'date',
-    ];
-
-    public function school()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function grade()
+    public function enrollments(): HasMany
     {
-        return $this->belongsTo(Grade::class);
-    }
-
-    public function marksheets()
-    {
-        return $this->hasMany(Marksheet::class);
-    }
-
-    public function marksheetMarks()
-    {
-        return $this->hasMany(MarksheetMark::class);
-    }
-
-    public function marks()
-    {
-        return $this->hasMany(Mark::class);
-    }
-
-    /**
-     * Get the student's image URL
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->getImageUrl($this->attributes['image'] ?? null);
+        return $this->hasMany(Enrollment::class);
     }
 }

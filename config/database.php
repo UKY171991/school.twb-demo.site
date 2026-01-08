@@ -16,25 +16,7 @@ return [
     |
     */
 
-    /*
-    |--------------------------------------------------------------------------
-    | Auto-detect database connection based on environment
-    |--------------------------------------------------------------------------
-    |
-    | Local Development (APP_ENV=local) -> SQLite
-    | Testing (APP_ENV=testing) -> SQLite  
-    | Production (APP_ENV=production) -> MySQL
-    | Staging (APP_ENV=staging) -> MySQL
-    |
-    | This allows seamless development and deployment without changing .env
-    */
-    'default' => env('DB_CONNECTION', match(env('APP_ENV', 'local')) {
-        'local' => 'sqlite',
-        'testing' => 'sqlite',
-        'production' => 'mysql',
-        'staging' => 'mysql',
-        default => 'sqlite'
-    }),
+    'default' => env('DB_CONNECTION', 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -66,7 +48,7 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE_MYSQL', env('DB_DATABASE', 'laravel')),
+            'database' => env('DB_DATABASE', 'laravel'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -113,7 +95,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'prefer',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
         'sqlsrv' => [

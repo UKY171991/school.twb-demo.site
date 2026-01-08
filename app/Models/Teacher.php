@@ -2,52 +2,26 @@
 
 namespace App\Models;
 
-use App\Traits\ImageUploadTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Teacher extends Model
 {
-    use ImageUploadTrait;
-
     protected $fillable = [
-        'school_id',
-        'name',
-        'email',
-        'phone',
-        'gender',
-        'date_of_birth',
-        'date_of_joining',
-        'address',
-        'designation',
-        'image',
-        'signature',
+        'user_id',
+        'employee_id',
+        'department',
+        'bio',
     ];
 
-    protected $casts = [
-        'date_of_birth' => 'date',
-        'date_of_joining' => 'date',
-    ];
-
-    public function school()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function subjects()
+    public function classrooms(): HasMany
     {
-        return $this->hasMany(Subject::class);
-    }
-
-    /**
-     * Get the teacher's image URL
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->getImageUrl($this->attributes['image'] ?? null);
-    }
-
-    public function getSignatureUrlAttribute()
-    {
-        return $this->getImageUrl($this->attributes['signature'] ?? null);
+        return $this->hasMany(Classroom::class);
     }
 }

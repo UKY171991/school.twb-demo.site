@@ -1,26 +1,36 @@
-@extends('adminlte::page')
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-@section('adminlte_css_pre')
-    @if(isset($dynamicSchoolFavicon) && $dynamicSchoolFavicon)
-        <link rel="icon" type="image/x-icon" href="{{ asset($dynamicSchoolFavicon) }}">
-        <link rel="shortcut icon" type="image/x-icon" href="{{ asset($dynamicSchoolFavicon) }}">
-    @endif
-@stop
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-@section('head')
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-@stop
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('css/app-custom.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/iframe-fix.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/user-role-badge.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-@stop
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
 
-@section('js')
-    <script src="{{ asset('js/app-custom.js') }}"></script>
-    <script src="{{ asset('js/ajax-crud.js') }}"></script>
-    @stack('scripts')
-@stop
+            <!-- Page Heading -->
+            @isset($header)
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+    </body>
+</html>

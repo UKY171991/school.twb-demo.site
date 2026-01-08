@@ -3,37 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Grade extends Model
 {
     protected $fillable = [
-        'school_id',
-        'teacher_id',
-        'name',
-        'section',
-        'capacity',
-        'description',
-        'grade_theme',
-        'status',
+        'enrollment_id',
+        'grade',
+        'comments',
+        'graded_at',
     ];
 
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class);
-    }
+    protected $casts = [
+        'graded_at' => 'datetime',
+    ];
 
-    public function school()
+    public function enrollment(): BelongsTo
     {
-        return $this->belongsTo(School::class);
-    }
-
-    public function students()
-    {
-        return $this->hasMany(Student::class);
-    }
-
-    public function subjects()
-    {
-        return $this->hasMany(Subject::class);
+        return $this->belongsTo(Enrollment::class);
     }
 }

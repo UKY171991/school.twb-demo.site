@@ -22,7 +22,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'created_by',
     ];
 
     /**
@@ -48,12 +47,28 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * The attributes that should have default values.
-     *
-     * @var array
-     */
-    protected $attributes = [
-        'role' => 'admin',
-    ];
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isTeacher()
+    {
+        return $this->role === 'teacher';
+    }
+
+    public function isStudent()
+    {
+        return $this->role === 'student';
+    }
 }

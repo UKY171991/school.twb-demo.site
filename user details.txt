@@ -1,0 +1,18 @@
+Login Credentials:
+
+Admin: admin@example.com / password
+Teacher: teacher1@example.com / password
+Student: student1@example.com / password
+
+
+Admin: admin@example.com / password
+Teacher 1: teacher1@example.com / password
+Teacher 2: teacher2@example.com / password
+Student 1: student1@example.com / password
+Student 2: student2@example.com / password
+
+
+🔐 Test Accounts:
+Admin: admin@example.com / password
+Teacher: teacher1@example.com / password
+Student: student1@example.com / password
