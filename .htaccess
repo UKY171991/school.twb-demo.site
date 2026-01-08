@@ -1,0 +1,80 @@
+# Laravel Public Folder Removal for Live Server
+# This .htaccess file should be placed in the ROOT directory of your domain
+# It redirects all requests to the public folder, effectively removing /public from URLs
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect www to non-www (optional)
+    # RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+    # Force HTTPS (optional - uncomment for live server)
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Handle Front Controller - Redirect to public folder
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /public/$1 [L]
+
+    # Handle Static Assets - Redirect to public folder
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|pdf|zip))$ /public/$1 [L]
+
+    # Remove /public from URL if accessed directly
+    RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
+    RewriteRule ^ /%1 [R=301,L]
+
+    # Handle trailing slashes
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+</IfModule>
+
+# Security - Prevent access to sensitive files and directories
+<IfModule mod_alias.c>
+    # Block access to Laravel directories
+    RedirectMatch 403 ^/\.env
+    RedirectMatch 403 ^/\.git
+    RedirectMatch 403 ^/storage/(?!app/public/)
+    RedirectMatch 403 ^/bootstrap/cache/
+    RedirectMatch 403 ^/vendor/
+    RedirectMatch 403 ^/config/
+    RedirectMatch 403 ^/database/
+    RedirectMatch 403 ^/resources/
+    RedirectMatch 403 ^/routes/
+    RedirectMatch 403 ^/tests/
+    RedirectMatch 403 ^/node_modules/
+    RedirectMatch 403 ^/composer\.(json|lock)
+    RedirectMatch 403 ^/package\.json
+    RedirectMatch 403 ^/artisan
+    RedirectMatch 403 ^/\.htaccess
+    RedirectMatch 403 ^/README\.md
+</IfModule>
+
+# Prevent Directory Browsing
+Options -Indexes
+
+# Block access to sensitive file types
+<FilesMatch "\.(env|log|md|git|htaccess|htpasswd|ini|conf|sql|bak|old)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
