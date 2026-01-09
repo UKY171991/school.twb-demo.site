@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('admin.teachers.store') }}" class="p-10">
+        <form method="POST" action="{{ route('admin.teachers.store') }}" class="p-10" enctype="multipart/form-data">
             @csrf
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -59,6 +59,25 @@
                                    class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-700" 
                                    placeholder="e.g. Mathematics and Physics">
                         </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Faculty Photograph</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-2xl hover:border-emerald-400 transition-colors bg-white">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex text-sm text-slate-600">
+                                        <label for="image" class="relative cursor-pointer bg-white rounded-md font-black text-emerald-600 hover:text-emerald-500">
+                                            <span>Upload photo</span>
+                                            <input id="image" name="image" type="file" class="sr-only" accept="image/*">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">PNG, JPG up to 2MB</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -91,6 +110,25 @@
                             <textarea name="bio" rows="3" 
                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-700" 
                                       placeholder="Brief background and specialties..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Digital Signature</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-2xl hover:border-indigo-400 transition-colors bg-white">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <div class="flex text-sm text-slate-600">
+                                        <label for="signature" class="relative cursor-pointer bg-white rounded-md font-black text-indigo-600 hover:text-indigo-500">
+                                            <span>Upload signature</span>
+                                            <input id="signature" name="signature" type="file" class="sr-only" accept="image/*">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-tight">Clear background PNG preferred</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

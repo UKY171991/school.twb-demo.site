@@ -57,6 +57,7 @@ class AdminController extends Controller
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable',
             'phone' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $user = \App\Models\User::create([
@@ -66,12 +67,18 @@ class AdminController extends Controller
             'role' => 'student',
         ]);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('students/images', 'public');
+        }
+
         Student::create([
             'user_id' => $user->id,
             'student_id' => $request->student_id,
             'date_of_birth' => $request->date_of_birth,
             'address' => $request->address,
             'phone' => $request->phone,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('admin.students')->with('success', 'Student created successfully');
@@ -91,6 +98,7 @@ class AdminController extends Controller
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable',
             'phone' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $student->user->update([
@@ -98,12 +106,21 @@ class AdminController extends Controller
             'email' => $request->email,
         ]);
 
-        $student->update([
+        $data = [
             'student_id' => $request->student_id,
             'date_of_birth' => $request->date_of_birth,
             'address' => $request->address,
             'phone' => $request->phone,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($student->image && \Storage::disk('public')->exists($student->image)) {
+                \Storage::disk('public')->delete($student->image);
+            }
+            $data['image'] = $request->file('image')->store('students/images', 'public');
+        }
+
+        $student->update($data);
 
         return redirect()->route('admin.students')->with('success', 'Student updated successfully');
     }
@@ -135,6 +152,8 @@ class AdminController extends Controller
             'employee_id' => 'required|unique:teachers',
             'department' => 'nullable',
             'bio' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
         $user = \App\Models\User::create([
@@ -144,11 +163,23 @@ class AdminController extends Controller
             'role' => 'teacher',
         ]);
 
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('teachers/images', 'public');
+        }
+
+        $signaturePath = null;
+        if ($request->hasFile('signature')) {
+            $signaturePath = $request->file('signature')->store('teachers/signatures', 'public');
+        }
+
         Teacher::create([
             'user_id' => $user->id,
             'employee_id' => $request->employee_id,
             'department' => $request->department,
             'bio' => $request->bio,
+            'image' => $imagePath,
+            'signature' => $signaturePath,
         ]);
 
         return redirect()->route('admin.teachers')->with('success', 'Teacher created successfully');
@@ -167,6 +198,8 @@ class AdminController extends Controller
             'employee_id' => 'required|unique:teachers,employee_id,' . $teacher->id,
             'department' => 'nullable',
             'bio' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'signature' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
         ]);
 
         $teacher->user->update([
@@ -174,11 +207,27 @@ class AdminController extends Controller
             'email' => $request->email,
         ]);
 
-        $teacher->update([
+        $data = [
             'employee_id' => $request->employee_id,
             'department' => $request->department,
             'bio' => $request->bio,
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($teacher->image && \Storage::disk('public')->exists($teacher->image)) {
+                \Storage::disk('public')->delete($teacher->image);
+            }
+            $data['image'] = $request->file('image')->store('teachers/images', 'public');
+        }
+
+        if ($request->hasFile('signature')) {
+            if ($teacher->signature && \Storage::disk('public')->exists($teacher->signature)) {
+                \Storage::disk('public')->delete($teacher->signature);
+            }
+            $data['signature'] = $request->file('signature')->store('teachers/signatures', 'public');
+        }
+
+        $teacher->update($data);
 
         return redirect()->route('admin.teachers')->with('success', 'Teacher updated successfully');
     }

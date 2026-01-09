@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('admin.teachers.update', $teacher) }}" class="p-10">
+        <form method="POST" action="{{ route('admin.teachers.update', $teacher) }}" class="p-10" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -57,6 +57,28 @@
                             <input type="text" name="department" value="{{ old('department', $teacher->department) }}"
                                    class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-700">
                         </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Faculty Photograph</label>
+                            <div class="flex items-center space-x-6 bg-white p-4 rounded-2xl border-2 border-slate-100">
+                                @if($teacher->image)
+                                    <div class="relative group">
+                                        <img src="{{ asset('storage/' . $teacher->image) }}" alt="Current photo" class="w-16 h-16 rounded-xl object-cover ring-2 ring-emerald-100">
+                                    </div>
+                                @else
+                                    <div class="w-16 h-16 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex-1">
+                                    <input type="file" name="image" id="image" class="hidden" accept="image/*">
+                                    <label for="image" class="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-emerald-100 transition-colors">
+                                        Upload New Photo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -80,6 +102,28 @@
                             <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Professional Bio</label>
                             <textarea name="bio" rows="4" 
                                       class="w-full px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium text-slate-700">{{ old('bio', $teacher->bio) }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Digital Signature</label>
+                            <div class="flex items-center space-x-6 bg-white p-4 rounded-2xl border-2 border-slate-100">
+                                @if($teacher->signature)
+                                    <div class="relative p-2 bg-slate-50 rounded-xl border border-slate-200">
+                                        <img src="{{ asset('storage/' . $teacher->signature) }}" alt="Current signature" class="h-12 object-contain">
+                                    </div>
+                                @else
+                                    <div class="w-16 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    </div>
+                                @endif
+                                
+                                <div class="flex-1">
+                                    <input type="file" name="signature" id="signature" class="hidden" accept="image/*">
+                                    <label for="signature" class="inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-100 transition-colors">
+                                        Update Signature
+                                    </label>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 text-xs text-amber-700 font-medium">

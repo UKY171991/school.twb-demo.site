@@ -13,6 +13,8 @@ class Teacher extends Model
         'employee_id',
         'department',
         'bio',
+        'image',
+        'signature',
         'school_id',
     ];
 

@@ -71,9 +71,13 @@
                 <tr>
                     <td>
                         <div class="flex items-center">
-                            <div class="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
-                                {{ substr($student->user->name, 0, 1) }}
-                            </div>
+                            @if($student->image)
+                                <img src="{{ asset('storage/' . $student->image) }}" alt="{{ $student->user->name }}" class="w-11 h-11 rounded-xl object-cover shadow-sm ring-2 ring-slate-100">
+                            @else
+                                <div class="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center text-white font-bold shadow-sm">
+                                    {{ substr($student->user->name, 0, 1) }}
+                                </div>
+                            @endif
                             <div class="ml-4">
                                 <div class="font-bold text-slate-800">{{ $student->user->name }}</div>
                                 <div class="text-xs text-slate-400 font-medium">{{ $student->user->email }}</div>
